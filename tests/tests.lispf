@@ -1,0 +1,82 @@
+(func eql (a b)
+      (cond (and (islist a) (islist b))
+            (equal-list a b)
+            (equal a b)))
+
+(func equal-list (a b)
+      (cond (and (isnull a) (isnull b)) (return true))
+      (cond (or (not (isnull a) (not (isnull b)))) (return false))
+      (cond (eql (head a) (head b))
+            (equal-list (tail a) (tail b))
+            false))
+
+(func test-mixed-types ()
+      (and
+        (equal (plus 2 0.1) 2.1)
+        (equal (minus 2 1.0) 1.0)))
+
+(func test-empty-list-and-null-are-the-same ()
+      (isnull ()))
+
+(func test-setq-return-value ()
+      (equal (setq a 1) 1))
+
+(func test-head ()
+      (equal (head '(1 2 3)) 1))
+
+(func test-tail ()
+      (and
+        (equal-list (tail '(1 2 3)) '(2 3))
+        (isnull (head '()))))
+
+(func test-isempty ()
+      (and
+        (isempty '())
+        (not (isempty '(null)))))
+
+(func test-cons ()
+      (equal (head (cons 1 '(2 3))) 1))
+
+(func test-prog-scope-1 ()
+      (setq x 2)
+      (prog (x) (setq x 3))
+      (equal x 2))
+
+(func test-prog-scope-2 ()
+      (setq x 2)
+      (prog () (setq x 3))
+      (equal x 3))
+
+(func test-func-scope ()
+      (setq x 2)
+      (func foo (x) (setq x 3))
+      (setq y (foo x))
+      (equal x 2))
+
+(func test-lambda ()
+      (setq increment (prog (counter)
+                            (setq counter 0)
+                            (lambda () (setq counter (plus counter 1)))))
+      (and
+        (equal (increment) 1)
+        (equal (increment) 2)))
+
+(func test-eval ()
+      (equal (eval '(plus 1 2)) 3))
+
+(func test-isatom ()
+      (setq x 1)
+      (and
+        (isatom 'x)
+        (not (isatom x))))
+
+(func test-break-from-prog ()
+      (prog ()
+            (cond true (break true))
+            (divide 1 0)))
+
+(func test-return-from-prog ()
+      (prog ()
+            (cond true (return true))
+            (divide 1 0))
+      (divide 2 0))
