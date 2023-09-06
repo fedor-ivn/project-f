@@ -7,7 +7,7 @@
       (cond (isnull a) (return (isnull b)))
       (cond (isnull b) (return false))
       (cond (eql (head a) (head b))
-            (equal-list (tail a) (tail b))
+            (equalList (tail a) (tail b))
             false))
 
 (func testMixedTypes ()
