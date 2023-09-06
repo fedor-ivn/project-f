@@ -4,8 +4,8 @@
             (equal a b)))
 
 (func equal-list (a b)
-      (cond (and (isnull a) (isnull b)) (return true))
-      (cond (or (not (isnull a) (not (isnull b)))) (return false))
+      (cond (isnull a) (return (isnull b)))
+      (cond (isnull b) (return false))
       (cond (eql (head a) (head b))
             (equal-list (tail a) (tail b))
             false))
