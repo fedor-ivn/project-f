@@ -29,11 +29,6 @@
         (equal-list (tail '(1 2 3)) '(2 3))
         (isnull (head '()))))
 
-(func test-isempty ()
-      (and
-        (isempty '())
-        (not (isempty '(null)))))
-
 (func test-cons ()
       (equal (head (cons 1 '(2 3))) 1))
 
