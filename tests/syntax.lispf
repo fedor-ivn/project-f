@@ -1,0 +1,16 @@
+; This file must parse by the reader. It is not necessarily semantically valid.
+
+(func ; a
+    foo ; b
+    (1 ; c
+     2
+     3)
+    bar) ; ; ; ; ...
+
+((() () ()) (() () ()) (() () ()))
+
+(plus 1 + 1 -1 0.5 - 1.5 +3.5)
+
+''''''''''''''''''''''''''''''''''''x
+
+(true false null TrUe FaLsE nUlL)
