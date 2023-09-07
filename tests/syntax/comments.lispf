@@ -1,0 +1,14 @@
+; This is a comment.
+; It starts with a semicolon and ends with a newline.
+;The space at the beginning is not required.
+; В комментариях можно использовать любые символы. Բարեւ Ձեզ! 👋🏻
+; ; ; ; ; ; Comments can be nested.
+;;;; Several semicolons in a row are commonly used to delimit sections.
+
+(foo) ; Invocation of a function named `foo`.
+(bar ; Comments can be
+ () ;  anywhere.
+ 1.2)
+
+(((((( ; Nesting doesn't matter.
+))))))
