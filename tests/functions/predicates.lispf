@@ -1,0 +1,34 @@
+(func testIsint ()
+    (and (isint 4)
+         (not (isint 4.0))))
+
+(func testIsreal ()
+    (and (isreal 4.0)
+         (isreal (divide 0.0 0.0))
+         (not (isreal 4))))
+
+(func testIsbool ()
+    (and (isbool true)
+         (isbool false)
+         (not (isbool 0))))
+
+(func testIsnull ()
+    (and (isnull null)
+         (isnull '())
+         (not (isnull '(null)))))
+
+(func testIsatom ()
+    (setq foo 1)
+    (setq bar 'bar)
+    (and (isatom 'foo)
+         (isatom bar)
+         (not (isatom foo))
+         (not (isatom ''foo))))
+
+(func testIslist ()
+    (and (islist '(1 2 3))
+         (islist null)
+         (not (islist 6))))
+
+(and (testIsint) (testIsreal) (testIsbool) (testIsnull) (testIsatom)
+     (testIslist))
