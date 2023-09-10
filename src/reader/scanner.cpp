@@ -1,4 +1,5 @@
 #include "scanner.h"
+#include <iostream>
 
 Scanner::Scanner(std::string_view source) : source(source) {}
 
