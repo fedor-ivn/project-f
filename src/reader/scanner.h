@@ -12,5 +12,5 @@ public:
 
 private:
   std::string_view source;
-  int current_index = 0;
+  size_t current_index = 0;
 };
