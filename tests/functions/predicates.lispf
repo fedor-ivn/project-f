@@ -30,5 +30,12 @@
          (islist null)
          (not (islist 6))))
 
+(func testIsfunc ()
+    (func foo () null)
+    (setq bar (lambda () null))
+    (and (isfunc isfunc)
+         (isfunc foo)
+         (isfunc bar)))
+
 (and (testIsint) (testIsreal) (testIsbool) (testIsnull) (testIsatom)
-     (testIslist))
+     (testIslist) (testIsfunc))
