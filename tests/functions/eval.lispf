@@ -1,10 +1,10 @@
+(setq a 1)
 (and
     (equal (eval 42) 42)
     (equal (eval true) true)
     (equal (eval null) null)
     (equal (eval '()) '())
 
-    (setq a 1)
     (equal (eval '(plus 4 2)) 6)
     (equal (eval '(setq a 2)) 2)
     (equal a 2)
