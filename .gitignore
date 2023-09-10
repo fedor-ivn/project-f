@@ -5,3 +5,4 @@ Makefile
 project-f
 .vscode/
 build/
+.cache/

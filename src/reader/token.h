@@ -7,18 +7,18 @@ class LeftParenthesis : public Token {};
 class RightParenthesis : public Token {};
 
 class Identifier : public Token {
-    std::string_view value;
+  std::string_view value;
 };
 
 class Integer : public Token {
-    int value;
+  int value;
 };
 class Real : public Token {
-    long double value;
+  long double value;
 };
 
 class Boolean : public Token {
-    bool value;
+  bool value;
 };
 
 class Apostrophe : public Token {};
