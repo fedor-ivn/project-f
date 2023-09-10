@@ -12,11 +12,11 @@ Token Scanner::next_token() {
     switch (source[current_index])
     {
         case '(':
-            std::cout << current_index << " " << "LeftParenthesis" << std::endl;
+            std::cout << "LeftParenthesis" << std::endl;
             result = LeftParenthesis();
             break;
         case ')':
-            std::cout << current_index << " " << "RightParenthesis" << std::endl;
+            std::cout << "RightParenthesis" << std::endl;
             result = RightParenthesis();
             break;
         default:
