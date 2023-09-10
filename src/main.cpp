@@ -5,6 +5,14 @@
 int main() {
   std::string_view source("(func f)");
   Scanner scanner(source);
-  std::cout << "Hello world!" << std::endl;
+  scanner.next_token();
+  scanner.next_token();
+  scanner.next_token();
+  scanner.next_token();
+  scanner.next_token();
+  scanner.next_token();
+  scanner.next_token();
+  scanner.next_token();
+  scanner.next_token();
   return 0;
 }
