@@ -1,0 +1,5 @@
+'x 'X'Y 'func
+'true 'false 'null
+'1 '+2 '-1.2
+'() '(foo) '( foo ) '('foo)
+'''''x
