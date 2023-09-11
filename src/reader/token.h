@@ -35,4 +35,4 @@ class Apostrophe : public Token {};
 
 class Null : public Token {};
 
-class Eof : public Token {};
+class EndOfFile : public Token {};
