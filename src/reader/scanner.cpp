@@ -53,7 +53,7 @@ Token Scanner::next_token() {
 
       return Identifier();
     }
-    else if (std::isdigit(source[current_index]) || source[current_index] == '-') {
+    else if (std::isdigit(source[current_index]) || source[current_index] == '-' || source[current_index] == '+') {
       int begin_index = current_index;
 
       current_index++;
