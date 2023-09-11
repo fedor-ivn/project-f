@@ -8,6 +8,9 @@ class LeftParenthesis : public Token {};
 class RightParenthesis : public Token {};
 
 class Identifier : public Token {
+public:
+  Identifier (std::string_view value) : value(value) {}
+private:
   std::string_view value;
 };
 

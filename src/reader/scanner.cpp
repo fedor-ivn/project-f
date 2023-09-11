@@ -13,7 +13,7 @@ Token Scanner::next_token() {
   Token result;
 
   if (current_index >= source.size()) {
-    return Null();
+    return EndOfFile();
   }
 
   switch (source[current_index]) {
@@ -51,7 +51,7 @@ Token Scanner::next_token() {
 
       std::cout << "Identifier `" << identifier << "`" << std::endl;
 
-      return Identifier();
+      return Identifier(identifier);
     }
     else if (std::isdigit(source[current_index]) || source[current_index] == '-' || source[current_index] == '+') {
       int begin_index = current_index;
