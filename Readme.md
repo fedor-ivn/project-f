@@ -16,7 +16,7 @@ First, initialize `cmake`.
 cmake .
 ```
 
-After initialization, you cna build the project.
+After initialization, you can build the project.
 
 ```bash
 cmake --build .
