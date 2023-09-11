@@ -1,4 +1,4 @@
-; test prog-local varables
+; test prog-local variables
 (setq a 1)
 (prog (a) (setq a 2))
 (cond (nonequal a 1)
