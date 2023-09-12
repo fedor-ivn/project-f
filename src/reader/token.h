@@ -21,14 +21,16 @@ public:
   Identifier (std::string_view value) : value(value) {}
 };
 
-class Integer : public Token {
+class Numeral : public Token {};
+
+class Integer : public Numeral {
 public:
   int64_t value;
 
   Integer (int64_t value) : value(value) {}
 };
 
-class Real : public Token {
+class Real : public Numeral {
 public:
   double value;
 

@@ -8,6 +8,8 @@
 class Scanner {
 public:
   std::unique_ptr<Token> next_token();
+  std::unique_ptr<Identifier> parse_identifier();
+  std::unique_ptr<Numeral> parse_numeral();
 
   Scanner(std::string_view source);
 private:
