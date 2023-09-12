@@ -1,35 +1,30 @@
 #include "scanner.h"
 #include "token.h"
-#include <cctype>
-#include <cstdint>
-#include <iostream>
-#include <ostream>
-#include <string>
-#include <string_view>
 
 Scanner::Scanner(std::string_view source) : source(source) {}
 
-Token Scanner::next_token() {
-  Token result;
+std::unique_ptr<Token> Scanner::next_token() {
+  std::unique_ptr<Token> result = std::make_unique<Null>(Null());
 
   if (current_index >= source.size()) {
-    return EndOfFile();
+    return std::make_unique<EndOfFile>(EndOfFile());
+  }
+
+  while (source[current_index] == ';') {
+    while (source[current_index] != '\n') {
+      current_index++;
+    }
   }
 
   switch (source[current_index]) {
   case '(':
-    std::cout << "LeftParenthesis" << std::endl;
-    result = LeftParenthesis();
+    result = std::make_unique<LeftParenthesis>(LeftParenthesis());
     break;
+
   case ')':
-    std::cout << "RightParenthesis" << std::endl;
-    result = RightParenthesis();
+    result = std::make_unique<RightParenthesis>(RightParenthesis());
     break;
-  case ';':
-    while (source[current_index] != '\n') {
-      current_index++;
-    }
-    break;
+ 
   default:
     if (std::isalpha(source[current_index])) {
       int begin_index = current_index;
@@ -45,13 +40,13 @@ Token Scanner::next_token() {
       std::string_view identifier = source.substr(begin_index, (end_index - begin_index));
 
       if (identifier == "true") {
-        std::cout << "True" << std::endl;
-        return Boolean(true);
+        return std::make_unique<Boolean>(Boolean(true));
+      }
+      else if (identifier == "false") {
+        return std::make_unique<Boolean>(Boolean(false));
       }
 
-      std::cout << "Identifier `" << identifier << "`" << std::endl;
-
-      return Identifier(identifier);
+      return std::make_unique<Identifier>(Identifier(identifier));
     }
     else if (std::isdigit(source[current_index]) || source[current_index] == '-' || source[current_index] == '+') {
       int begin_index = current_index;
@@ -73,24 +68,14 @@ Token Scanner::next_token() {
 
         double real = std::stod(std::string(source.substr(begin_index, (end_index - begin_index))));
 
-        std::cout << "Real " << real;
-
-        if (static_cast<int64_t>(real * 10) % 10 == 0) {
-          std::cout << ".0";
-        }
-
-        std::cout << std::endl;
-
-        return Real(real);
+        return std::make_unique<Real>(Real(real));
       }
       else {
         int end_index = current_index;
 
         int64_t integer = std::stoll(std::string(source.substr(begin_index, (end_index - begin_index))));
 
-        std::cout << "Integer " << integer << std::endl;
-
-        return Integer(integer);
+        return std::make_unique<Integer>(Integer(integer));
       }
     }
     break;

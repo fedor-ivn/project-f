@@ -1,9 +1,15 @@
 #pragma once
 
 #include <cstdint>
+#include <ostream>
 #include <string_view>
 
-class Token {};
+class Token {
+public:
+  virtual ~Token() = default;
+
+  friend std::ostream &operator<<(std::ostream &stream, const Token &token);
+};
 
 class LeftParenthesis : public Token {};
 class RightParenthesis : public Token {};
