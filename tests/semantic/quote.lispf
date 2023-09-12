@@ -1,0 +1,10 @@
+(setq a (quote foo))
+(setq b 'foo)
+(setq c ''foo); `c` contains the list `(quote foo)`
+
+(and (isatom a)
+     (isatom'a)
+     (isatom b)
+     (islist c)
+     (isatom (head c))
+     (isatom (head (tail c))))

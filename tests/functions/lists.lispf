@@ -1,0 +1,24 @@
+(func equalList (a b)
+    (cond (isnull a) (return (isnull b)))
+    (cond (isnull b) (return false))
+    (cond (nonequal (head a) (head b)) (return false))
+    (equalList (tail a) (tail b)))
+
+(func testHead ()
+    (and (equal (head '(1 2 3 4)) 1)
+         (equal (head (cons 4 (cons 3 null))) 4)
+         (isnull (head '()))
+         (isnull (head null))))
+
+(func testTail ()
+    (and (equalList (tail '(1 2 3 4)) '(2 3 4))
+         (equalList (tail (cons 4 (cons 3 null))) '(3))
+         (isnull (tail '()))
+         (isnull (tail null))))
+
+(func testCons ()
+    (and (equalList (cons 1 '(2 3)) '(1 2 3))
+         (equalList (cons 1 null) '(1))
+         (equalList (cons null null) '(null)))
+
+(and (testHead) (testTail) (testCons))

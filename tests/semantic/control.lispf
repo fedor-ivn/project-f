@@ -1,0 +1,38 @@
+; test `cond`
+(setq a false)
+(setq b false)
+(cond true (setq a true) (return false))
+(cond false (return false) (setq b true))
+(setq c (cond false 42))
+(setq condResult (and a b (isnull c)))
+
+; test `while`
+(setq n 1)
+(setq result 0)
+(while (nonequal n 10)
+    (setq result (plus result n))
+    (setq n (plus n 1)))
+(setq whileResult (equal result 45))
+
+; test `break` inside `while`
+(setq l '(1 2 3 4))
+(while (not (isnull l))
+    (cond (equal (head l) 3) (break))
+    (setq l (tail l)))
+(setq breakWhileResult (equal (head l) 3))
+
+; test `break` inside `prog`
+(setq breakProgResult
+      (prog ()
+        (break true)
+        (divide 2 0)))
+
+; test `return` inside `func`
+(func foo ()
+    (return 42)
+    (divide 1 0))
+(setq returnResult (equal (foo) 42))
+
+(return (and condResult whileResult breakWhileResult breakProgResult
+             returnResult))
+(divide 3 0)

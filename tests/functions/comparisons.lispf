@@ -1,0 +1,33 @@
+(func testEqual ()
+    (and (equal true true)
+         (equal 4 4)
+         (not (equal 4 4.0))))
+
+(func testNonequal ()
+    (and (nonequal true false)
+         (nonequal 4 3.0)
+         (not (nonequal 2 2))))
+
+(func testLess ()
+    (and (less 4 5)
+         (less false true)
+         (not (less true true))
+         (less -1.0 5.0)))
+
+(func testLesseq ()
+    (and (lesseq 4 4)
+         (not (lesseq true false))
+         (lesseq -1.0 -1.0)))
+
+(func testGreater ()
+    (and (greater 4 3)
+         (not (greater false true))
+         (greater -1.0 -2.0)))
+
+(func testGreatereq ()
+    (and (greatereq 4 3)
+         (not (greatereq false true))
+         (greater -1.0 -2.0)))
+
+(and (testEqual) (testNonequal) (testLess) (testLesseq) (testGreater)
+     (testGreatereq))
