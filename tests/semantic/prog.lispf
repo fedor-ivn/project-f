@@ -14,7 +14,7 @@
           (setq counter 0)
           (lambda () (setq counter (plus counter 1)))))
 (cond (not (and (equal (increment) 1)
-                (equal (increment 2)))
+                (equal (increment) 2)))
     (return false))
 
 ; `func` inside `prog` never changes the outer function
