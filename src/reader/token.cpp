@@ -11,7 +11,7 @@ std::ostream &operator<<(std::ostream &stream, const Token &token) {
   }
   else if (const Identifier *t =
           dynamic_cast<const Identifier *>(&token)) {
-    stream << "Identifier `" << t->value << "`\n";
+    stream << "Identifier(" << t->value << ")";
   }
   else if (const Integer *t =
           dynamic_cast<const Integer *>(&token)) {
