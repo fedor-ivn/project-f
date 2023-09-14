@@ -5,43 +5,43 @@
 #include <string_view>
 
 class Token {
-public:
-  virtual ~Token() = default;
+  public:
+    virtual ~Token() = default;
 
-  friend std::ostream &operator<<(std::ostream &stream, const Token &token);
+    friend std::ostream& operator<<(std::ostream& stream, const Token& token);
 };
 
 class LeftParenthesis : public Token {};
 class RightParenthesis : public Token {};
 
 class Identifier : public Token {
-public:
-  std::string_view value;
+  public:
+    std::string_view value;
 
-  Identifier (std::string_view value) : value(value) {}
+    Identifier(std::string_view value) : value(value) {}
 };
 
 class Numeral : public Token {};
 
 class Integer : public Numeral {
-public:
-  int64_t value;
+  public:
+    int64_t value;
 
-  Integer (int64_t value) : value(value) {}
+    Integer(int64_t value) : value(value) {}
 };
 
 class Real : public Numeral {
-public:
-  double value;
+  public:
+    double value;
 
-  Real (double value) : value(value) {}
+    Real(double value) : value(value) {}
 };
 
 class Boolean : public Token {
-public:
-  bool value;
+  public:
+    bool value;
 
-  Boolean (bool value) : value(value) {}
+    Boolean(bool value) : value(value) {}
 };
 
 class Apostrophe : public Token {};
