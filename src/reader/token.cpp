@@ -15,7 +15,7 @@ std::ostream &operator<<(std::ostream &stream, const Token &token) {
   }
   else if (const Integer *t =
           dynamic_cast<const Integer *>(&token)) {
-    stream << "Integer " << t->value << '\n';
+    stream << "Integer(" << t->value << ")";
   }
   else if (const Real *t =
           dynamic_cast<const Real *>(&token)) {
