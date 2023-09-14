@@ -29,12 +29,7 @@ std::ostream &operator<<(std::ostream &stream, const Token &token) {
   }
   else if (const Boolean *t =
           dynamic_cast<const Boolean *>(&token)) {
-    if (t->value) {
-      stream << "True\n";
-    }
-    else {
-      stream << "False\n";
-    }
+    stream << "Boolean(" << t->value << ")";
   }
 
   return stream;
