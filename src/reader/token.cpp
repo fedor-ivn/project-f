@@ -19,7 +19,7 @@ std::ostream &operator<<(std::ostream &stream, const Token &token) {
   }
   else if (const Real *t =
           dynamic_cast<const Real *>(&token)) {
-    stream << "Real " << t->value;
+    stream << "Real(" << t->value << ")";
     if (static_cast<int64_t>(t->value * 10) % 10 == 0) {
       stream << ".0\n";
     }
