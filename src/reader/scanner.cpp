@@ -66,9 +66,7 @@ std::unique_ptr<Token> Scanner::next_token() {
     }
 
     while (source[current_index] == ';' && current_index < source.size()) {
-        while (
-            (source[current_index] != '\n' || source[current_index] == '\0') &&
-            current_index < source.size()) {
+        while (source[current_index] != '\n' && current_index < source.size()) {
             current_index++;
         }
         current_index++;
