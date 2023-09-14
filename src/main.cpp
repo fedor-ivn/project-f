@@ -9,8 +9,6 @@ int main() {
   std::string_view source("(func ; a\nfoo ; b\n(1 ; c\n2.0 -3)\ntrue) ; ; ; ; ...");
   Scanner scanner(source);
 
-  std::unique_ptr<Token> token;
-
   while (true) {
     std::unique_ptr<Token> token = scanner.next_token();
     if (EndOfFile* new_token = dynamic_cast<EndOfFile*>(&*token)) {
