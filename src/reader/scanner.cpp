@@ -101,8 +101,7 @@ std::unique_ptr<Token> Scanner::next_token() {
                     std::make_unique<Boolean>(Boolean(false));
                 return result;
             } else if (result->value == "null") {
-                std::unique_ptr<Null> result =
-                    std::make_unique<Null>(Null());
+                std::unique_ptr<Null> result = std::make_unique<Null>(Null());
                 return result;
             }
 
@@ -112,9 +111,9 @@ std::unique_ptr<Token> Scanner::next_token() {
                    source[current_index] == '+') {
             std::unique_ptr<Numeral> result = parse_numeral();
             return result;
-        } 
-        else if (source[current_index] == '\'') {
-            std::unique_ptr<Apostrophe> result = std::make_unique<Apostrophe>(Apostrophe());
+        } else if (source[current_index] == '\'') {
+            std::unique_ptr<Apostrophe> result =
+                std::make_unique<Apostrophe>(Apostrophe());
             current_index++;
             return result;
         }
