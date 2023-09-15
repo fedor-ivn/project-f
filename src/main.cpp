@@ -7,7 +7,7 @@
 
 int main() {
     std::string_view source(
-        "(func ; a\nfoo ; b\n(1 ; c\n2.0 -3)\ntrue) ; ; ; ; ...");
+        "(func ; a\nfoo ; b\n(1 ; c\n2.0 'kek null -3)\ntrue) ; ; ; ; ...");
     Scanner scanner(source);
 
     while (true) {

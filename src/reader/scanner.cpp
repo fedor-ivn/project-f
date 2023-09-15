@@ -1,5 +1,6 @@
 #include "scanner.h"
 #include "token.h"
+#include <cctype>
 #include <iostream>
 #include <iterator>
 #include <memory>
@@ -60,7 +61,7 @@ std::unique_ptr<Numeral> Scanner::parse_numeral() {
 std::unique_ptr<Token> Scanner::next_token() {
     std::unique_ptr<Token> result;
 
-    while ((source[current_index] == ' ' || source[current_index] == '\n') &&
+    while (std::isspace(source[current_index]) &&
            current_index < source.size()) {
         current_index++;
     }
@@ -79,10 +80,12 @@ std::unique_ptr<Token> Scanner::next_token() {
     switch (source[current_index]) {
     case '(':
         result = std::make_unique<LeftParenthesis>(LeftParenthesis());
+        current_index++;
         break;
 
     case ')':
         result = std::make_unique<RightParenthesis>(RightParenthesis());
+        current_index++;
         break;
 
     default:
@@ -97,6 +100,10 @@ std::unique_ptr<Token> Scanner::next_token() {
                 std::unique_ptr<Boolean> result =
                     std::make_unique<Boolean>(Boolean(false));
                 return result;
+            } else if (result->value == "null") {
+                std::unique_ptr<Null> result =
+                    std::make_unique<Null>(Null());
+                return result;
             }
 
             return result;
@@ -105,10 +112,14 @@ std::unique_ptr<Token> Scanner::next_token() {
                    source[current_index] == '+') {
             std::unique_ptr<Numeral> result = parse_numeral();
             return result;
+        } 
+        else if (source[current_index] == '\'') {
+            std::unique_ptr<Apostrophe> result = std::make_unique<Apostrophe>(Apostrophe());
+            current_index++;
+            return result;
         }
         break;
     }
-    current_index++;
 
     return result;
 }

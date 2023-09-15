@@ -15,6 +15,10 @@ std::ostream& operator<<(std::ostream& stream, const Token& token) {
         stream << "Real(" << t->value << ")";
     } else if (const Boolean* t = dynamic_cast<const Boolean*>(&token)) {
         stream << "Boolean(" << t->value << ")";
+    } else if (const Apostrophe* t = dynamic_cast<const Apostrophe*>(&token)) {
+        stream << "Apostrophe";
+    } else if (const Null* t = dynamic_cast<const Null*>(&token)) {
+        stream << "Null";
     }
 
     return stream;
