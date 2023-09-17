@@ -94,9 +94,7 @@ std::unique_ptr<Token> Scanner::next_token() {
 
     default:
         if (std::isalpha(source[current_index])) {
-            std::unique_ptr<Token> result = parse_symbol();
-
-            return result;
+            return parse_symbol();
         } else if (std::isdigit(source[current_index]) ||
                    source[current_index] == '-' ||
                    source[current_index] == '+') {
