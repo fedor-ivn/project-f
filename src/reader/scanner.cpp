@@ -83,30 +83,25 @@ std::unique_ptr<Token> Scanner::next_token() {
 
     switch (source[current_index]) {
     case '(':
-        result = std::make_unique<LeftParenthesis>(LeftParenthesis());
         current_index++;
-        break;
+        return std::make_unique<LeftParenthesis>(LeftParenthesis());
 
     case ')':
-        result = std::make_unique<RightParenthesis>(RightParenthesis());
         current_index++;
-        break;
+        return std::make_unique<RightParenthesis>(RightParenthesis());
 
-    default:
-        if (std::isalpha(source[current_index])) {
-            return parse_symbol();
-        } else if (std::isdigit(source[current_index]) ||
-                   source[current_index] == '-' ||
-                   source[current_index] == '+') {
-            std::unique_ptr<Numeral> result = parse_numeral();
-            return result;
-        } else if (source[current_index] == '\'') {
-            std::unique_ptr<Apostrophe> result =
-                std::make_unique<Apostrophe>(Apostrophe());
-            current_index++;
-            return result;
-        }
-        break;
+    case '\'':
+        current_index++;
+        return std::make_unique<Apostrophe>(Apostrophe());
+    }
+
+    if (std::isalpha(source[current_index])) {
+        return parse_symbol();
+    }
+    if (std::isdigit(source[current_index]) || source[current_index] == '-' ||
+        source[current_index] == '+') {
+        std::unique_ptr<Numeral> result = parse_numeral();
+        return result;
     }
 
     return result;
