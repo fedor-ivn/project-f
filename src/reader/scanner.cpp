@@ -100,8 +100,7 @@ std::unique_ptr<Token> Scanner::next_token() {
     }
     if (std::isdigit(source[current_index]) || source[current_index] == '-' ||
         source[current_index] == '+') {
-        std::unique_ptr<Numeral> result = parse_numeral();
-        return result;
+        return parse_numeral();
     }
 
     return result;
