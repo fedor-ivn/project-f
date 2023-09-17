@@ -8,10 +8,8 @@
 
 Scanner::Scanner(std::string_view source) : source(source) {}
 
-std::unique_ptr<Identifier> Scanner::parse_identifier() {
-    int begin_index = current_index;
-
-    current_index++;
+std::unique_ptr<Token> Scanner::parse_symbol() {
+    int begin_index = current_index++;
 
     while (std::isalpha(source[current_index]) ||
            std::isdigit(source[current_index])) {
@@ -20,10 +18,23 @@ std::unique_ptr<Identifier> Scanner::parse_identifier() {
 
     int end_index = current_index;
 
-    std::string_view identifier =
+    std::string_view symbol =
         source.substr(begin_index, (end_index - begin_index));
 
-    return std::make_unique<Identifier>(Identifier(identifier));
+    if (symbol == "true") {
+        std::unique_ptr<Boolean> result =
+            std::make_unique<Boolean>(Boolean(true));
+        return result;
+    } else if (symbol == "false") {
+        std::unique_ptr<Boolean> result =
+            std::make_unique<Boolean>(Boolean(false));
+        return result;
+    } else if (symbol == "null") {
+        std::unique_ptr<Null> result = std::make_unique<Null>(Null());
+        return result;
+    }
+
+    return std::make_unique<Identifier>(Identifier(symbol));
 }
 
 std::unique_ptr<Numeral> Scanner::parse_numeral() {
@@ -88,20 +99,7 @@ std::unique_ptr<Token> Scanner::next_token() {
 
     default:
         if (std::isalpha(source[current_index])) {
-            std::unique_ptr<Identifier> result = parse_identifier();
-
-            if (result->value == "true") {
-                std::unique_ptr<Boolean> result =
-                    std::make_unique<Boolean>(Boolean(true));
-                return result;
-            } else if (result->value == "false") {
-                std::unique_ptr<Boolean> result =
-                    std::make_unique<Boolean>(Boolean(false));
-                return result;
-            } else if (result->value == "null") {
-                std::unique_ptr<Null> result = std::make_unique<Null>(Null());
-                return result;
-            }
+            std::unique_ptr<Token> result = parse_symbol();
 
             return result;
         } else if (std::isdigit(source[current_index]) ||
