@@ -22,16 +22,11 @@ std::unique_ptr<Token> Scanner::parse_symbol() {
         source.substr(begin_index, (end_index - begin_index));
 
     if (symbol == "true") {
-        std::unique_ptr<Boolean> result =
-            std::make_unique<Boolean>(Boolean(true));
-        return result;
+        return std::make_unique<Boolean>(Boolean(true));
     } else if (symbol == "false") {
-        std::unique_ptr<Boolean> result =
-            std::make_unique<Boolean>(Boolean(false));
-        return result;
+        return std::make_unique<Boolean>(Boolean(false));
     } else if (symbol == "null") {
-        std::unique_ptr<Null> result = std::make_unique<Null>(Null());
-        return result;
+        return std::make_unique<Null>(Null());
     }
 
     return std::make_unique<Identifier>(Identifier(symbol));
