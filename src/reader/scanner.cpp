@@ -8,7 +8,8 @@
 
 class ReachedEndOfFile {};
 
-Scanner::Scanner(std::string_view source) : source(source) {}
+Scanner::Scanner(std::string_view source, Position offset)
+    : source(source), position(offset) {}
 
 char Scanner::peek() const {
     if (this->source.empty()) {
@@ -17,7 +18,18 @@ char Scanner::peek() const {
     return this->source[0];
 }
 
-void Scanner::advance(size_t by) { this->source = this->source.substr(by); }
+void Scanner::advance(size_t by) {
+    by = std::min(by, this->source.size());
+
+    for (size_t past = 0; past < by; ++past) {
+        if (this->source[past] == '\n') {
+            this->position.to_next_line();
+        } else {
+            this->position.to_next_column();
+        }
+    }
+    this->source = this->source.substr(by);
+}
 
 std::unique_ptr<Token> Scanner::parse_symbol() {
     size_t end = 0;
