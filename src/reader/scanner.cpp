@@ -1,5 +1,6 @@
 #include "scanner.h"
 #include "token.h"
+#include "error/error.h"
 #include <cctype>
 #include <iostream>
 #include <iterator>
@@ -33,11 +34,13 @@ std::unique_ptr<Token> Scanner::parse_symbol() {
 }
 
 std::unique_ptr<Numeral> Scanner::parse_numeral() {
-    int begin_index = current_index++;
+    int begin_index = ++current_index;
 
     while (std::isdigit(source[current_index])) {
         current_index++;
     }
+
+    int end_index = current_index;
 
     if (source[current_index] == '.') {
         current_index++;
@@ -46,14 +49,16 @@ std::unique_ptr<Numeral> Scanner::parse_numeral() {
             current_index++;
         }
 
-        int end_index = current_index;
+        end_index = current_index;
 
         double real = std::stod(
             std::string(source.substr(begin_index, (end_index - begin_index))));
 
         return std::make_unique<Real>(Real(real));
     } else {
-        int end_index = current_index;
+        if (begin_index == end_index) {
+            throw SyntaxError(ErrorCause::MissingIntegerPart, true);
+        }
 
         int64_t integer = std::stoll(
             std::string(source.substr(begin_index, (end_index - begin_index))));
