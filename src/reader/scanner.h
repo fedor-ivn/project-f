@@ -13,7 +13,7 @@ class Scanner {
 
   private:
     std::unique_ptr<Token> parse_symbol();
-    std::unique_ptr<Numeral> parse_numeral();
+    std::unique_ptr<Token> parse_numeral();
     std::string_view source;
     size_t current_index = 0;
 };

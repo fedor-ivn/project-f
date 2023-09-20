@@ -32,7 +32,7 @@ std::unique_ptr<Token> Scanner::parse_symbol() {
     return std::make_unique<Identifier>(Identifier(symbol));
 }
 
-std::unique_ptr<Numeral> Scanner::parse_numeral() {
+std::unique_ptr<Token> Scanner::parse_numeral() {
     int begin_index = current_index++;
 
     while (std::isdigit(source[current_index])) {
