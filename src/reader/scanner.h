@@ -12,8 +12,11 @@ class Scanner {
     std::unique_ptr<Token> next_token();
 
   private:
+    std::string_view source;
+
+    char peek() const;
+    void advance(size_t by = 1);
+
     std::unique_ptr<Token> parse_symbol();
     std::unique_ptr<Token> parse_numeral();
-    std::string_view source;
-    size_t current_index = 0;
 };
