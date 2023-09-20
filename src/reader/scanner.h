@@ -17,7 +17,7 @@ class Scanner {
     Position position;
 
     char peek() const;
-    void advance(size_t by = 1);
+    Span advance(size_t by = 1);
 
     std::unique_ptr<Token> parse_symbol();
     std::unique_ptr<Token> parse_numeral();

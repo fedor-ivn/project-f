@@ -19,6 +19,7 @@ class Position {
 };
 
 class Span {
+  public:
     Position start;
     Position end;
 

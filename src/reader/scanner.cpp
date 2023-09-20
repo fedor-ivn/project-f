@@ -18,9 +18,10 @@ char Scanner::peek() const {
     return this->source[0];
 }
 
-void Scanner::advance(size_t by) {
-    by = std::min(by, this->source.size());
+Span Scanner::advance(size_t by) {
+    auto start = this->position;
 
+    by = std::min(by, this->source.size());
     for (size_t past = 0; past < by; ++past) {
         if (this->source[past] == '\n') {
             this->position.to_next_line();
@@ -29,6 +30,8 @@ void Scanner::advance(size_t by) {
         }
     }
     this->source = this->source.substr(by);
+
+    return Span(start, this->position);
 }
 
 std::unique_ptr<Token> Scanner::parse_symbol() {
@@ -37,18 +40,18 @@ std::unique_ptr<Token> Scanner::parse_symbol() {
         ++end;
     }
 
-    std::string_view symbol = this->source.substr(0, end);
-    this->advance(end);
+    auto symbol = this->source.substr(0, end);
+    auto span = this->advance(end);
 
     if (symbol == "true") {
-        return std::make_unique<Boolean>(Boolean(true));
+        return std::make_unique<Boolean>(Boolean(true, span));
     } else if (symbol == "false") {
-        return std::make_unique<Boolean>(Boolean(false));
+        return std::make_unique<Boolean>(Boolean(false, span));
     } else if (symbol == "null") {
-        return std::make_unique<Null>(Null());
+        return std::make_unique<Null>(Null(span));
     }
 
-    return std::make_unique<Identifier>(Identifier(symbol));
+    return std::make_unique<Identifier>(Identifier(symbol, span));
 }
 
 std::unique_ptr<Token> Scanner::parse_numeral() {
@@ -68,12 +71,12 @@ std::unique_ptr<Token> Scanner::parse_numeral() {
         }
 
         double real = std::stod(std::string(source.substr(0, end)));
-        this->advance(end);
-        return std::make_unique<Real>(Real(real));
+        auto span = this->advance(end);
+        return std::make_unique<Real>(Real(real, span));
     } else {
         int64_t integer = std::stoll(std::string(source.substr(0, end)));
-        this->advance(end);
-        return std::make_unique<Integer>(Integer(integer));
+        auto span = this->advance(end);
+        return std::make_unique<Integer>(Integer(integer, span));
     }
 }
 
@@ -94,17 +97,18 @@ std::unique_ptr<Token> Scanner::next_token() {
 
         char character = this->peek();
         switch (character) {
-        case '(':
-            this->advance();
-            return std::make_unique<LeftParenthesis>(LeftParenthesis());
-
-        case ')':
-            this->advance();
-            return std::make_unique<RightParenthesis>(RightParenthesis());
-
-        case '\'':
-            this->advance();
-            return std::make_unique<Apostrophe>(Apostrophe());
+        case '(': {
+            auto span = this->advance();
+            return std::make_unique<LeftParenthesis>(LeftParenthesis(span));
+        }
+        case ')': {
+            auto span = this->advance();
+            return std::make_unique<RightParenthesis>(RightParenthesis(span));
+        }
+        case '\'': {
+            auto span = this->advance();
+            return std::make_unique<Apostrophe>(Apostrophe(span));
+        }
         }
 
         if (std::isalpha(character)) {
@@ -114,7 +118,8 @@ std::unique_ptr<Token> Scanner::next_token() {
             return parse_numeral();
         }
     } catch (ReachedEndOfFile) {
-        return std::make_unique<EndOfFile>(EndOfFile());
+        return std::make_unique<EndOfFile>(
+            EndOfFile(Span(this->position, this->position)));
     }
 
     return result;
