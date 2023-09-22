@@ -1,5 +1,7 @@
 #include <iostream>
 
+#pragma once
+
 enum class ErrorCause {
     MissingIntegerPart
 };
