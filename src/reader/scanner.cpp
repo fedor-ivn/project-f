@@ -34,7 +34,8 @@ std::unique_ptr<Token> Scanner::parse_symbol() {
 }
 
 std::unique_ptr<Numeral> Scanner::parse_numeral() {
-    int begin_index = ++current_index;
+    int begin_index = current_index;
+    ++current_index;
 
     while (std::isdigit(source[current_index])) {
         current_index++;
