@@ -143,11 +143,12 @@ std::unique_ptr<Token> Scanner::next_token() {
                     this->advance();
                 }
                 this->advance();
-                break;
+                continue;
             }
 
             if (std::isspace(character)) {
                 this->advance();
+                continue;
             }
             if (std::isalpha(character)) {
                 return parse_symbol();
@@ -156,6 +157,9 @@ std::unique_ptr<Token> Scanner::next_token() {
                 character == '+') {
                 return parse_numeral();
             }
+
+            throw SyntaxError(ErrorCause::UnexpectedCharacter, this->advance(),
+                              false);
         }
     } catch (ReachedEndOfFile) {
     }
