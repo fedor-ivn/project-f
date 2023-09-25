@@ -13,6 +13,11 @@ class ReachedEndOfFile {};
 Scanner::Scanner(std::string_view source, Position offset)
     : source(source), position(offset) {}
 
+char is_number_end(char character) {
+    return character == '(' || character == ')' || character == '\'' ||
+           std::isspace(character);
+}
+
 char Scanner::peek() const {
     if (this->source.empty()) {
         throw ReachedEndOfFile();
@@ -81,9 +86,17 @@ std::unique_ptr<Token> Scanner::parse_numeral() {
             ++end;
         }
 
+        if (end < this->source.size() && !is_number_end(this->source[end])) {
+            throw this->make_invalid_number_error();
+        }
+
         double real = std::stod(std::string(source.substr(0, end)));
         auto span = this->advance(end);
         return std::make_unique<Real>(Real(real, span));
+    }
+
+    if (end < this->source.size() && !is_number_end(this->source[end])) {
+        throw this->make_invalid_number_error();
     }
 
     auto literal = source.substr(0, end);
@@ -94,6 +107,19 @@ std::unique_ptr<Token> Scanner::parse_numeral() {
     } catch (std::out_of_range) {
         throw SyntaxError(ErrorCause::IntegerOverflow, span, false);
     }
+}
+
+SyntaxError Scanner::make_invalid_number_error() {
+    auto start = this->position;
+    try {
+        while (!is_number_end(this->peek())) {
+            this->advance();
+        }
+    } catch (ReachedEndOfFile) {
+    }
+
+    return SyntaxError(ErrorCause::InvalidNumber, Span(start, this->position),
+                       false);
 }
 
 std::unique_ptr<Token> Scanner::next_token() {

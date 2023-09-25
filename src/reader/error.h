@@ -8,6 +8,7 @@ enum class ErrorCause {
     MissingNumber,
     MissingFractionalPart,
     IntegerOverflow,
+    InvalidNumber,
 };
 
 class SyntaxError : public std::exception {
