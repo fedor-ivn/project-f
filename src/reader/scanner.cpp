@@ -1,6 +1,6 @@
 #include "scanner.h"
-#include "token.h"
 #include "error.h"
+#include "token.h"
 #include <cctype>
 #include <iostream>
 #include <iterator>
@@ -38,7 +38,7 @@ std::unique_ptr<Numeral> Scanner::parse_numeral() {
     int begin_index = current_index;
 
     if (source[current_index] == '+' || source[current_index] == '-') {
-	++current_index;
+        ++current_index;
     }
 
     if (!std::isdigit(source[current_index])) {
@@ -63,7 +63,7 @@ std::unique_ptr<Numeral> Scanner::parse_numeral() {
         end_index = current_index;
 
         if (end_index == floating_part_begin_index) {
-            throw SyntaxError(ErrorCause::MissingFloatingPart, false);
+            throw SyntaxError(ErrorCause::MissingFractionalPart, false);
         }
 
         double real = std::stod(
@@ -77,10 +77,10 @@ std::unique_ptr<Numeral> Scanner::parse_numeral() {
 
         int64_t integer;
         try {
-            integer = std::stoll(
-                std::string(source.substr(begin_index, (end_index - begin_index))));
+            integer = std::stoll(std::string(
+                source.substr(begin_index, (end_index - begin_index))));
         } catch (std::out_of_range) {
-            throw SyntaxError(ErrorCause::Integer64Overflow, false);
+            throw SyntaxError(ErrorCause::IntegerOverflow, false);
         }
 
         return std::make_unique<Integer>(Integer(integer));

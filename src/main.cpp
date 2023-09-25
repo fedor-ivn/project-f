@@ -19,17 +19,17 @@ void print_tokens(Scanner& scanner) {
             std::cout << "SyntaxError: ";
 
             switch (e.cause) {
-                case ErrorCause::Integer64Overflow:
-                    std::cout << "integer is out of the range";
-                    break;
-                case ErrorCause::MissingNumber:
-                    std::cout << "numeral part is missing";
-                    break;
-                case ErrorCause::MissingFloatingPart:
-                    std::cout << "floating part is missing";
-                    break;
-                default:
-                    std::cout << "Unknown";
+            case ErrorCause::IntegerOverflow:
+                std::cout << "integer is out of the range";
+                break;
+            case ErrorCause::MissingNumber:
+                std::cout << "numeral part is missing";
+                break;
+            case ErrorCause::MissingFractionalPart:
+                std::cout << "floating part is missing";
+                break;
+            default:
+                std::cout << "Unknown";
             }
 
             std::cout << std::endl;

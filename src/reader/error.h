@@ -4,13 +4,12 @@
 
 enum class ErrorCause {
     MissingNumber,
-    Integer64Overflow,
-    MissingFloatingPart,
-    MissingIntegerPart,
+    MissingFractionalPart,
+    IntegerOverflow,
 };
 
 class SyntaxError : public std::exception {
-public:
+  public:
     SyntaxError(ErrorCause cause, bool can_recover);
 
     ErrorCause cause;
