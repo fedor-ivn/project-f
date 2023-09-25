@@ -63,19 +63,21 @@ std::unique_ptr<Token> Scanner::parse_numeral() {
         ++end;
     }
 
-    if (!std::isdigit(this->peek())) {
-        throw SyntaxError(ErrorCause::MissingNumber, true);
+    if (end >= this->source.size() || !std::isdigit(this->source[end])) {
+        throw SyntaxError(ErrorCause::MissingNumber,
+                          end == this->source.size());
     }
-    while (std::isdigit(this->source[end])) {
+    while (end < this->source.size() && std::isdigit(this->source[end])) {
         ++end;
     }
 
-    if (this->source[end] == '.') {
+    if (end < this->source.size() && this->source[end] == '.') {
         ++end;
-        if (!std::isdigit(this->source[end])) {
-            throw SyntaxError(ErrorCause::MissingFractionalPart, true);
+        if (end >= this->source.size() || !std::isdigit(this->source[end])) {
+            throw SyntaxError(ErrorCause::MissingFractionalPart,
+                              end == this->source.size());
         }
-        while (std::isdigit(this->source[end])) {
+        while (end < this->source.size() && std::isdigit(this->source[end])) {
             ++end;
         }
 
