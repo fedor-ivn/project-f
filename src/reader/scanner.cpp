@@ -6,101 +6,120 @@
 #include <memory>
 #include <ostream>
 
-Scanner::Scanner(std::string_view source) : source(source) {}
+class ReachedEndOfFile {};
 
-std::unique_ptr<Token> Scanner::parse_symbol() {
-    int begin_index = current_index++;
+Scanner::Scanner(std::string_view source, Position offset)
+    : source(source), position(offset) {}
 
-    while (std::isalpha(source[current_index]) ||
-           std::isdigit(source[current_index])) {
-        current_index++;
+char Scanner::peek() const {
+    if (this->source.empty()) {
+        throw ReachedEndOfFile();
     }
-
-    int end_index = current_index;
-
-    std::string_view symbol =
-        source.substr(begin_index, (end_index - begin_index));
-
-    if (symbol == "true") {
-        return std::make_unique<Boolean>(Boolean(true));
-    } else if (symbol == "false") {
-        return std::make_unique<Boolean>(Boolean(false));
-    } else if (symbol == "null") {
-        return std::make_unique<Null>(Null());
-    }
-
-    return std::make_unique<Identifier>(Identifier(symbol));
+    return this->source[0];
 }
 
-std::unique_ptr<Numeral> Scanner::parse_numeral() {
-    int begin_index = current_index++;
+Span Scanner::advance(size_t by) {
+    auto start = this->position;
 
-    while (std::isdigit(source[current_index])) {
-        current_index++;
+    by = std::min(by, this->source.size());
+    for (size_t past = 0; past < by; ++past) {
+        if (this->source[past] == '\n') {
+            this->position.to_next_line();
+        } else {
+            this->position.to_next_column();
+        }
+    }
+    this->source = this->source.substr(by);
+
+    return Span(start, this->position);
+}
+
+std::unique_ptr<Token> Scanner::parse_symbol() {
+    size_t end = 0;
+    while (std::isalpha(this->source[end]) || std::isdigit(this->source[end])) {
+        ++end;
     }
 
-    if (source[current_index] == '.') {
-        current_index++;
+    auto symbol = this->source.substr(0, end);
+    auto span = this->advance(end);
 
-        while (std::isdigit(source[current_index])) {
-            current_index++;
+    if (symbol == "true") {
+        return std::make_unique<Boolean>(Boolean(true, span));
+    } else if (symbol == "false") {
+        return std::make_unique<Boolean>(Boolean(false, span));
+    } else if (symbol == "null") {
+        return std::make_unique<Null>(Null(span));
+    }
+
+    return std::make_unique<Identifier>(Identifier(symbol, span));
+}
+
+std::unique_ptr<Token> Scanner::parse_numeral() {
+    size_t end = 0;
+
+    if (this->peek() == '+' || this->peek() == '-') {
+        ++end;
+    }
+    while (std::isdigit(this->source[end])) {
+        ++end;
+    }
+
+    if (this->source[end] == '.') {
+        ++end;
+        while (std::isdigit(this->source[end])) {
+            ++end;
         }
 
-        int end_index = current_index;
-
-        double real = std::stod(
-            std::string(source.substr(begin_index, (end_index - begin_index))));
-
-        return std::make_unique<Real>(Real(real));
+        double real = std::stod(std::string(source.substr(0, end)));
+        auto span = this->advance(end);
+        return std::make_unique<Real>(Real(real, span));
     } else {
-        int end_index = current_index;
-
-        int64_t integer = std::stoll(
-            std::string(source.substr(begin_index, (end_index - begin_index))));
-
-        return std::make_unique<Integer>(Integer(integer));
+        int64_t integer = std::stoll(std::string(source.substr(0, end)));
+        auto span = this->advance(end);
+        return std::make_unique<Integer>(Integer(integer, span));
     }
 }
 
 std::unique_ptr<Token> Scanner::next_token() {
     std::unique_ptr<Token> result;
 
-    while (std::isspace(source[current_index]) &&
-           current_index < source.size()) {
-        current_index++;
-    }
-
-    while (source[current_index] == ';' && current_index < source.size()) {
-        while (source[current_index] != '\n' && current_index < source.size()) {
-            current_index++;
+    try {
+        while (std::isspace(this->peek())) {
+            this->advance();
         }
-        current_index++;
-    }
 
-    if (current_index >= source.size()) {
-        return std::make_unique<EndOfFile>(EndOfFile());
-    }
+        while (this->peek() == ';') {
+            while (this->peek() != '\n') {
+                this->advance();
+            }
+            this->advance();
+        }
 
-    switch (source[current_index]) {
-    case '(':
-        current_index++;
-        return std::make_unique<LeftParenthesis>(LeftParenthesis());
+        char character = this->peek();
+        switch (character) {
+        case '(': {
+            auto span = this->advance();
+            return std::make_unique<LeftParenthesis>(LeftParenthesis(span));
+        }
+        case ')': {
+            auto span = this->advance();
+            return std::make_unique<RightParenthesis>(RightParenthesis(span));
+        }
+        case '\'': {
+            auto span = this->advance();
+            return std::make_unique<Apostrophe>(Apostrophe(span));
+        }
+        }
 
-    case ')':
-        current_index++;
-        return std::make_unique<RightParenthesis>(RightParenthesis());
-
-    case '\'':
-        current_index++;
-        return std::make_unique<Apostrophe>(Apostrophe());
-    }
-
-    if (std::isalpha(source[current_index])) {
-        return parse_symbol();
-    }
-    if (std::isdigit(source[current_index]) || source[current_index] == '-' ||
-        source[current_index] == '+') {
-        return parse_numeral();
+        if (std::isalpha(character)) {
+            return parse_symbol();
+        }
+        if (std::isdigit(character) || character == '-' || character == '+') {
+            return parse_numeral();
+        }
+    } catch (ReachedEndOfFile) {
+        return std::make_unique<EndOfFile>(
+            EndOfFile(Span(this->position, this->position)));
     }
 
     return result;

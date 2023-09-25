@@ -1,5 +1,7 @@
 #include "token.h"
 
+Token::Token(Span span) : span(span) {}
+
 std::ostream& operator<<(std::ostream& stream, const Token& token) {
     if (const LeftParenthesis* t =
             dynamic_cast<const LeftParenthesis*>(&token)) {
@@ -20,6 +22,8 @@ std::ostream& operator<<(std::ostream& stream, const Token& token) {
     } else if (const Null* t = dynamic_cast<const Null*>(&token)) {
         stream << "Null";
     }
+
+    stream << " at " << token.span.start << ".." << token.span.end;
 
     return stream;
 }
