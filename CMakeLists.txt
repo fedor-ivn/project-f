@@ -9,5 +9,5 @@ add_executable(project-f
     src/main.cpp
     src/reader/scanner.cpp
     src/reader/token.cpp
-    src/reader/error/error.cpp
+    src/reader/error.cpp
 )

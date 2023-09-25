@@ -3,7 +3,10 @@
 #pragma once
 
 enum class ErrorCause {
-    MissingIntegerPart
+    MissingNumber,
+    Integer64Overflow,
+    MissingFloatingPart,
+    MissingIntegerPart,
 };
 
 class SyntaxError : public std::exception {

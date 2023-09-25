@@ -1,11 +1,12 @@
 #include "scanner.h"
 #include "token.h"
-#include "error/error.h"
+#include "error.h"
 #include <cctype>
 #include <iostream>
 #include <iterator>
 #include <memory>
 #include <ostream>
+#include <stdexcept>
 
 Scanner::Scanner(std::string_view source) : source(source) {}
 
@@ -41,7 +42,7 @@ std::unique_ptr<Numeral> Scanner::parse_numeral() {
     }
 
     if (!std::isdigit(source[current_index])) {
-	throw SyntaxError(ErrorCause::MissingIntegerPart, true);
+        throw SyntaxError(ErrorCause::MissingNumber, true);
     }
 
     while (std::isdigit(source[current_index])) {
@@ -53,11 +54,17 @@ std::unique_ptr<Numeral> Scanner::parse_numeral() {
     if (source[current_index] == '.') {
         current_index++;
 
+        int floating_part_begin_index = current_index;
+
         while (std::isdigit(source[current_index])) {
             current_index++;
         }
 
         end_index = current_index;
+
+        if (end_index == floating_part_begin_index) {
+            throw SyntaxError(ErrorCause::MissingFloatingPart, false);
+        }
 
         double real = std::stod(
             std::string(source.substr(begin_index, (end_index - begin_index))));
@@ -65,11 +72,16 @@ std::unique_ptr<Numeral> Scanner::parse_numeral() {
         return std::make_unique<Real>(Real(real));
     } else {
         if (begin_index == end_index) {
-            throw SyntaxError(ErrorCause::MissingIntegerPart, true);
+            throw SyntaxError(ErrorCause::MissingNumber, true);
         }
 
-        int64_t integer = std::stoll(
-            std::string(source.substr(begin_index, (end_index - begin_index))));
+        int64_t integer;
+        try {
+            integer = std::stoll(
+                std::string(source.substr(begin_index, (end_index - begin_index))));
+        } catch (std::out_of_range) {
+            throw SyntaxError(ErrorCause::Integer64Overflow, false);
+        }
 
         return std::make_unique<Integer>(Integer(integer));
     }
