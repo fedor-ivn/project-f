@@ -23,7 +23,7 @@ std::ostream& operator<<(std::ostream& stream, const Token& token) {
         stream << "Null";
     }
 
-    stream << " at " << token.span.start << ".." << token.span.end;
+    stream << " at " << token.span;
 
     return stream;
 }

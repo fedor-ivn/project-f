@@ -24,4 +24,6 @@ class Span {
     Position end;
 
     Span(Position start, Position end);
+
+    friend std::ostream& operator<<(std::ostream& stream, const Span& span);
 };

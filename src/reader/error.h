@@ -1,6 +1,8 @@
+#pragma once
+
 #include <iostream>
 
-#pragma once
+#include "span.h"
 
 enum class ErrorCause {
     MissingNumber,
@@ -10,9 +12,10 @@ enum class ErrorCause {
 
 class SyntaxError : public std::exception {
   public:
-    SyntaxError(ErrorCause cause, bool can_recover);
+    SyntaxError(ErrorCause cause, Span span, bool can_recover);
 
     ErrorCause cause;
+    Span span;
     bool can_recover;
 
     friend std::ostream& operator<<(std::ostream& stream,

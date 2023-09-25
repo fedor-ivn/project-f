@@ -1,12 +1,10 @@
 #include "error.h"
 
-SyntaxError::SyntaxError(ErrorCause cause, bool can_recover) {
-    this->cause = cause;
-    this->can_recover = can_recover;
-}
+SyntaxError::SyntaxError(ErrorCause cause, Span span, bool can_recover)
+    : cause(cause), span(span), can_recover(can_recover) {}
 
 std::ostream& operator<<(std::ostream& stream, const SyntaxError& error) {
-    stream << "Syntax error: ";
+    stream << "Syntax error at " << error.span << ": ";
 
     switch (error.cause) {
     case ErrorCause::MissingNumber:

@@ -64,7 +64,7 @@ std::unique_ptr<Token> Scanner::parse_numeral() {
     }
 
     if (end >= this->source.size() || !std::isdigit(this->source[end])) {
-        throw SyntaxError(ErrorCause::MissingNumber,
+        throw SyntaxError(ErrorCause::MissingNumber, this->advance(end),
                           end == this->source.size());
     }
     while (end < this->source.size() && std::isdigit(this->source[end])) {
@@ -75,7 +75,7 @@ std::unique_ptr<Token> Scanner::parse_numeral() {
         ++end;
         if (end >= this->source.size() || !std::isdigit(this->source[end])) {
             throw SyntaxError(ErrorCause::MissingFractionalPart,
-                              end == this->source.size());
+                              this->advance(end), end == this->source.size());
         }
         while (end < this->source.size() && std::isdigit(this->source[end])) {
             ++end;
@@ -86,12 +86,13 @@ std::unique_ptr<Token> Scanner::parse_numeral() {
         return std::make_unique<Real>(Real(real, span));
     }
 
+    auto literal = source.substr(0, end);
+    auto span = this->advance(end);
     try {
-        int64_t integer = std::stoll(std::string(source.substr(0, end)));
-        auto span = this->advance(end);
+        int64_t integer = std::stoll(std::string(literal));
         return std::make_unique<Integer>(Integer(integer, span));
     } catch (std::out_of_range) {
-        throw SyntaxError(ErrorCause::IntegerOverflow, false);
+        throw SyntaxError(ErrorCause::IntegerOverflow, span, false);
     }
 }
 
