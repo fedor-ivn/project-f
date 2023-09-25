@@ -44,9 +44,12 @@ void print_tokens(Scanner& scanner) {
 
 void repl() {
     std::string line;
+    size_t nth_line = 0;
     while (std::getline(std::cin, line)) {
+        ++nth_line;
+
         std::string_view source(line);
-        Scanner scanner(source);
+        Scanner scanner(source, Position(nth_line));
         print_tokens(scanner);
     }
 }
@@ -63,7 +66,7 @@ int main(int argc, char** argv) {
         buffer << file.rdbuf();
 
         std::string source(buffer.str());
-        Scanner scanner((std::string_view(source)));
+        Scanner scanner((std::string_view(source)), Position());
 
         std::cout << argv[nth_file] << ':' << std::endl;
         print_tokens(scanner);
