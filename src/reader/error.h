@@ -14,4 +14,7 @@ class SyntaxError : public std::exception {
 
     ErrorCause cause;
     bool can_recover;
+
+    friend std::ostream& operator<<(std::ostream& stream,
+                                    const SyntaxError& error);
 };
