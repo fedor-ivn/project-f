@@ -18,11 +18,12 @@ char is_number_end(char character) {
            std::isspace(character);
 }
 
-char Scanner::peek() const {
-    if (this->source.empty()) {
+bool Scanner::can_peek(size_t at) const { return at >= this->source.size(); }
+char Scanner::peek(size_t at) const {
+    if (!this->can_peek(at)) {
         throw ReachedEndOfFile();
     }
-    return this->source[0];
+    return this->source[at];
 }
 
 Span Scanner::advance(size_t by) {
@@ -43,7 +44,7 @@ Span Scanner::advance(size_t by) {
 
 std::unique_ptr<Token> Scanner::parse_symbol() {
     size_t end = 0;
-    while (std::isalpha(this->source[end]) || std::isdigit(this->source[end])) {
+    while (this->can_peek(end) && std::isalnum(this->peek(end))) {
         ++end;
     }
 
@@ -68,25 +69,25 @@ std::unique_ptr<Token> Scanner::parse_numeral() {
         ++end;
     }
 
-    if (end >= this->source.size() || !std::isdigit(this->source[end])) {
+    if (!this->can_peek(end) || !std::isdigit(this->peek(end))) {
         throw SyntaxError(ErrorCause::MissingNumber, this->advance(end),
                           end == this->source.size());
     }
-    while (end < this->source.size() && std::isdigit(this->source[end])) {
+    while (this->can_peek(end) && std::isdigit(this->peek(end))) {
         ++end;
     }
 
-    if (end < this->source.size() && this->source[end] == '.') {
+    if (this->can_peek(end) && this->peek(end) == '.') {
         ++end;
-        if (end >= this->source.size() || !std::isdigit(this->source[end])) {
+
+        if (!this->can_peek(end) || !std::isdigit(this->peek(end))) {
             throw SyntaxError(ErrorCause::MissingFractionalPart,
                               this->advance(end), end == this->source.size());
         }
-        while (end < this->source.size() && std::isdigit(this->source[end])) {
+        while (this->can_peek(end) && std::isdigit(this->peek(end))) {
             ++end;
         }
-
-        if (end < this->source.size() && !is_number_end(this->source[end])) {
+        if (this->can_peek(end) && !is_number_end(this->peek(end))) {
             throw this->make_invalid_number_error();
         }
 
@@ -95,11 +96,11 @@ std::unique_ptr<Token> Scanner::parse_numeral() {
         return std::make_unique<Real>(Real(real, span));
     }
 
-    if (end < this->source.size() && !is_number_end(this->source[end])) {
+    if (this->can_peek(end) && !is_number_end(this->source[end])) {
         throw this->make_invalid_number_error();
     }
 
-    auto literal = source.substr(0, end);
+    auto literal = this->source.substr(0, end);
     auto span = this->advance(end);
     try {
         int64_t integer = std::stoll(std::string(literal));
@@ -111,11 +112,8 @@ std::unique_ptr<Token> Scanner::parse_numeral() {
 
 SyntaxError Scanner::make_invalid_number_error() {
     auto start = this->position;
-    try {
-        while (!is_number_end(this->peek())) {
-            this->advance();
-        }
-    } catch (ReachedEndOfFile) {
+    while (this->can_peek() && !is_number_end(this->peek())) {
+        this->advance();
     }
 
     return SyntaxError(ErrorCause::InvalidNumber, Span(start, this->position),
