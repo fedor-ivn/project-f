@@ -18,7 +18,7 @@ char is_number_end(char character) {
            std::isspace(character);
 }
 
-bool Scanner::can_peek(size_t at) const { return at >= this->source.size(); }
+bool Scanner::can_peek(size_t at) const { return at < this->source.size(); }
 char Scanner::peek(size_t at) const {
     if (!this->can_peek(at)) {
         throw ReachedEndOfFile();
@@ -121,46 +121,45 @@ SyntaxError Scanner::make_invalid_number_error() {
 }
 
 std::unique_ptr<Token> Scanner::next_token() {
-    std::unique_ptr<Token> result;
-
     try {
-        while (std::isspace(this->peek())) {
-            this->advance();
-        }
+        while (true) {
+            char character = this->peek();
+            switch (character) {
+            case '(': {
+                auto span = this->advance();
+                return std::make_unique<LeftParenthesis>(LeftParenthesis(span));
+            }
+            case ')': {
+                auto span = this->advance();
+                return std::make_unique<RightParenthesis>(
+                    RightParenthesis(span));
+            }
+            case '\'': {
+                auto span = this->advance();
+                return std::make_unique<Apostrophe>(Apostrophe(span));
+            }
+            case ';':
+                while (this->peek() != '\n') {
+                    this->advance();
+                }
+                this->advance();
+                break;
+            }
 
-        while (this->peek() == ';') {
-            while (this->peek() != '\n') {
+            if (std::isspace(character)) {
                 this->advance();
             }
-            this->advance();
-        }
-
-        char character = this->peek();
-        switch (character) {
-        case '(': {
-            auto span = this->advance();
-            return std::make_unique<LeftParenthesis>(LeftParenthesis(span));
-        }
-        case ')': {
-            auto span = this->advance();
-            return std::make_unique<RightParenthesis>(RightParenthesis(span));
-        }
-        case '\'': {
-            auto span = this->advance();
-            return std::make_unique<Apostrophe>(Apostrophe(span));
-        }
-        }
-
-        if (std::isalpha(character)) {
-            return parse_symbol();
-        }
-        if (std::isdigit(character) || character == '-' || character == '+') {
-            return parse_numeral();
+            if (std::isalpha(character)) {
+                return parse_symbol();
+            }
+            if (std::isdigit(character) || character == '-' ||
+                character == '+') {
+                return parse_numeral();
+            }
         }
     } catch (ReachedEndOfFile) {
-        return std::make_unique<EndOfFile>(
-            EndOfFile(Span(this->position, this->position)));
     }
 
-    return result;
+    return std::make_unique<EndOfFile>(
+        EndOfFile(Span(this->position, this->position)));
 }
