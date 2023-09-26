@@ -11,7 +11,7 @@ class Scanner {
   public:
     Scanner(std::string_view source, Position offset);
 
-    std::unique_ptr<Token> next_token();
+    std::unique_ptr<token::Token> next_token();
 
   private:
     std::string_view source;
@@ -21,7 +21,7 @@ class Scanner {
     char peek(size_t at = 0) const;
     Span advance(size_t by = 1);
 
-    std::unique_ptr<Token> parse_symbol();
-    std::unique_ptr<Token> parse_numeral();
+    std::unique_ptr<token::Token> parse_symbol();
+    std::unique_ptr<token::Token> parse_numeral();
     SyntaxError make_invalid_number_error();
 };
