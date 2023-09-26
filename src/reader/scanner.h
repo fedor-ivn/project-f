@@ -17,7 +17,8 @@ class Scanner {
     std::string_view source;
     Position position;
 
-    char peek() const;
+    bool can_peek(size_t at = 0) const;
+    char peek(size_t at = 0) const;
     Span advance(size_t by = 1);
 
     std::unique_ptr<Token> parse_symbol();

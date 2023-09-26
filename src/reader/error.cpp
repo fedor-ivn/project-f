@@ -19,6 +19,9 @@ std::ostream& operator<<(std::ostream& stream, const SyntaxError& error) {
     case ErrorCause::InvalidNumber:
         stream << "invalid numerical literal";
         break;
+    case ErrorCause::UnexpectedCharacter:
+        stream << "unexpected character";
+        break;
     }
 
     if (error.can_recover) {
