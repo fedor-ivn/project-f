@@ -3,6 +3,7 @@
 #include <memory>
 #include <string_view>
 
+#include "error.h"
 #include "span.h"
 #include "token.h"
 
@@ -21,4 +22,5 @@ class Scanner {
 
     std::unique_ptr<Token> parse_symbol();
     std::unique_ptr<Token> parse_numeral();
+    SyntaxError make_invalid_number_error();
 };

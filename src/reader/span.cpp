@@ -15,3 +15,8 @@ std::ostream& operator<<(std::ostream& stream, const Position& position) {
 }
 
 Span::Span(Position start, Position end) : start(start), end(end) {}
+
+std::ostream& operator<<(std::ostream& stream, const Span& span) {
+    stream << span.start << ".." << span.end;
+    return stream;
+}

@@ -1,18 +1,26 @@
 #include <fstream>
 #include <iostream>
+#include <iterator>
 #include <memory>
+#include <ostream>
 #include <sstream>
 
+#include "reader/error.h"
 #include "reader/scanner.h"
 #include "reader/token.h"
 
 void print_tokens(Scanner& scanner) {
     while (true) {
-        std::unique_ptr<Token> token = scanner.next_token();
-        if (EndOfFile* new_token = dynamic_cast<EndOfFile*>(&*token)) {
-            break;
+        try {
+            auto token = scanner.next_token();
+            if (auto new_token = dynamic_cast<EndOfFile*>(&*token)) {
+                break;
+            }
+            std::cout << *token << std::endl;
+        } catch (SyntaxError error) {
+            std::cout << error << std::endl;
+            return;
         }
-        std::cout << *token << std::endl;
     }
 }
 

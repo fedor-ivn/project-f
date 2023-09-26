@@ -1,15 +1,22 @@
 #include "scanner.h"
+#include "error.h"
 #include "token.h"
 #include <cctype>
 #include <iostream>
 #include <iterator>
 #include <memory>
 #include <ostream>
+#include <stdexcept>
 
 class ReachedEndOfFile {};
 
 Scanner::Scanner(std::string_view source, Position offset)
     : source(source), position(offset) {}
+
+char is_number_end(char character) {
+    return character == '(' || character == ')' || character == '\'' ||
+           std::isspace(character);
+}
 
 char Scanner::peek() const {
     if (this->source.empty()) {
@@ -60,24 +67,59 @@ std::unique_ptr<Token> Scanner::parse_numeral() {
     if (this->peek() == '+' || this->peek() == '-') {
         ++end;
     }
-    while (std::isdigit(this->source[end])) {
+
+    if (end >= this->source.size() || !std::isdigit(this->source[end])) {
+        throw SyntaxError(ErrorCause::MissingNumber, this->advance(end),
+                          end == this->source.size());
+    }
+    while (end < this->source.size() && std::isdigit(this->source[end])) {
         ++end;
     }
 
-    if (this->source[end] == '.') {
+    if (end < this->source.size() && this->source[end] == '.') {
         ++end;
-        while (std::isdigit(this->source[end])) {
+        if (end >= this->source.size() || !std::isdigit(this->source[end])) {
+            throw SyntaxError(ErrorCause::MissingFractionalPart,
+                              this->advance(end), end == this->source.size());
+        }
+        while (end < this->source.size() && std::isdigit(this->source[end])) {
             ++end;
+        }
+
+        if (end < this->source.size() && !is_number_end(this->source[end])) {
+            throw this->make_invalid_number_error();
         }
 
         double real = std::stod(std::string(source.substr(0, end)));
         auto span = this->advance(end);
         return std::make_unique<Real>(Real(real, span));
-    } else {
-        int64_t integer = std::stoll(std::string(source.substr(0, end)));
-        auto span = this->advance(end);
-        return std::make_unique<Integer>(Integer(integer, span));
     }
+
+    if (end < this->source.size() && !is_number_end(this->source[end])) {
+        throw this->make_invalid_number_error();
+    }
+
+    auto literal = source.substr(0, end);
+    auto span = this->advance(end);
+    try {
+        int64_t integer = std::stoll(std::string(literal));
+        return std::make_unique<Integer>(Integer(integer, span));
+    } catch (std::out_of_range) {
+        throw SyntaxError(ErrorCause::IntegerOverflow, span, false);
+    }
+}
+
+SyntaxError Scanner::make_invalid_number_error() {
+    auto start = this->position;
+    try {
+        while (!is_number_end(this->peek())) {
+            this->advance();
+        }
+    } catch (ReachedEndOfFile) {
+    }
+
+    return SyntaxError(ErrorCause::InvalidNumber, Span(start, this->position),
+                       false);
 }
 
 std::unique_ptr<Token> Scanner::next_token() {
