@@ -8,6 +8,8 @@
 #include <ostream>
 #include <stdexcept>
 
+using namespace token;
+
 class ReachedEndOfFile {};
 
 Scanner::Scanner(std::string_view source, Position offset)

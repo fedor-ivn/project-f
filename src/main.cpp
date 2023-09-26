@@ -13,7 +13,7 @@ void print_tokens(Scanner& scanner) {
     while (true) {
         try {
             auto token = scanner.next_token();
-            if (auto new_token = dynamic_cast<EndOfFile*>(&*token)) {
+            if (token->is_end_of_file()) {
                 break;
             }
             std::cout << *token << std::endl;
