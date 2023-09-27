@@ -15,7 +15,7 @@ class ReachedEndOfFile {};
 Scanner::Scanner(std::string_view source, Position offset)
     : source(source), position(offset) {}
 
-char is_number_end(char character) {
+char is_delimiter(char character) {
     return character == '(' || character == ')' || character == '\'' ||
            std::isspace(character);
 }
@@ -48,6 +48,9 @@ std::unique_ptr<Token> Scanner::parse_symbol() {
     size_t end = 0;
     while (this->can_peek(end) && std::isalnum(this->peek(end))) {
         ++end;
+    }
+    if (this->can_peek(end) && !is_delimiter(this->peek(end))) {
+        throw this->make_literal_error(ErrorCause::InvalidIdentifier);
     }
 
     auto symbol = this->source.substr(0, end);
@@ -89,8 +92,8 @@ std::unique_ptr<Token> Scanner::parse_numeral() {
         while (this->can_peek(end) && std::isdigit(this->peek(end))) {
             ++end;
         }
-        if (this->can_peek(end) && !is_number_end(this->peek(end))) {
-            throw this->make_invalid_number_error();
+        if (this->can_peek(end) && !is_delimiter(this->peek(end))) {
+            throw this->make_literal_error(ErrorCause::InvalidNumber);
         }
 
         double real = std::stod(std::string(source.substr(0, end)));
@@ -98,8 +101,8 @@ std::unique_ptr<Token> Scanner::parse_numeral() {
         return std::make_unique<Real>(Real(real, span));
     }
 
-    if (this->can_peek(end) && !is_number_end(this->source[end])) {
-        throw this->make_invalid_number_error();
+    if (this->can_peek(end) && !is_delimiter(this->source[end])) {
+        throw this->make_literal_error(ErrorCause::InvalidNumber);
     }
 
     auto literal = this->source.substr(0, end);
@@ -112,14 +115,13 @@ std::unique_ptr<Token> Scanner::parse_numeral() {
     }
 }
 
-SyntaxError Scanner::make_invalid_number_error() {
+SyntaxError Scanner::make_literal_error(ErrorCause cause) {
     auto start = this->position;
-    while (this->can_peek() && !is_number_end(this->peek())) {
+    while (this->can_peek() && !is_delimiter(this->peek())) {
         this->advance();
     }
 
-    return SyntaxError(ErrorCause::InvalidNumber, Span(start, this->position),
-                       false);
+    return SyntaxError(cause, Span(start, this->position), false);
 }
 
 std::unique_ptr<Token> Scanner::next_token() {

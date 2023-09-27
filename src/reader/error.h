@@ -9,6 +9,7 @@ enum class ErrorCause {
     MissingFractionalPart,
     IntegerOverflow,
     InvalidNumber,
+    InvalidIdentifier,
     UnexpectedCharacter,
 };
 

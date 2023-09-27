@@ -23,5 +23,5 @@ class Scanner {
 
     std::unique_ptr<token::Token> parse_symbol();
     std::unique_ptr<token::Token> parse_numeral();
-    SyntaxError make_invalid_number_error();
+    SyntaxError make_literal_error(ErrorCause cause);
 };
