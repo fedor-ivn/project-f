@@ -6,8 +6,8 @@
 #include <sstream>
 
 #include "reader/error.h"
+#include "reader/reader.h"
 #include "reader/scanner.h"
-#include "reader/token.h"
 
 void print_tokens(Scanner& scanner) {
     while (true) {
@@ -24,15 +24,31 @@ void print_tokens(Scanner& scanner) {
     }
 }
 
+void print_ast(Reader& reader) {
+    try {
+        auto ast = reader.read();
+        for (auto&& element : ast) {
+            std::cout << *element << std::endl;
+        }
+
+    } catch (SyntaxError error) {
+        std::cout << error << std::endl;
+        return;
+    }
+}
+
 void repl() {
     std::string line;
     size_t nth_line = 0;
-    while (std::getline(std::cin, line)) {
+    while (true) {
+        std::cout << ">>> ";
+        if (!std::getline(std::cin, line)) {
+            break;
+        }
         ++nth_line;
-
         std::string_view source(line);
-        Scanner scanner(source, Position(nth_line));
-        print_tokens(scanner);
+        Reader reader((std::string_view(source)), Position(nth_line));
+        print_ast(reader);
     }
 }
 
@@ -48,10 +64,10 @@ int main(int argc, char** argv) {
         buffer << file.rdbuf();
 
         std::string source(buffer.str());
-        Scanner scanner((std::string_view(source)), Position());
+        Reader reader((std::string_view(source)));
 
         std::cout << argv[nth_file] << ':' << std::endl;
-        print_tokens(scanner);
+        print_ast(reader);
     }
 
     return 0;
