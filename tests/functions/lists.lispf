@@ -19,6 +19,6 @@
 (func testCons ()
     (and (equalList (cons 1 '(2 3)) '(1 2 3))
          (equalList (cons 1 null) '(1))
-         (equalList (cons null null) '(null)))
+         (equalList (cons null null) '(null))))
 
 (and (testHead) (testTail) (testCons))
