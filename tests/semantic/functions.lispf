@@ -1,5 +1,5 @@
 (func foo (x y z)
-    (+ x (* y z)))
+    (plus x (times y z)))
 (cond (nonequal (foo 1 2 3) 7)
     (return false))
 
@@ -7,7 +7,7 @@
 (func factorial (n)
     (cond (lesseq n 1)
         1
-        (* n (factorial (- n 1)))))
+        (times n (factorial (minus n 1)))))
 (cond (nonequal (factorial 5) 120)
     (return false))
 
@@ -44,7 +44,7 @@
     (return false))
 
 ; test lambdas
-(setq square (lambda (x) (* x x)))
+(setq square (lambda (x) (times x x)))
 (cond (nonequal (square 5) 25)
     (return false))
 (cond (nonequal (x square) 144)
