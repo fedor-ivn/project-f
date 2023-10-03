@@ -11,6 +11,8 @@ enum class ErrorCause {
     InvalidNumber,
     InvalidIdentifier,
     UnexpectedCharacter,
+    UnexpectedRightParenthesis,
+    UnclosedList
 };
 
 class SyntaxError : public std::exception {

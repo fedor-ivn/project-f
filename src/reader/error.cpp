@@ -25,6 +25,12 @@ std::ostream& operator<<(std::ostream& stream, const SyntaxError& error) {
     case ErrorCause::UnexpectedCharacter:
         stream << "unexpected character";
         break;
+    case ErrorCause::UnexpectedRightParenthesis:
+        stream << "unexpected right parenthesis";
+        break;
+    case ErrorCause::UnclosedList:
+        stream << "unclosed list";
+        break;
     }
 
     if (error.can_recover) {
