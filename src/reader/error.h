@@ -12,7 +12,7 @@ enum class ErrorCause {
     InvalidIdentifier,
     UnexpectedCharacter,
     UnexpectedRightParenthesis,
-    UnclosedList
+    UnclosedList,
 };
 
 class SyntaxError : public std::exception {

@@ -30,7 +30,6 @@ void print_ast(Reader& reader) {
         for (auto&& element : ast) {
             std::cout << *element << std::endl;
         }
-
     } catch (SyntaxError error) {
         std::cout << error << std::endl;
         return;

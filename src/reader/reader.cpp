@@ -3,8 +3,6 @@
 #include "scanner.h"
 #include "span.h"
 
-Reader::Reader(std::string_view source) : source(source) {}
-
 Reader::Reader(std::string_view source, Position position)
     : source(source), position(position) {}
 

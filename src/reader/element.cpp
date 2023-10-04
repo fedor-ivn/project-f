@@ -56,8 +56,8 @@ Cons::Cons(std::shared_ptr<Element> left, std::shared_ptr<Element> right,
            Span span)
     : Element(span), left(left), right(right) {}
 
-std::ostream& element::operator<<(std::ostream& stream,
-                                  const Element& element) {
+void display_element(std::ostream& stream, const Element& element,
+                     size_t depth) {
     if (element.is_null()) {
         stream << "Null";
     } else if (auto value = element.to_integer()) {
@@ -69,10 +69,20 @@ std::ostream& element::operator<<(std::ostream& stream,
     } else if (auto value = element.to_symbol()) {
         stream << "Symbol(" << *value << ")";
     } else if (auto cons = dynamic_cast<const Cons*>(&element)) {
-        stream << "Cons(" << *cons->left << ", " << *cons->right << ")";
+        std::string indentation;
+        indentation.resize(depth * 2, ' ');
+        stream << "Cons(\n" << indentation << "  ";
+        display_element(stream, *cons->left, depth + 1);
+        stream << ",\n" << indentation << "  ";
+        display_element(stream, *cons->right, depth + 1);
+        stream << ",\n" << indentation << ')';
     }
 
     stream << " at " << element.span;
+}
 
+std::ostream& element::operator<<(std::ostream& stream,
+                                  const Element& element) {
+    display_element(stream, element, 0);
     return stream;
 }

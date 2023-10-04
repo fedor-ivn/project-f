@@ -8,8 +8,7 @@
 
 class Reader {
   public:
-    Reader(std::string_view source);
-    Reader(std::string_view source, Position position);
+    Reader(std::string_view source, Position position = Position());
     
     std::vector<std::unique_ptr<element::Element>> read();
 

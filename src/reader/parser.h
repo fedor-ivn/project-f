@@ -16,7 +16,6 @@ class Parser {
     Scanner scanner;
     std::unique_ptr<token::Token> peeked = nullptr;
 
-
     std::unique_ptr<token::Token>& peek_token();
     std::unique_ptr<token::Token> next_token();
     std::unique_ptr<element::Element> parse_cons();
