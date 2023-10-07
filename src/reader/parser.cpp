@@ -2,6 +2,7 @@
 #include "element.h"
 #include "error.h"
 #include "scanner.h"
+#include "span.h"
 #include <algorithm>
 #include <exception>
 #include <memory>
@@ -25,8 +26,6 @@ std::unique_ptr<token::Token> Parser::next_token() {
     this->peeked = nullptr;
     return token;
 }
-
-class ReachedEndOfFile {};
 
 std::unique_ptr<Element> Parser::parse_cons() {
     auto& token = this->peek_token();
@@ -75,9 +74,21 @@ std::unique_ptr<Element> Parser::parse_element() {
     }
 
     if (token->is_left_parenthesis()) {
-        auto cons = this->parse_cons();
-        cons->span.start = token->span.start;
-        return cons;
+        try {
+            auto cons = this->parse_cons();
+            cons->span.start = token->span.start;
+            return cons;
+        } catch (SyntaxError& error) {
+            switch (error.cause) {
+            case ErrorCause::UnclosedList:
+                throw SyntaxError(ErrorCause::UnclosedList,
+                                  Span(token->span.start, error.span.end),
+                                  true);
+                break;
+            default:
+                throw error;
+            }
+        }
     }
 
     if (token->is_right_parenthesis()) {
@@ -92,11 +103,8 @@ std::vector<std::unique_ptr<Element>> Parser::parse() {
     std::vector<std::unique_ptr<Element>> ast;
 
     while (!this->peek_token()->is_end_of_file()) {
-        try {
-            auto element = this->parse_element();
-            ast.push_back(std::move(element));
-        } catch (ReachedEndOfFile) {
-        }
+        auto element = this->parse_element();
+        ast.push_back(std::move(element));
     }
 
     return ast;
