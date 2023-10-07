@@ -14,8 +14,8 @@ class Position {
     void to_next_line();
     void to_next_column();
 
-    friend std::ostream& operator<<(std::ostream& stream,
-                                    const Position& position);
+    friend std::ostream&
+    operator<<(std::ostream& stream, const Position& position);
 };
 
 class Span {
