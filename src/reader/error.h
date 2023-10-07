@@ -23,6 +23,6 @@ class SyntaxError : public std::exception {
     Span span;
     bool can_recover;
 
-    friend std::ostream& operator<<(std::ostream& stream,
-                                    const SyntaxError& error);
+    friend std::ostream&
+    operator<<(std::ostream& stream, const SyntaxError& error);
 };

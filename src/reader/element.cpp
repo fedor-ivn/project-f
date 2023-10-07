@@ -33,8 +33,8 @@ std::optional<bool> Element::to_boolean() const {
 
 std::optional<std::string_view> Element::to_symbol() const {
     if (auto element = dynamic_cast<const Symbol*>(this)) {
-        return std::optional<std::string_view>(
-            std::string_view(element->value));
+        return std::optional<std::string_view>(std::string_view(element->value)
+        );
     }
     return std::nullopt;
 }
@@ -54,12 +54,14 @@ Boolean::Boolean(bool value, Span span) : Element(span), value(value) {}
 
 Symbol::Symbol(std::string value, Span span) : Element(span), value(value) {}
 
-Cons::Cons(std::shared_ptr<Element> left, std::shared_ptr<Element> right,
-           Span span)
+Cons::Cons(
+    std::shared_ptr<Element> left, std::shared_ptr<Element> right, Span span
+)
     : Element(span), left(left), right(right) {}
 
-void display_element(std::ostream& stream, const Element& element,
-                     size_t depth) {
+void display_element(
+    std::ostream& stream, const Element& element, size_t depth
+) {
     if (element.is_null()) {
         stream << "Null";
     } else if (auto value = element.to_integer()) {
@@ -83,8 +85,8 @@ void display_element(std::ostream& stream, const Element& element,
     stream << " at " << element.span;
 }
 
-std::ostream& element::operator<<(std::ostream& stream,
-                                  const Element& element) {
+std::ostream&
+element::operator<<(std::ostream& stream, const Element& element) {
     display_element(stream, element, 0);
     return stream;
 }

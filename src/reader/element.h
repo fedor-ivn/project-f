@@ -26,8 +26,8 @@ class Element {
     std::optional<Cons> to_list() const;
 
     virtual ~Element() = default;
-    friend std::ostream& operator<<(std::ostream& stream,
-                                    const Element& element);
+    friend std::ostream&
+    operator<<(std::ostream& stream, const Element& element);
 };
 
 class Null : public Element {
@@ -67,8 +67,9 @@ class Cons : public Element {
     std::shared_ptr<Element> left;
     std::shared_ptr<Element> right;
 
-    Cons(std::shared_ptr<Element> left, std::shared_ptr<Element> right,
-         Span span);
+    Cons(
+        std::shared_ptr<Element> left, std::shared_ptr<Element> right, Span span
+    );
 };
 
 } // namespace element

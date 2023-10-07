@@ -75,8 +75,11 @@ std::unique_ptr<Token> Scanner::parse_numeral() {
     }
 
     if (!this->can_peek(end) || !std::isdigit(this->peek(end))) {
-        throw SyntaxError(ErrorCause::MissingNumber, this->advance(end),
-                          end == this->source.size());
+        throw SyntaxError(
+            ErrorCause::MissingNumber,
+            this->advance(end),
+            end == this->source.size()
+        );
     }
     while (this->can_peek(end) && std::isdigit(this->peek(end))) {
         ++end;
@@ -86,8 +89,11 @@ std::unique_ptr<Token> Scanner::parse_numeral() {
         ++end;
 
         if (!this->can_peek(end) || !std::isdigit(this->peek(end))) {
-            throw SyntaxError(ErrorCause::MissingFractionalPart,
-                              this->advance(end), end == this->source.size());
+            throw SyntaxError(
+                ErrorCause::MissingFractionalPart,
+                this->advance(end),
+                end == this->source.size()
+            );
         }
         while (this->can_peek(end) && std::isdigit(this->peek(end))) {
             ++end;
@@ -135,8 +141,8 @@ std::unique_ptr<Token> Scanner::next_token() {
             }
             case ')': {
                 auto span = this->advance();
-                return std::make_unique<RightParenthesis>(
-                    RightParenthesis(span));
+                return std::make_unique<RightParenthesis>(RightParenthesis(span)
+                );
             }
             case '\'': {
                 auto span = this->advance();
@@ -162,12 +168,14 @@ std::unique_ptr<Token> Scanner::next_token() {
                 return parse_numeral();
             }
 
-            throw SyntaxError(ErrorCause::UnexpectedCharacter, this->advance(),
-                              false);
+            throw SyntaxError(
+                ErrorCause::UnexpectedCharacter, this->advance(), false
+            );
         }
     } catch (ReachedEndOfFile) {
     }
 
     return std::make_unique<EndOfFile>(
-        EndOfFile(Span(this->position, this->position)));
+        EndOfFile(Span(this->position, this->position))
+    );
 }
