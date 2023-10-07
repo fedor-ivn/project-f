@@ -16,6 +16,13 @@ First, initialize `cmake`.
 cmake .
 ```
 
+If you want to build with debug symbols, set `CMAKE_BUILD_TYPE` variable to
+`Debug`. The variable value will be saved for all further local builds. 
+
+```bash
+cmake -DCMAKE_BUILD_TYPE=Debug .
+```
+
 After initialization, you can build the project.
 
 ```bash
