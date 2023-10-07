@@ -39,6 +39,13 @@ std::optional<std::string_view> Element::to_symbol() const {
     return std::nullopt;
 }
 
+std::optional<Cons> Element::to_list() const {
+    if (auto element = dynamic_cast<const Cons*>(this)) {
+        return std::optional<Cons>(*element);
+    }
+    return std::nullopt;
+}
+
 Integer::Integer(int64_t value, Span span) : Element(span), value(value) {}
 
 Real::Real(double value, Span span) : Element(span), value(value) {}
@@ -63,7 +70,7 @@ void display_element(std::ostream& stream, const Element& element,
         stream << "Boolean(" << *value << ")";
     } else if (auto value = element.to_symbol()) {
         stream << "Symbol(" << *value << ")";
-    } else if (auto cons = dynamic_cast<const Cons*>(&element)) {
+    } else if (auto cons = element.to_list()) {
         std::string indentation;
         indentation.resize(depth * 2, ' ');
         stream << "Cons(\n" << indentation << "  ";

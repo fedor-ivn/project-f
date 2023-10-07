@@ -10,18 +10,20 @@
 
 namespace element {
 
+class Cons;
+
 class Element {
   public:
     Span span;
 
     Element(Span span);
-    
+
     bool is_null() const;
     std::optional<int64_t> to_integer() const;
     std::optional<double> to_real() const;
     std::optional<bool> to_boolean() const;
     std::optional<std::string_view> to_symbol() const;
-    // std::optional<Cons> to_list() const;
+    std::optional<Cons> to_list() const;
 
     virtual ~Element() = default;
     friend std::ostream& operator<<(std::ostream& stream,
