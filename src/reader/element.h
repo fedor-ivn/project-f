@@ -65,8 +65,6 @@ class Cons : public Element {
     std::shared_ptr<Element> left;
     std::shared_ptr<Element> right;
 
-    Cons(std::shared_ptr<Element> left, Span span);
-
     Cons(std::shared_ptr<Element> left, std::shared_ptr<Element> right,
          Span span);
 };

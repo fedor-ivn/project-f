@@ -61,11 +61,14 @@ std::unique_ptr<Element> Parser::parse_element() {
         return std::make_unique<Symbol>(
             Symbol(std::string(identifier.value()), token->span));
     }
-    
+
     if (token->is_apostrophe()) {
         auto quote = std::make_unique<Symbol>(Symbol("quote", token->span));
-        auto tail =
-            std::make_unique<Cons>(Cons(this->parse_element(), token->span));
+        auto element = this->parse_element();
+        auto end = element->span.end;
+        auto tail = std::make_unique<Cons>(
+            Cons(std::move(element),
+                 std::make_shared<Null>(Null(Span(end, end))), element->span));
         return std::make_unique<Cons>(
             Cons(std::move(quote), std::move(tail),
                  Span(token->span.start, tail->span.end)));

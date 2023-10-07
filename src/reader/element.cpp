@@ -47,11 +47,6 @@ Boolean::Boolean(bool value, Span span) : Element(span), value(value) {}
 
 Symbol::Symbol(std::string value, Span span) : Element(span), value(value) {}
 
-Cons::Cons(std::shared_ptr<Element> left, Span span)
-    : Element(span), left(left) {
-    this->right = std::make_shared<Null>(Null(span));
-}
-
 Cons::Cons(std::shared_ptr<Element> left, std::shared_ptr<Element> right,
            Span span)
     : Element(span), left(left), right(right) {}
