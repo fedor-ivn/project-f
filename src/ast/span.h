@@ -4,6 +4,8 @@
 #include <ostream>
 #include <string>
 
+namespace ast {
+
 class Position {
   public:
     size_t line;
@@ -27,3 +29,5 @@ class Span {
 
     friend std::ostream& operator<<(std::ostream& stream, const Span& span);
 };
+
+} // namespace ast

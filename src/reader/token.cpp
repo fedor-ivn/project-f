@@ -3,9 +3,9 @@
 
 #include "token.h"
 
-using namespace token;
+namespace reader {
 
-Token::Token(Span span) : span(span) {}
+Token::Token(ast::Span span) : span(span) {}
 
 bool Token::is_left_parenthesis() const {
     return dynamic_cast<const LeftParenthesis*>(this) != nullptr;
@@ -55,7 +55,7 @@ bool Token::is_end_of_file() const {
     return dynamic_cast<const EndOfFile*>(this) != nullptr;
 }
 
-std::ostream& token::operator<<(std::ostream& stream, const Token& token) {
+std::ostream& operator<<(std::ostream& stream, const Token& token) {
     if (token.is_left_parenthesis()) {
         stream << "LeftParenthesis";
     } else if (token.is_right_parenthesis()) {
@@ -78,3 +78,5 @@ std::ostream& token::operator<<(std::ostream& stream, const Token& token) {
 
     return stream;
 }
+
+} // namespace reader

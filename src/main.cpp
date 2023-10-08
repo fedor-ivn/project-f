@@ -5,9 +5,15 @@
 #include <ostream>
 #include <sstream>
 
+#include "ast/span.h"
 #include "reader/error.h"
 #include "reader/reader.h"
 #include "reader/scanner.h"
+
+using ast::Position;
+using reader::Reader;
+using reader::Scanner;
+using reader::SyntaxError;
 
 void print_tokens(Scanner& scanner) {
     while (true) {

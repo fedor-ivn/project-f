@@ -8,7 +8,7 @@
 
 #include "span.h"
 
-namespace element {
+namespace ast {
 
 class Cons;
 
@@ -72,4 +72,4 @@ class Cons : public Element {
     );
 };
 
-} // namespace element
+} // namespace ast

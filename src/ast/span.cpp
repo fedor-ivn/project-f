@@ -1,5 +1,7 @@
 #include "span.h"
 
+namespace ast {
+
 Position::Position(size_t line, size_t column) : line(line), column(column) {}
 
 void Position::to_next_line() {
@@ -20,3 +22,5 @@ std::ostream& operator<<(std::ostream& stream, const Span& span) {
     stream << span.start << ".." << span.end;
     return stream;
 }
+
+} // namespace ast

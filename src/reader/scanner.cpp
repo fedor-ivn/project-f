@@ -8,7 +8,10 @@
 #include <ostream>
 #include <stdexcept>
 
-using namespace token;
+namespace reader {
+
+using ast::Position;
+using ast::Span;
 
 class ReachedEndOfFile {};
 
@@ -179,3 +182,5 @@ std::unique_ptr<Token> Scanner::next_token() {
         EndOfFile(Span(this->position, this->position))
     );
 }
+
+} // namespace reader
