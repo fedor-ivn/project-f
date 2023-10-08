@@ -23,7 +23,7 @@ class Element {
     std::optional<double> to_real() const;
     std::optional<bool> to_boolean() const;
     std::optional<std::string_view> to_symbol() const;
-    std::optional<Cons> to_list() const;
+    std::optional<Cons> to_cons() const;
 
     virtual ~Element() = default;
     friend std::ostream&
