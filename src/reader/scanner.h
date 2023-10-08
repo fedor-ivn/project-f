@@ -7,11 +7,13 @@
 #include "error.h"
 #include "token.h"
 
+namespace reader {
+
 class Scanner {
   public:
     Scanner(std::string_view source, ast::Position offset);
 
-    std::unique_ptr<token::Token> next_token();
+    std::unique_ptr<Token> next_token();
 
   private:
     std::string_view source;
@@ -21,7 +23,9 @@ class Scanner {
     char peek(size_t at = 0) const;
     ast::Span advance(size_t by = 1);
 
-    std::unique_ptr<token::Token> parse_symbol();
-    std::unique_ptr<token::Token> parse_numeral();
+    std::unique_ptr<Token> parse_symbol();
+    std::unique_ptr<Token> parse_numeral();
     SyntaxError make_literal_error(ErrorCause cause);
 };
+
+} // namespace reader

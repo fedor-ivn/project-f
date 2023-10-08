@@ -4,6 +4,8 @@
 
 #include "../ast/span.h"
 
+namespace reader {
+
 enum class ErrorCause {
     MissingNumber,
     MissingFractionalPart,
@@ -26,3 +28,5 @@ class SyntaxError : public std::exception {
     friend std::ostream&
     operator<<(std::ostream& stream, const SyntaxError& error);
 };
+
+} // namespace reader

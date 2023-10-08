@@ -7,6 +7,8 @@
 #include "../ast/element.h"
 #include "../ast/span.h"
 
+namespace reader {
+
 class Reader {
   public:
     Reader(std::string_view source, ast::Position position = ast::Position());
@@ -17,3 +19,5 @@ class Reader {
     std::string_view source;
     ast::Position position;
 };
+
+} // namespace reader

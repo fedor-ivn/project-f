@@ -7,7 +7,7 @@
 
 #include "../ast/span.h"
 
-namespace token {
+namespace reader {
 
 class Token {
   public:
@@ -79,4 +79,4 @@ class EndOfFile : public Token {
     using Token::Token;
 };
 
-} // namespace token
+} // namespace reader
