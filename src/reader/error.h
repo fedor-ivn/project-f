@@ -2,7 +2,7 @@
 
 #include <iostream>
 
-#include "span.h"
+#include "../ast/span.h"
 
 enum class ErrorCause {
     MissingNumber,
@@ -17,10 +17,10 @@ enum class ErrorCause {
 
 class SyntaxError : public std::exception {
   public:
-    SyntaxError(ErrorCause cause, Span span, bool can_recover);
+    SyntaxError(ErrorCause cause, ast::Span span, bool can_recover);
 
     ErrorCause cause;
-    Span span;
+    ast::Span span;
     bool can_recover;
 
     friend std::ostream&

@@ -2,7 +2,7 @@
 
 #include "element.h"
 
-using namespace element;
+namespace ast {
 
 Element::Element(Span span) : span(span) {}
 
@@ -85,8 +85,9 @@ void display_element(
     stream << " at " << element.span;
 }
 
-std::ostream&
-element::operator<<(std::ostream& stream, const Element& element) {
+std::ostream& operator<<(std::ostream& stream, const Element& element) {
     display_element(stream, element, 0);
     return stream;
 }
+
+} // namespace ast

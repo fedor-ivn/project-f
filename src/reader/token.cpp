@@ -5,7 +5,7 @@
 
 using namespace token;
 
-Token::Token(Span span) : span(span) {}
+Token::Token(ast::Span span) : span(span) {}
 
 bool Token::is_left_parenthesis() const {
     return dynamic_cast<const LeftParenthesis*>(this) != nullptr;

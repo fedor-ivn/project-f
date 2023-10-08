@@ -1,6 +1,6 @@
 #include "error.h"
 
-SyntaxError::SyntaxError(ErrorCause cause, Span span, bool can_recover)
+SyntaxError::SyntaxError(ErrorCause cause, ast::Span span, bool can_recover)
     : cause(cause), span(span), can_recover(can_recover) {}
 
 std::ostream& operator<<(std::ostream& stream, const SyntaxError& error) {

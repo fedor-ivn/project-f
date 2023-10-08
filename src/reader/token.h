@@ -5,15 +5,15 @@
 #include <ostream>
 #include <string_view>
 
-#include "span.h"
+#include "../ast/span.h"
 
 namespace token {
 
 class Token {
   public:
-    Span span;
+    ast::Span span;
 
-    Token(Span span);
+    Token(ast::Span span);
 
     virtual ~Token() = default;
 
@@ -42,28 +42,29 @@ class Identifier : public Token {
   public:
     std::string_view value;
 
-    Identifier(std::string_view value, Span span) : Token(span), value(value) {}
+    Identifier(std::string_view value, ast::Span span)
+        : Token(span), value(value) {}
 };
 
 class Integer : public Token {
   public:
     int64_t value;
 
-    Integer(int64_t value, Span span) : Token(span), value(value) {}
+    Integer(int64_t value, ast::Span span) : Token(span), value(value) {}
 };
 
 class Real : public Token {
   public:
     double value;
 
-    Real(double value, Span span) : Token(span), value(value) {}
+    Real(double value, ast::Span span) : Token(span), value(value) {}
 };
 
 class Boolean : public Token {
   public:
     bool value;
 
-    Boolean(bool value, Span span) : Token(span), value(value) {}
+    Boolean(bool value, ast::Span span) : Token(span), value(value) {}
 };
 
 class Apostrophe : public Token {

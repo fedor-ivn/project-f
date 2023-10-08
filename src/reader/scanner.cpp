@@ -9,6 +9,8 @@
 #include <stdexcept>
 
 using namespace token;
+using ast::Position;
+using ast::Span;
 
 class ReachedEndOfFile {};
 

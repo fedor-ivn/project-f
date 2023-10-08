@@ -7,11 +7,11 @@ set(CMAKE_CXX_STANDARD_REQUIRED True)
 
 add_executable(project-f
     src/main.cpp
+    src/ast/element.cpp
+    src/ast/span.cpp
     src/reader/scanner.cpp
-    src/reader/span.cpp
     src/reader/token.cpp
     src/reader/parser.cpp
-    src/reader/element.cpp
     src/reader/reader.cpp
     src/reader/error.cpp
 )

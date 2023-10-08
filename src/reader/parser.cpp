@@ -1,13 +1,12 @@
-#include "parser.h"
-#include "element.h"
-#include "error.h"
-#include "scanner.h"
-#include "span.h"
 #include <algorithm>
 #include <exception>
 #include <memory>
 
-using namespace element;
+#include "../ast/span.h"
+#include "error.h"
+#include "parser.h"
+
+using namespace ast;
 
 Parser::Parser(Scanner scanner) : scanner(scanner) {}
 
