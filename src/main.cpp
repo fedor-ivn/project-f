@@ -6,11 +6,15 @@
 #include <sstream>
 
 #include "ast/span.h"
+#include "evaluator/evaluator.h"
+#include "evaluator/program.h"
 #include "reader/error.h"
 #include "reader/reader.h"
 #include "reader/scanner.h"
 
 using ast::Position;
+using evaluator::Evaluator;
+using evaluator::Program;
 using reader::Reader;
 using reader::Scanner;
 using reader::SyntaxError;
@@ -43,6 +47,8 @@ void print_ast(Reader& reader) {
 }
 
 void repl() {
+    Evaluator evaluator;
+
     std::string line;
     size_t nth_line = 0;
     while (true) {
@@ -50,10 +56,15 @@ void repl() {
         if (!std::getline(std::cin, line)) {
             break;
         }
+
         ++nth_line;
         std::string_view source(line);
         Reader reader((std::string_view(source)), Position(nth_line));
-        print_ast(reader);
+        auto elements = reader.read();
+        auto program = Program::from_elements(std::move(elements));
+        auto result = evaluator.evaluate(std::move(program));
+
+        std::cout << *result << std::endl;
     }
 }
 
