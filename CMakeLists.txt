@@ -9,6 +9,7 @@ add_executable(project-f
     src/main.cpp
     src/ast/element.cpp
     src/ast/span.cpp
+    src/evaluator/program.cpp
     src/reader/scanner.cpp
     src/reader/token.cpp
     src/reader/parser.cpp
