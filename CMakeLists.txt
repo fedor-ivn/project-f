@@ -17,3 +17,15 @@ add_executable(project-f
     src/reader/reader.cpp
     src/reader/error.cpp
 )
+
+add_executable(test-runner
+    src/test_runner/main.cpp
+    src/test_runner/test_runner.cpp
+    src/reader/reader.cpp
+    src/reader/parser.cpp
+    src/reader/error.cpp
+    src/reader/token.cpp
+    src/ast/element.cpp
+    src/ast/span.cpp
+    src/reader/scanner.cpp
+)
