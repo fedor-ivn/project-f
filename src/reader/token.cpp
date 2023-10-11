@@ -15,8 +15,8 @@ bool Token::is_right_parenthesis() const {
     return dynamic_cast<const RightParenthesis*>(this) != nullptr;
 }
 
-std::optional<std::string_view> Token::to_identifier() const {
-    if (auto token = dynamic_cast<const Identifier*>(this)) {
+std::optional<std::string_view> Token::to_symbol() const {
+    if (auto token = dynamic_cast<const Symbol*>(this)) {
         return std::optional<std::string_view>(token->value);
     }
     return std::nullopt;
@@ -60,8 +60,8 @@ std::ostream& operator<<(std::ostream& stream, const Token& token) {
         stream << "LeftParenthesis";
     } else if (token.is_right_parenthesis()) {
         stream << "RightParenthesis";
-    } else if (auto value = token.to_identifier()) {
-        stream << "Identifier(" << *value << ")";
+    } else if (auto value = token.to_symbol()) {
+        stream << "Symbol(" << *value << ")";
     } else if (auto value = token.to_integer()) {
         stream << "Integer(" << *value << ")";
     } else if (auto value = token.to_real()) {

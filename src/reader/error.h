@@ -11,7 +11,7 @@ enum class ErrorCause {
     MissingFractionalPart,
     IntegerOverflow,
     InvalidNumber,
-    InvalidIdentifier,
+    InvalidSymbol,
     UnexpectedCharacter,
     UnexpectedRightParenthesis,
     UnclosedList,

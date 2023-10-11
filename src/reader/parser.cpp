@@ -63,9 +63,9 @@ std::unique_ptr<ast::Element> Parser::parse_element() {
         return std::make_unique<ast::Real>(ast::Real(real.value(), token->span)
         );
     }
-    if (auto identifier = token->to_identifier()) {
+    if (auto symbol = token->to_symbol()) {
         return std::make_unique<ast::Symbol>(
-            ast::Symbol(std::string(identifier.value()), token->span)
+            ast::Symbol(std::string(symbol.value()), token->span)
         );
     }
 
