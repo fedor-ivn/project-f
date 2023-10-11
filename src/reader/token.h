@@ -19,7 +19,7 @@ class Token {
 
     bool is_left_parenthesis() const;
     bool is_right_parenthesis() const;
-    std::optional<std::string_view> to_identifier() const;
+    std::optional<std::string_view> to_symbol() const;
     std::optional<int64_t> to_integer() const;
     std::optional<double> to_real() const;
     std::optional<bool> to_boolean() const;
@@ -38,11 +38,11 @@ class RightParenthesis : public Token {
     using Token::Token;
 };
 
-class Identifier : public Token {
+class Symbol : public Token {
   public:
     std::string_view value;
 
-    Identifier(std::string_view value, ast::Span span)
+    Symbol(std::string_view value, ast::Span span)
         : Token(span), value(value) {}
 };
 

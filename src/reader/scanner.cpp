@@ -53,7 +53,7 @@ std::unique_ptr<Token> Scanner::parse_symbol() {
         ++end;
     }
     if (this->can_peek(end) && !is_delimiter(this->peek(end))) {
-        throw this->make_literal_error(ErrorCause::InvalidIdentifier);
+        throw this->make_literal_error(ErrorCause::InvalidSymbol);
     }
 
     auto symbol = this->source.substr(0, end);
@@ -67,7 +67,7 @@ std::unique_ptr<Token> Scanner::parse_symbol() {
         return std::make_unique<Null>(Null(span));
     }
 
-    return std::make_unique<Identifier>(Identifier(symbol, span));
+    return std::make_unique<Symbol>(Symbol(symbol, span));
 }
 
 std::unique_ptr<Token> Scanner::parse_numeral() {
