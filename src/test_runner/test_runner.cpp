@@ -33,13 +33,12 @@ bool TestRunner::test_fail_file(std::filesystem::path path) {
         try {
             Reader reader((std::string_view(line)));
             auto elements = reader.read();
-            passed = false;
-            break;
+            return false;
         } catch (reader::SyntaxError e) {
         }
     }
 
-    return passed;
+    return true;
 }
 
 std::vector<std::string> TestRunner::split(std::string str, char separator) {
