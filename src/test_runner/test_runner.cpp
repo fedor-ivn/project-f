@@ -13,12 +13,7 @@ bool TestRunner::path_ends_with(std::filesystem::path path, std::string end) {
         return false;
     }
 
-    if (path.string().substr(
-            path.string().length() - end.length(), end.length()
-        ) == end) {
-        return true;
-    }
-    return false;
+    return path.string().substr(path.string().length() - end.length()) == end;
 }
 
 bool TestRunner::test_fail_file(std::filesystem::path path) {
