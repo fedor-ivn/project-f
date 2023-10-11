@@ -78,9 +78,8 @@ bool TestRunner::test_correct_file(std::filesystem::path path) {
 bool TestRunner::test_file(std::filesystem::path path) {
     if (path_ends_with(path, ".fail.lispf")) {
         return test_fail_file(path);
-    } else {
-        return test_correct_file(path);
     }
+    return test_correct_file(path);
 }
 
 void TestRunner::test_all_files() {
