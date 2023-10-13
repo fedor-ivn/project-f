@@ -15,13 +15,6 @@
 
 using reader::Reader;
 
-bool path_ends_with(std::filesystem::path path, std::string end) {
-    if (path.string().length() < end.length()) {
-        return false;
-    }
-
-    return path.string().substr(path.string().length() - end.length()) == end;
-}
 
 bool test_fail_file(std::filesystem::path path) {
     std::ifstream file(path);
