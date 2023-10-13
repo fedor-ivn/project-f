@@ -3,15 +3,8 @@
 #include <string>
 #include <iostream>
 
-#include "ast/element.h"
-#include "ast/span.h"
-#include "evaluator/evaluator.h"
-#include "evaluator/program.h"
 #include "reader/error.h"
-#include "reader/parser.h"
 #include "reader/reader.h"
-#include "reader/scanner.h"
-#include "reader/token.h"
 
 using reader::Reader;
 
@@ -19,8 +12,6 @@ using reader::Reader;
 bool test_fail_file(std::filesystem::path path) {
     std::ifstream file(path);
     std::string line;
-
-    bool passed = true;
 
     while (std::getline(file, line)) {
         try {
@@ -31,9 +22,7 @@ bool test_fail_file(std::filesystem::path path) {
         }
     }
 
-    file.close();
-
-    return passed;
+    return true;
 }
 
 
@@ -43,16 +32,14 @@ bool test_correct_file(std::filesystem::path path) {
     buffer << file.rdbuf();
     std::string source(buffer.str());
 
-    bool passed = true;
-
     Reader reader((std::string_view(source)));
     try {
         auto elements = reader.read();
     } catch (reader::SyntaxError e) {
-        passed = false;
+        return false;
     }
 
-    return passed;
+    return true;
 }
 
 bool test_file(std::filesystem::path path) {
