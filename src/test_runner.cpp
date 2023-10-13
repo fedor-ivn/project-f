@@ -43,20 +43,6 @@ bool test_fail_file(std::filesystem::path path) {
     return passed;
 }
 
-std::vector<std::string> split(std::string str, char separator) {
-    std::vector<std::string> strings;
-
-    int startIndex = 0;
-    int endIndex = 0;
-    for (int i = 0; i <= str.size(); i++) {
-        if (str[i] == separator || i == str.size()) {
-            endIndex = i;
-            std::string temp = str.substr(startIndex, endIndex - startIndex);
-            startIndex = endIndex + 1;
-        }
-    }
-    return strings;
-}
 
 bool test_correct_file(std::filesystem::path path) {
     std::ifstream file(path);
