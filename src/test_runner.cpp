@@ -76,7 +76,7 @@ bool test_correct_file(std::filesystem::path path) {
     return passed;
 }
 
-bool parse_file(std::filesystem::path path) {
+bool test_file(std::filesystem::path path) {
     if (path.string().ends_with(".fail.lispf")) {
         return test_fail_file(path);
     }
@@ -104,7 +104,7 @@ void test_all_files() {
     for (auto path : paths) {
         std::cout << path << ": ";
 
-        bool passed = parse_file(path);
+        bool passed = test_file(path);
         if (passed) {
             std::cout << "passed" << std::endl;
         } else {
