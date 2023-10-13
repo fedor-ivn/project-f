@@ -80,7 +80,7 @@ std::vector<std::filesystem::path> get_paths() {
 void test_all_files() {
     std::vector<std::filesystem::path> paths = get_paths();
 
-    for (auto path : paths) {
+    for (auto&& path : paths) {
         std::cout << path << ": ";
 
         bool passed = test_file(path);
