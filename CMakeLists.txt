@@ -2,11 +2,10 @@ cmake_minimum_required(VERSION 3.10)
 
 project(project-f)
 
-set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
 
-add_executable(project-f
-    src/main.cpp
+add_library(internals
     src/ast/element.cpp
     src/ast/span.cpp
     src/evaluator/evaluator.cpp
@@ -18,14 +17,15 @@ add_executable(project-f
     src/reader/error.cpp
 )
 
+add_executable(project-f
+    src/main.cpp
+)
+target_link_libraries(
+    project-f PUBLIC internals
+)
 add_executable(test-runner
-    src/test_runner/main.cpp
-    src/test_runner/test_runner.cpp
-    src/reader/reader.cpp
-    src/reader/parser.cpp
-    src/reader/error.cpp
-    src/reader/token.cpp
-    src/ast/element.cpp
-    src/ast/span.cpp
-    src/reader/scanner.cpp
+    src/test_runner.cpp
+)
+target_link_libraries(
+    test-runner PUBLIC internals
 )

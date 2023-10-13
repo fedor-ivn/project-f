@@ -1,14 +1,21 @@
 #include <filesystem>
 #include <fstream>
+#include <string>
 #include <iostream>
 
-#include "../reader/error.h"
-#include "../reader/reader.h"
-#include "test_runner.h"
+#include "ast/element.h"
+#include "ast/span.h"
+#include "evaluator/evaluator.h"
+#include "evaluator/program.h"
+#include "reader/error.h"
+#include "reader/parser.h"
+#include "reader/reader.h"
+#include "reader/scanner.h"
+#include "reader/token.h"
 
 using reader::Reader;
 
-bool TestRunner::path_ends_with(std::filesystem::path path, std::string end) {
+bool path_ends_with(std::filesystem::path path, std::string end) {
     if (path.string().length() < end.length()) {
         return false;
     }
@@ -21,15 +28,13 @@ bool TestRunner::path_ends_with(std::filesystem::path path, std::string end) {
     return false;
 }
 
-bool TestRunner::test_fail_file(std::filesystem::path path) {
+bool test_fail_file(std::filesystem::path path) {
     std::ifstream file(path);
-    std::stringstream buffer;
-    buffer << file.rdbuf();
-    std::string source(buffer.str());
+    std::string line;
 
     bool passed = true;
 
-    for (auto line : split(source, '\n')) {
+    while (std::getline(file, line)) {
         try {
             Reader reader((std::string_view(line)));
             auto elements = reader.read();
@@ -39,10 +44,12 @@ bool TestRunner::test_fail_file(std::filesystem::path path) {
         }
     }
 
+    file.close();
+
     return passed;
 }
 
-std::vector<std::string> TestRunner::split(std::string str, char separator) {
+std::vector<std::string> split(std::string str, char separator) {
     std::vector<std::string> strings;
 
     int startIndex = 0;
@@ -57,7 +64,7 @@ std::vector<std::string> TestRunner::split(std::string str, char separator) {
     return strings;
 }
 
-bool TestRunner::test_correct_file(std::filesystem::path path) {
+bool test_correct_file(std::filesystem::path path) {
     std::ifstream file(path);
     std::stringstream buffer;
     buffer << file.rdbuf();
@@ -75,15 +82,30 @@ bool TestRunner::test_correct_file(std::filesystem::path path) {
     return passed;
 }
 
-bool TestRunner::parse_file(std::filesystem::path path) {
-    if (path_ends_with(path, ".fail.lispf")) {
+bool parse_file(std::filesystem::path path) {
+    if (path.string().ends_with(".fail.lispf")) {
         return test_fail_file(path);
     } else {
         return test_correct_file(path);
     }
 }
 
-void TestRunner::test_all_files() {
+std::vector<std::filesystem::path> get_paths() {
+    std::vector<std::filesystem::path> paths;
+
+    std::string path = "tests/syntax";
+    std::string ext = ".lispf";
+
+    for (const auto& entry : std::filesystem::directory_iterator(path)) {
+        if (entry.path().extension() == ext) {
+            paths.push_back(entry.path());
+        }
+    }
+
+    return paths;
+}
+
+void test_all_files() {
     std::vector<std::filesystem::path> paths = get_paths();
 
     for (auto path : paths) {
@@ -98,17 +120,6 @@ void TestRunner::test_all_files() {
     }
 }
 
-std::vector<std::filesystem::path> TestRunner::get_paths() {
-    std::vector<std::filesystem::path> paths;
-
-    std::string path = "tests/syntax";
-    std::string ext = ".lispf";
-
-    for (const auto& entry : std::filesystem::directory_iterator(path)) {
-        if (entry.path().extension() == ext) {
-            paths.push_back(entry.path());
-        }
-    }
-
-    return paths;
+int main() {
+    test_all_files();
 }

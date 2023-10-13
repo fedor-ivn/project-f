@@ -8,3 +8,4 @@ project-f
 build/
 .cache/
 test-runner
+libinternals.a
