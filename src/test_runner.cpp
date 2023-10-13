@@ -20,12 +20,7 @@ bool path_ends_with(std::filesystem::path path, std::string end) {
         return false;
     }
 
-    if (path.string().substr(
-            path.string().length() - end.length(), end.length()
-        ) == end) {
-        return true;
-    }
-    return false;
+    return path.string().substr(path.string().length() - end.length()) == end;
 }
 
 bool test_fail_file(std::filesystem::path path) {
@@ -38,8 +33,7 @@ bool test_fail_file(std::filesystem::path path) {
         try {
             Reader reader((std::string_view(line)));
             auto elements = reader.read();
-            passed = false;
-            break;
+            return false;
         } catch (reader::SyntaxError e) {
         }
     }
@@ -85,9 +79,8 @@ bool test_correct_file(std::filesystem::path path) {
 bool parse_file(std::filesystem::path path) {
     if (path.string().ends_with(".fail.lispf")) {
         return test_fail_file(path);
-    } else {
-        return test_correct_file(path);
     }
+    return test_correct_file(path);
 }
 
 std::vector<std::filesystem::path> get_paths() {
