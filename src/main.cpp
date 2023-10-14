@@ -202,7 +202,13 @@ void process(
     }
 }
 
-void repl(Mode mode, Evaluator& evaluator) {
+void repl(Mode mode) {
+    if (mode == Mode::Auto) {
+        mode = Mode::PrintResult;
+    }
+
+    Evaluator evaluator;
+
     std::string line;
     size_t nth_line = 0;
     while (true) {
@@ -215,6 +221,21 @@ void repl(Mode mode, Evaluator& evaluator) {
         std::string_view source(line);
         process(mode, evaluator, std::string_view(source), Position(nth_line));
     }
+}
+
+void file(Mode mode, std::string_view path) {
+    if (mode == Mode::Auto) {
+        mode = Mode::Silent;
+    }
+
+    std::ifstream file((std::string(path)));
+    std::stringstream buffer;
+    buffer << file.rdbuf();
+
+    std::string source(buffer.str());
+
+    Evaluator evaluator;
+    process(mode, evaluator, std::string_view(source), Position());
 }
 
 int main(int argc, const char** argv) {
@@ -231,25 +252,10 @@ int main(int argc, const char** argv) {
         return 0;
     }
 
-    Evaluator evaluator;
-
     if (arguments.file) {
-        if (arguments.mode == Mode::Auto) {
-            arguments.mode = Mode::Silent;
-        }
-        std::ifstream file(std::string(*arguments.file));
-        std::stringstream buffer;
-        buffer << file.rdbuf();
-
-        std::string source(buffer.str());
-        process(
-            arguments.mode, evaluator, std::string_view(source), Position()
-        );
+        file(arguments.mode, *arguments.file);
     } else {
-        if (arguments.mode == Mode::Auto) {
-            arguments.mode = Mode::PrintResult;
-        }
-        repl(arguments.mode, evaluator);
+        repl(arguments.mode);
     }
 
     return 0;
