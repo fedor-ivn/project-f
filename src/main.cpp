@@ -173,28 +173,32 @@ void print_ast(std::vector<std::unique_ptr<Element>>& ast) {
 void process(
     Mode mode, Evaluator& evaluator, std::string_view source, Position position
 ) {
-    Scanner scanner(source, position);
-    if (mode == Mode::LexicalAnalysis) {
-        print_tokens(scanner);
-        return;
-    }
+    try {
+        Scanner scanner(source, position);
+        if (mode == Mode::LexicalAnalysis) {
+            print_tokens(scanner);
+            return;
+        }
 
-    Parser parser(scanner);
-    auto ast = parser.parse();
-    if (mode == Mode::SyntaxAnalysis) {
-        print_ast(ast);
-        return;
-    }
+        Parser parser(scanner);
+        auto ast = parser.parse();
+        if (mode == Mode::SyntaxAnalysis) {
+            print_ast(ast);
+            return;
+        }
 
-    auto program = Program::from_elements(std::move(ast));
-    if (mode == Mode::SemanticAnalysis) {
-        // todo: print programs
-        return;
-    }
-    auto output = evaluator.evaluate(std::move(program));
+        auto program = Program::from_elements(std::move(ast));
+        if (mode == Mode::SemanticAnalysis) {
+            // todo: print programs
+            return;
+        }
+        auto output = evaluator.evaluate(std::move(program));
 
-    if (mode == Mode::PrintResult) {
-        std::cout << *output << std::endl;
+        if (mode == Mode::PrintResult) {
+            std::cout << *output << std::endl;
+        }
+    } catch (SyntaxError error) {
+        std::cerr << error << std::endl;
     }
 }
 
