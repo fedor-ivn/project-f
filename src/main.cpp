@@ -46,9 +46,15 @@ void print_ast(Reader& reader) {
     }
 }
 
-void repl() {
-    Evaluator evaluator;
+void process(Evaluator& evaluator, Reader& reader) {
+    auto elements = reader.read();
+    auto program = Program::from_elements(std::move(elements));
+    auto output = evaluator.evaluate(std::move(program));
 
+    std::cout << *output << std::endl;
+}
+
+void repl(Evaluator& evaluator) {
     std::string line;
     size_t nth_line = 0;
     while (true) {
@@ -60,11 +66,7 @@ void repl() {
         ++nth_line;
         std::string_view source(line);
         Reader reader((std::string_view(source)), Position(nth_line));
-        auto elements = reader.read();
-        auto program = Program::from_elements(std::move(elements));
-        auto result = evaluator.evaluate(std::move(program));
-
-        std::cout << *result << std::endl;
+        process(evaluator, reader);
     }
 }
 
@@ -74,8 +76,10 @@ int main(int argc, char** argv) {
         return 1;
     }
 
+    Evaluator evaluator;
+
     if (argc == 1) {
-        repl();
+        repl(evaluator);
         return 0;
     }
 
@@ -86,8 +90,7 @@ int main(int argc, char** argv) {
 
     std::string source(buffer.str());
     Reader reader((std::string_view(source)));
-
-    print_ast(reader);
+    process(evaluator, reader);
 
     return 0;
 }
