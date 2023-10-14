@@ -69,22 +69,25 @@ void repl() {
 }
 
 int main(int argc, char** argv) {
-    if (argc <= 1) {
+    if (argc > 2) {
+        std::cerr << "Error: too many arguments" << std::endl;
+        return 1;
+    }
+
+    if (argc == 1) {
         repl();
         return 0;
     }
 
-    for (int nth_file = 1; nth_file < argc; ++nth_file) {
-        std::ifstream file(argv[nth_file]);
-        std::stringstream buffer;
-        buffer << file.rdbuf();
+    char* file_name = argv[1];
+    std::ifstream file(file_name);
+    std::stringstream buffer;
+    buffer << file.rdbuf();
 
-        std::string source(buffer.str());
-        Reader reader((std::string_view(source)));
+    std::string source(buffer.str());
+    Reader reader((std::string_view(source)));
 
-        std::cout << argv[nth_file] << ':' << std::endl;
-        print_ast(reader);
-    }
+    print_ast(reader);
 
     return 0;
 }
