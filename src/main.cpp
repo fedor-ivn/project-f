@@ -6,17 +6,19 @@
 #include <ostream>
 #include <sstream>
 
+#include "ast/element.h"
 #include "ast/span.h"
 #include "evaluator/evaluator.h"
 #include "evaluator/program.h"
 #include "reader/error.h"
-#include "reader/reader.h"
+#include "reader/parser.h"
 #include "reader/scanner.h"
 
+using ast::Element;
 using ast::Position;
 using evaluator::Evaluator;
 using evaluator::Program;
-using reader::Reader;
+using reader::Parser;
 using reader::Scanner;
 using reader::SyntaxError;
 
@@ -162,27 +164,41 @@ void print_tokens(Scanner& scanner) {
     }
 }
 
-void print_ast(Reader& reader) {
-    try {
-        auto ast = reader.read();
-        for (auto&& element : ast) {
-            std::cout << *element << std::endl;
-        }
-    } catch (SyntaxError error) {
-        std::cout << error << std::endl;
-        return;
+void print_ast(std::vector<std::unique_ptr<Element>>& ast) {
+    for (auto& element : ast) {
+        std::cout << *element << std::endl;
     }
 }
 
-void process(Evaluator& evaluator, Reader& reader) {
-    auto elements = reader.read();
-    auto program = Program::from_elements(std::move(elements));
+void process(
+    Mode mode, Evaluator& evaluator, std::string_view source, Position position
+) {
+    Scanner scanner(source, position);
+    if (mode == Mode::LexicalAnalysis) {
+        print_tokens(scanner);
+        return;
+    }
+
+    Parser parser(scanner);
+    auto ast = parser.parse();
+    if (mode == Mode::SyntaxAnalysis) {
+        print_ast(ast);
+        return;
+    }
+
+    auto program = Program::from_elements(std::move(ast));
+    if (mode == Mode::SemanticAnalysis) {
+        // todo: print programs
+        return;
+    }
     auto output = evaluator.evaluate(std::move(program));
 
-    std::cout << *output << std::endl;
+    if (mode == Mode::PrintResult) {
+        std::cout << *output << std::endl;
+    }
 }
 
-void repl(Evaluator& evaluator) {
+void repl(Mode mode, Evaluator& evaluator) {
     std::string line;
     size_t nth_line = 0;
     while (true) {
@@ -193,8 +209,7 @@ void repl(Evaluator& evaluator) {
 
         ++nth_line;
         std::string_view source(line);
-        Reader reader((std::string_view(source)), Position(nth_line));
-        process(evaluator, reader);
+        process(mode, evaluator, std::string_view(source), Position(nth_line));
     }
 }
 
@@ -223,13 +238,14 @@ int main(int argc, const char** argv) {
         buffer << file.rdbuf();
 
         std::string source(buffer.str());
-        Reader reader((std::string_view(source)));
-        process(evaluator, reader);
+        process(
+            arguments.mode, evaluator, std::string_view(source), Position()
+        );
     } else {
         if (arguments.mode == Mode::Auto) {
             arguments.mode = Mode::PrintResult;
         }
-        repl(evaluator);
+        repl(arguments.mode, evaluator);
     }
 
     return 0;
