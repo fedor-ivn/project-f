@@ -61,8 +61,10 @@ std::vector<std::filesystem::path> get_paths() {
     return paths;
 }
 
-void test_all_files() {
+int test_all_files() {
     std::vector<std::filesystem::path> paths = get_paths();
+
+    int code = 0;
 
     for (auto&& path : paths) {
         std::cout << path << ": ";
@@ -72,10 +74,13 @@ void test_all_files() {
             std::cout << "passed" << std::endl;
         } else {
             std::cout << "failed" << std::endl;
+            code = 1;
         }
     }
+
+    return code;
 }
 
 int main() {
-    test_all_files();
+    return test_all_files();
 }
