@@ -229,6 +229,10 @@ void file(Mode mode, std::string_view path) {
     }
 
     std::ifstream file((std::string(path)));
+    if (!file.is_open()) {
+        std::cerr << "Error: cannot read file " << path << std::endl;
+        return;
+    }
     std::stringstream buffer;
     buffer << file.rdbuf();
 
