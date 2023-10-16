@@ -11,6 +11,7 @@
 namespace ast {
 
 class DisplayVerbose;
+class DisplayPretty;
 
 class Cons;
 
@@ -29,12 +30,16 @@ class Element {
     std::optional<Cons> to_cons() const;
 
     DisplayVerbose display_verbose();
+    DisplayPretty display_pretty();
 
   private:
     virtual void _display_verbose(std::ostream& stream, size_t depth) const = 0;
+    virtual void _display_pretty(std::ostream& stream) const = 0;
 
     friend std::ostream&
     operator<<(std::ostream& stream, const DisplayVerbose& self);
+    friend std::ostream&
+    operator<<(std::ostream& stream, const DisplayPretty& self);
     friend Cons;
 };
 
@@ -44,6 +49,7 @@ class Null : public Element {
 
   private:
     virtual void _display_verbose(std::ostream& stream, size_t depth) const;
+    virtual void _display_pretty(std::ostream& stream) const;
 };
 
 class Integer : public Element {
@@ -54,6 +60,7 @@ class Integer : public Element {
 
   private:
     virtual void _display_verbose(std::ostream& stream, size_t depth) const;
+    virtual void _display_pretty(std::ostream& stream) const;
 };
 
 class Real : public Element {
@@ -64,6 +71,7 @@ class Real : public Element {
 
   private:
     virtual void _display_verbose(std::ostream& stream, size_t depth) const;
+    virtual void _display_pretty(std::ostream& stream) const;
 };
 
 class Boolean : public Element {
@@ -74,6 +82,7 @@ class Boolean : public Element {
 
   private:
     virtual void _display_verbose(std::ostream& stream, size_t depth) const;
+    virtual void _display_pretty(std::ostream& stream) const;
 };
 
 class Symbol : public Element {
@@ -84,6 +93,7 @@ class Symbol : public Element {
 
   private:
     virtual void _display_verbose(std::ostream& stream, size_t depth) const;
+    virtual void _display_pretty(std::ostream& stream) const;
 };
 
 class Cons : public Element {
@@ -97,6 +107,7 @@ class Cons : public Element {
 
   private:
     virtual void _display_verbose(std::ostream& stream, size_t depth) const;
+    virtual void _display_pretty(std::ostream& stream) const;
 };
 
 class DisplayVerbose {
@@ -108,6 +119,17 @@ class DisplayVerbose {
 
     friend std::ostream&
     operator<<(std::ostream& stream, const DisplayVerbose& self);
+};
+
+class DisplayPretty {
+    Element* element;
+
+    DisplayPretty(Element* element);
+
+    friend DisplayPretty Element::display_pretty();
+
+    friend std::ostream&
+    operator<<(std::ostream& stream, const DisplayPretty& self);
 };
 
 } // namespace ast

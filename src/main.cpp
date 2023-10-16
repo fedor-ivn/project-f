@@ -195,7 +195,7 @@ void process(
         auto output = evaluator.evaluate(std::move(program));
 
         if (mode == Mode::PrintResult) {
-            std::cout << output->display_verbose() << std::endl;
+            std::cout << output->display_pretty() << std::endl;
         }
     } catch (SyntaxError error) {
         std::cerr << error << std::endl;
