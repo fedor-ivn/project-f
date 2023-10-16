@@ -4,6 +4,20 @@
 
 namespace ast {
 
+class Depth {
+  public:
+    size_t depth;
+
+    Depth(size_t depth) : depth(depth) {}
+
+    friend std::ostream& operator<<(std::ostream& stream, const Depth& self) {
+        for (int i = 0; i < self.depth * 2; ++i) {
+            stream << ' ';
+        }
+        return stream;
+    }
+};
+
 Element::Element(Span span) : span(span) {}
 
 bool Element::is_null() const {
@@ -46,47 +60,62 @@ std::optional<Cons> Element::to_cons() const {
     return std::nullopt;
 }
 
+void Null::_display_verbose(std::ostream& stream, size_t depth) const {
+    stream << Depth(depth) << "Null(" << this->span << ")";
+}
+
+DisplayVerbose Element::display_verbose() { return DisplayVerbose(this); }
+
 Integer::Integer(int64_t value, Span span) : Element(span), value(value) {}
+
+void Integer::_display_verbose(std::ostream& stream, size_t depth) const {
+    stream << Depth(depth) << "Integer(" << this->value << ", " << this->span
+           << ")";
+}
 
 Real::Real(double value, Span span) : Element(span), value(value) {}
 
+void Real::_display_verbose(std::ostream& stream, size_t depth) const {
+    stream << Depth(depth) << "Real(" << this->value << ", " << this->span
+           << ")";
+}
+
 Boolean::Boolean(bool value, Span span) : Element(span), value(value) {}
 
+void Boolean::_display_verbose(std::ostream& stream, size_t depth) const {
+    auto value = this->value ? "true" : "false";
+    stream << Depth(depth) << "Boolean(" << value << ", " << this->span << ")";
+}
+
 Symbol::Symbol(std::string value, Span span) : Element(span), value(value) {}
+
+void Symbol::_display_verbose(std::ostream& stream, size_t depth) const {
+    stream << Depth(depth) << "Symbol(" << this->value << ", " << this->span
+           << ")";
+}
 
 Cons::Cons(
     std::shared_ptr<Element> left, std::shared_ptr<Element> right, Span span
 )
     : Element(span), left(left), right(right) {}
 
-void display_element(
-    std::ostream& stream, const Element& element, size_t depth
-) {
-    if (element.is_null()) {
-        stream << "Null";
-    } else if (auto value = element.to_integer()) {
-        stream << "Integer(" << *value << ")";
-    } else if (auto value = element.to_real()) {
-        stream << "Real(" << *value << ")";
-    } else if (auto value = element.to_boolean()) {
-        stream << "Boolean(" << *value << ")";
-    } else if (auto value = element.to_symbol()) {
-        stream << "Symbol(" << *value << ")";
-    } else if (auto cons = element.to_cons()) {
-        std::string indentation;
-        indentation.resize(depth * 2, ' ');
-        stream << "Cons(\n" << indentation << "  ";
-        display_element(stream, *cons->left, depth + 1);
-        stream << ",\n" << indentation << "  ";
-        display_element(stream, *cons->right, depth + 1);
-        stream << ",\n" << indentation << ')';
-    }
+void Cons::_display_verbose(std::ostream& stream, size_t depth) const {
+    stream << Depth(depth) << "Cons(\n";
 
-    stream << " at " << element.span;
+    this->left->_display_verbose(stream, depth + 1);
+    stream << ",\n";
+
+    this->right->_display_verbose(stream, depth + 1);
+    stream << ",\n";
+
+    stream << Depth(depth + 1) << this->span << '\n';
+    stream << Depth(depth) << ')';
 }
 
-std::ostream& operator<<(std::ostream& stream, const Element& element) {
-    display_element(stream, element, 0);
+DisplayVerbose::DisplayVerbose(Element* element) : element(element) {}
+
+std::ostream& operator<<(std::ostream& stream, const DisplayVerbose& self) {
+    self.element->_display_verbose(stream, 0);
     return stream;
 }
 
