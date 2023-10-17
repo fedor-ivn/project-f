@@ -10,6 +10,9 @@
 
 namespace ast {
 
+class DisplayVerbose;
+class DisplayPretty;
+
 class Cons;
 
 class Element {
@@ -17,6 +20,7 @@ class Element {
     Span span;
 
     Element(Span span);
+    virtual ~Element() = default;
 
     bool is_null() const;
     std::optional<int64_t> to_integer() const;
@@ -25,13 +29,27 @@ class Element {
     std::optional<std::string_view> to_symbol() const;
     std::optional<Cons> to_cons() const;
 
-    virtual ~Element() = default;
+    DisplayVerbose display_verbose();
+    DisplayPretty display_pretty();
+
+  private:
+    virtual void _display_verbose(std::ostream& stream, size_t depth) const = 0;
+    virtual void _display_pretty(std::ostream& stream) const = 0;
+
     friend std::ostream&
-    operator<<(std::ostream& stream, const Element& element);
+    operator<<(std::ostream& stream, const DisplayVerbose& self);
+    friend std::ostream&
+    operator<<(std::ostream& stream, const DisplayPretty& self);
+    friend Cons;
 };
 
 class Null : public Element {
+  public:
     using Element::Element;
+
+  private:
+    virtual void _display_verbose(std::ostream& stream, size_t depth) const;
+    virtual void _display_pretty(std::ostream& stream) const;
 };
 
 class Integer : public Element {
@@ -39,6 +57,10 @@ class Integer : public Element {
     int64_t value;
 
     Integer(int64_t value, Span span);
+
+  private:
+    virtual void _display_verbose(std::ostream& stream, size_t depth) const;
+    virtual void _display_pretty(std::ostream& stream) const;
 };
 
 class Real : public Element {
@@ -46,6 +68,10 @@ class Real : public Element {
     double value;
 
     Real(double value, Span span);
+
+  private:
+    virtual void _display_verbose(std::ostream& stream, size_t depth) const;
+    virtual void _display_pretty(std::ostream& stream) const;
 };
 
 class Boolean : public Element {
@@ -53,6 +79,10 @@ class Boolean : public Element {
     bool value;
 
     Boolean(bool value, Span span);
+
+  private:
+    virtual void _display_verbose(std::ostream& stream, size_t depth) const;
+    virtual void _display_pretty(std::ostream& stream) const;
 };
 
 class Symbol : public Element {
@@ -60,6 +90,10 @@ class Symbol : public Element {
     std::string value;
 
     Symbol(std::string value, Span span);
+
+  private:
+    virtual void _display_verbose(std::ostream& stream, size_t depth) const;
+    virtual void _display_pretty(std::ostream& stream) const;
 };
 
 class Cons : public Element {
@@ -70,6 +104,32 @@ class Cons : public Element {
     Cons(
         std::shared_ptr<Element> left, std::shared_ptr<Element> right, Span span
     );
+
+  private:
+    virtual void _display_verbose(std::ostream& stream, size_t depth) const;
+    virtual void _display_pretty(std::ostream& stream) const;
+};
+
+class DisplayVerbose {
+    Element* element;
+
+    DisplayVerbose(Element* element);
+
+    friend DisplayVerbose Element::display_verbose();
+
+    friend std::ostream&
+    operator<<(std::ostream& stream, const DisplayVerbose& self);
+};
+
+class DisplayPretty {
+    Element* element;
+
+    DisplayPretty(Element* element);
+
+    friend DisplayPretty Element::display_pretty();
+
+    friend std::ostream&
+    operator<<(std::ostream& stream, const DisplayPretty& self);
 };
 
 } // namespace ast

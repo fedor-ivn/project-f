@@ -166,7 +166,7 @@ void print_tokens(Scanner& scanner) {
 
 void print_ast(std::vector<std::unique_ptr<Element>>& ast) {
     for (auto& element : ast) {
-        std::cout << *element << std::endl;
+        std::cout << element->display_verbose() << std::endl;
     }
 }
 
@@ -195,7 +195,7 @@ void process(
         auto output = evaluator.evaluate(std::move(program));
 
         if (mode == Mode::PrintResult) {
-            std::cout << *output << std::endl;
+            std::cout << output->display_pretty() << std::endl;
         }
     } catch (SyntaxError error) {
         std::cerr << error << std::endl;
