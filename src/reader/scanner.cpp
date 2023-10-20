@@ -119,7 +119,7 @@ std::unique_ptr<Token> Scanner::parse_numeral() {
     try {
         int64_t integer = std::stoll(std::string(literal));
         return std::make_unique<Integer>(Integer(integer, span));
-    } catch (std::out_of_range) {
+    } catch (std::out_of_range const&) {
         throw SyntaxError(ErrorCause::IntegerOverflow, span, false);
     }
 }

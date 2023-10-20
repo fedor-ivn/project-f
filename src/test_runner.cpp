@@ -1,13 +1,12 @@
 #include <filesystem>
 #include <fstream>
-#include <string>
 #include <iostream>
+#include <string>
 
 #include "reader/error.h"
 #include "reader/reader.h"
 
 using reader::Reader;
-
 
 bool test_fail_file(std::filesystem::path path) {
     std::ifstream file(path);
@@ -18,13 +17,12 @@ bool test_fail_file(std::filesystem::path path) {
             Reader reader((std::string_view(line)));
             auto elements = reader.read();
             return false;
-        } catch (reader::SyntaxError e) {
+        } catch (reader::SyntaxError const&) {
         }
     }
 
     return true;
 }
-
 
 bool test_correct_file(std::filesystem::path path) {
     std::ifstream file(path);
@@ -35,7 +33,7 @@ bool test_correct_file(std::filesystem::path path) {
     Reader reader((std::string_view(source)));
     try {
         auto elements = reader.read();
-    } catch (reader::SyntaxError e) {
+    } catch (reader::SyntaxError const&) {
         return false;
     }
 
@@ -52,7 +50,8 @@ bool test_file(std::filesystem::path path) {
 std::vector<std::filesystem::path> get_paths() {
     std::vector<std::filesystem::path> paths;
 
-    for (const auto& entry : std::filesystem::directory_iterator("tests/syntax")) {
+    for (const auto& entry :
+         std::filesystem::directory_iterator("tests/syntax")) {
         if (entry.path().extension() == ".lispf") {
             paths.push_back(entry.path());
         }
@@ -81,6 +80,4 @@ int test_all_files() {
     return code;
 }
 
-int main() {
-    return test_all_files();
-}
+int main() { return test_all_files(); }
