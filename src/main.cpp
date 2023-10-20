@@ -157,7 +157,7 @@ void print_tokens(Scanner& scanner) {
                 break;
             }
             std::cout << *token << std::endl;
-        } catch (SyntaxError error) {
+        } catch (SyntaxError const& error) {
             std::cout << error << std::endl;
             return;
         }
@@ -197,7 +197,7 @@ void process(
         if (mode == Mode::PrintResult) {
             std::cout << output->display_pretty() << std::endl;
         }
-    } catch (SyntaxError error) {
+    } catch (SyntaxError const& error) {
         std::cerr << error << std::endl;
     }
 }
@@ -246,7 +246,7 @@ int main(int argc, const char** argv) {
     Arguments arguments;
     try {
         arguments.parse(argc, argv);
-    } catch (ArgumentError error) {
+    } catch (ArgumentError const& error) {
         std::cerr << error << std::endl;
         return 1;
     }
