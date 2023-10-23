@@ -189,7 +189,7 @@ void process(
 
         auto program = Program::from_elements(std::move(ast));
         if (mode == Mode::SemanticAnalysis) {
-            // todo: print programs
+            std::cout << program << std::endl;
             return;
         }
         auto output = evaluator.evaluate(std::move(program));

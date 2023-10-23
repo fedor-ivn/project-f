@@ -31,6 +31,10 @@ std::shared_ptr<Element> Atom::evaluate() const {
     return this->atom;
 }
 
+void Atom::display(std::ostream& stream) const {
+    stream << "Atom { element = " << this->atom->display_verbose() << "}";
+}
+
 Quote::Quote(std::shared_ptr<Element> element)
     : Expression(), element(element) {}
 
@@ -49,6 +53,12 @@ std::unique_ptr<Quote> Quote::parse(std::shared_ptr<List> arguments) {
 }
 
 std::shared_ptr<Element> Quote::evaluate() const { return this->element; }
+
+void Quote::display(std::ostream& stream) const {
+    stream << "Quote {\n";
+    stream << "  element = " << this->element->display_verbose() << "\n";
+    stream << "}";
+}
 
 Program::Program(std::vector<std::unique_ptr<Expression>> program)
     : program(std::move(program)) {}
@@ -69,6 +79,18 @@ std::shared_ptr<Element> Program::evaluate() const {
         last_evaluated = expression->evaluate();
     }
     return last_evaluated;
+}
+
+std::ostream& operator<<(std::ostream& stream, const Program& program) {
+    stream << "Program [\n";
+
+    for (const auto& expression : program.program) {
+        expression->display(stream);
+        stream << ",\n";
+    }
+
+    stream << "]";
+    return stream;
 }
 
 } // namespace evaluator
