@@ -61,12 +61,6 @@ std::optional<Cons> Element::to_cons() const {
     return std::nullopt;
 }
 
-void Null::_display_verbose(std::ostream& stream, size_t depth) const {
-    stream << Depth(depth) << "Null(" << this->span << ")";
-}
-
-void Null::_display_pretty(std::ostream& stream) const { stream << "null"; }
-
 DisplayVerbose Element::display_verbose() { return DisplayVerbose(this); }
 DisplayPretty Element::display_pretty() { return DisplayPretty(this); }
 
@@ -133,10 +127,16 @@ void Symbol::_display_pretty(std::ostream& stream) const {
     stream << this->value;
 }
 
+void Null::_display_verbose(std::ostream& stream, size_t depth) const {
+    stream << Depth(depth) << "Null(" << this->span << ")";
+}
+
+void Null::_display_pretty(std::ostream& stream) const { stream << "null"; }
+
 Cons::Cons(
-    std::shared_ptr<Element> left, std::shared_ptr<Element> right, Span span
+    std::shared_ptr<Element> left, std::shared_ptr<List> right, Span span
 )
-    : Element(span), left(left), right(right) {}
+    : List(span), left(left), right(right) {}
 
 void Cons::_display_verbose(std::ostream& stream, size_t depth) const {
     stream << Depth(depth) << "Cons(\n";
