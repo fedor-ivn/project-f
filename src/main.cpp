@@ -175,7 +175,7 @@ void process(
     Evaluator& evaluator,
     std::string_view source,
     Position position,
-    bool preserve_recoverable = false
+    bool ignore_recoverable = false
 ) {
     try {
         Scanner scanner(source, position);
@@ -202,8 +202,8 @@ void process(
             std::cout << output->display_pretty() << std::endl;
         }
     } catch (SyntaxError const& error) {
-        if (preserve_recoverable && error.can_recover) {
-            throw error;
+        if (ignore_recoverable && error.can_recover) {
+            return;
         }
         std::cerr << error << std::endl;
     }
@@ -229,19 +229,16 @@ void repl(Mode mode) {
 
         buffered.append(line).push_back('\n');
         ++lines_buffered;
-        try {
-            process(
-                mode,
-                evaluator,
-                std::string_view(buffered),
-                Position(lines_executed + 1),
-                true
-            );
-            buffered = "";
-            lines_executed = current_line;
-            lines_buffered = 0;
-        } catch (SyntaxError const& error) {
-        }
+        process(
+            mode,
+            evaluator,
+            std::string_view(buffered),
+            Position(lines_executed + 1),
+            true
+        );
+        buffered = "";
+        lines_executed = current_line;
+        lines_buffered = 0;
     }
 }
 
