@@ -24,6 +24,17 @@ class Atom : public Expression {
     virtual std::shared_ptr<ast::Element> evaluate() const;
 };
 
+class Quote : public Expression {
+    std::shared_ptr<ast::Element> element;
+
+  public:
+    Quote(std::shared_ptr<ast::Element> element);
+
+    static std::unique_ptr<Quote> parse(std::shared_ptr<ast::List> arguments);
+
+    virtual std::shared_ptr<ast::Element> evaluate() const;
+};
+
 class Program {
     std::vector<std::unique_ptr<Expression>> program;
 

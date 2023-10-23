@@ -3,14 +3,19 @@
 namespace evaluator {
 
 using ast::Element;
+using ast::List;
 using ast::Null;
 using ast::Position;
 using ast::Span;
 
 std::unique_ptr<Expression>
 Expression::from_element(std::unique_ptr<Element> element) {
-    if (element->to_cons()) {
-        throw std::runtime_error("List evaluation is to be implemented");
+    if (auto cons = element->to_cons()) {
+        auto symbol = cons->left->to_symbol();
+
+        if (symbol == "quote") {
+            return Quote::parse(cons->right);
+        }
     }
 
     return std::make_unique<Atom>(Atom(std::move(element)));
@@ -25,6 +30,25 @@ std::shared_ptr<Element> Atom::evaluate() const {
 
     return this->atom;
 }
+
+Quote::Quote(std::shared_ptr<Element> element)
+    : Expression(), element(element) {}
+
+std::unique_ptr<Quote> Quote::parse(std::shared_ptr<List> arguments) {
+    if (auto cons = arguments->to_cons()) {
+        auto element = cons->left;
+
+        if (cons->right->to_cons()) {
+            throw std::runtime_error("quote has more than one argument");
+        }
+
+        return std::make_unique<Quote>(Quote(element));
+    }
+
+    throw std::runtime_error("quote has zero arguments");
+}
+
+std::shared_ptr<Element> Quote::evaluate() const { return this->element; }
 
 Program::Program(std::vector<std::unique_ptr<Expression>> program)
     : program(std::move(program)) {}
