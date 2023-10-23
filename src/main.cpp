@@ -171,7 +171,11 @@ void print_ast(std::vector<std::unique_ptr<Element>>& ast) {
 }
 
 void process(
-    Mode mode, Evaluator& evaluator, std::string_view source, Position position
+    Mode mode,
+    Evaluator& evaluator,
+    std::string_view source,
+    Position position,
+    bool ignore_recoverable = false
 ) {
     try {
         Scanner scanner(source, position);
@@ -198,6 +202,9 @@ void process(
             std::cout << output->display_pretty() << std::endl;
         }
     } catch (SyntaxError const& error) {
+        if (ignore_recoverable && error.can_recover) {
+            return;
+        }
         std::cerr << error << std::endl;
     }
 }
@@ -210,16 +217,28 @@ void repl(Mode mode) {
     Evaluator evaluator;
 
     std::string line;
-    size_t nth_line = 0;
+    std::string buffered;
+    size_t lines_executed = 0;
+    size_t lines_buffered = 0;
     while (true) {
-        std::cout << ">>> ";
+        auto current_line = lines_executed + lines_buffered + 1;
+        std::cerr << "[" << current_line << "]> ";
         if (!std::getline(std::cin, line)) {
             break;
         }
 
-        ++nth_line;
-        std::string_view source(line);
-        process(mode, evaluator, std::string_view(source), Position(nth_line));
+        buffered.append(line).push_back('\n');
+        ++lines_buffered;
+        process(
+            mode,
+            evaluator,
+            std::string_view(buffered),
+            Position(lines_executed + 1),
+            true
+        );
+        buffered = "";
+        lines_executed = current_line;
+        lines_buffered = 0;
     }
 }
 
