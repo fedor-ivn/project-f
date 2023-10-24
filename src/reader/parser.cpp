@@ -28,7 +28,7 @@ std::unique_ptr<Token> Parser::next_token() {
     return token;
 }
 
-std::unique_ptr<ast::Element> Parser::parse_cons() {
+std::unique_ptr<ast::List> Parser::parse_list() {
     auto& token = this->peek_token();
     if (token->is_right_parenthesis()) {
         auto token = this->next_token();
@@ -37,7 +37,7 @@ std::unique_ptr<ast::Element> Parser::parse_cons() {
 
     auto start = token->span.start;
     auto head = this->parse_element();
-    auto tail = this->parse_cons();
+    auto tail = this->parse_list();
     return std::make_unique<ast::Cons>(
         ast::Cons(std::move(head), std::move(tail), Span(start, tail->span.end))
     );
@@ -88,9 +88,9 @@ std::unique_ptr<ast::Element> Parser::parse_element() {
 
     if (token->is_left_parenthesis()) {
         try {
-            auto cons = this->parse_cons();
-            cons->span.start = token->span.start;
-            return cons;
+            auto list = this->parse_list();
+            list->span.start = token->span.start;
+            return list;
         } catch (SyntaxError& error) {
             switch (error.cause) {
             case ErrorCause::UnclosedList:

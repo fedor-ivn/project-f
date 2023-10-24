@@ -43,15 +43,6 @@ class Element {
     friend Cons;
 };
 
-class Null : public Element {
-  public:
-    using Element::Element;
-
-  private:
-    virtual void _display_verbose(std::ostream& stream, size_t depth) const;
-    virtual void _display_pretty(std::ostream& stream) const;
-};
-
 class Integer : public Element {
   public:
     int64_t value;
@@ -96,14 +87,25 @@ class Symbol : public Element {
     virtual void _display_pretty(std::ostream& stream) const;
 };
 
-class Cons : public Element {
+class List : public Element {
+    using Element::Element;
+};
+
+class Null : public List {
+  public:
+    using List::List;
+
+  private:
+    virtual void _display_verbose(std::ostream& stream, size_t depth) const;
+    virtual void _display_pretty(std::ostream& stream) const;
+};
+
+class Cons : public List {
   public:
     std::shared_ptr<Element> left;
-    std::shared_ptr<Element> right;
+    std::shared_ptr<List> right;
 
-    Cons(
-        std::shared_ptr<Element> left, std::shared_ptr<Element> right, Span span
-    );
+    Cons(std::shared_ptr<Element> left, std::shared_ptr<List> right, Span span);
 
   private:
     virtual void _display_verbose(std::ostream& stream, size_t depth) const;
