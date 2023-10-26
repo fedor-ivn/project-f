@@ -1,4 +1,6 @@
 #include "program.h"
+#include <memory>
+#include <stdexcept>
 
 namespace evaluator {
 
@@ -9,12 +11,16 @@ using ast::Position;
 using ast::Span;
 
 std::unique_ptr<Expression>
-Expression::from_element(std::unique_ptr<Element> element) {
+Expression::from_element(std::shared_ptr<Element> element) {
     if (auto cons = element->to_cons()) {
         auto symbol = cons->left->to_symbol();
 
         if (symbol == "quote") {
             return Quote::parse(cons->right);
+        }
+
+        else if (symbol == "setq") {
+            return Setq::parse(cons->right);
         }
     }
 
@@ -58,6 +64,40 @@ void Quote::display(std::ostream& stream) const {
     stream << "Quote {\n";
     stream << "  element = " << this->element->display_verbose() << "\n";
     stream << "}";
+}
+
+Setq::Setq(std::shared_ptr<ast::Symbol> symbol, std::shared_ptr<Element> element) {
+    this->symbol = symbol;
+    this->expression = Expression::from_element(std::move(element));
+}
+
+std::unique_ptr<Setq> Setq::parse(std::shared_ptr<ast::List> arguments) {
+    if (auto cons = arguments->to_cons()) {
+        auto symbol_value = cons->left->to_symbol().value();
+        auto symbol = std::make_shared<ast::Symbol>(ast::Symbol(std::string(symbol_value), Span(Position(0, 0), Position(0, 0))));
+
+        if (auto remaining_cons = cons->right->to_cons()) {
+            auto element = remaining_cons->left;
+
+            if (remaining_cons->right->to_cons()) {
+                throw std::runtime_error("setq has more than 2 arguments");
+            }
+
+            return std::make_unique<Setq>(Setq(symbol, element));
+        }
+
+        throw std::runtime_error("setq has one argument");
+    }
+
+    throw std::runtime_error("setq has zero arguments");
+}
+
+std::shared_ptr<ast::Element> Setq::evaluate() const {
+    throw std::runtime_error("Not implemented");
+}
+
+void Setq::display(std::ostream& stream) const {
+    throw std::runtime_error("Not implemented");
 }
 
 Program::Program(std::vector<std::unique_ptr<Expression>> program)

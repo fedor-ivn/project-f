@@ -1,6 +1,7 @@
 #pragma once
 
 #include "../ast/element.h"
+#include <memory>
 #include <vector>
 
 namespace evaluator {
@@ -8,7 +9,7 @@ namespace evaluator {
 class Expression {
   public:
     static std::unique_ptr<Expression>
-    from_element(std::unique_ptr<ast::Element> element);
+    from_element(std::shared_ptr<ast::Element> element);
 
     virtual ~Expression() = default;
 
@@ -33,6 +34,19 @@ class Quote : public Expression {
     Quote(std::shared_ptr<ast::Element> element);
 
     static std::unique_ptr<Quote> parse(std::shared_ptr<ast::List> arguments);
+
+    virtual std::shared_ptr<ast::Element> evaluate() const;
+    virtual void display(std::ostream& stream) const;
+};
+
+class Setq : public Expression {
+    std::shared_ptr<ast::Symbol> symbol;
+    std::unique_ptr<Expression> expression;
+
+  public:
+    Setq(std::shared_ptr<ast::Symbol> symbol, std::shared_ptr<ast::Element> element);
+    
+    static std::unique_ptr<Setq> parse(std::shared_ptr<ast::List> arguments);
 
     virtual std::shared_ptr<ast::Element> evaluate() const;
     virtual void display(std::ostream& stream) const;
