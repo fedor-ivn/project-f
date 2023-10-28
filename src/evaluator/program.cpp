@@ -22,6 +22,10 @@ Expression::from_element(std::shared_ptr<Element> element) {
         else if (symbol == "setq") {
             return Setq::parse(cons->right);
         }
+
+        else if (symbol == "func") {
+            return Func::parse(cons->right);
+        }
     }
 
     return std::make_unique<Atom>(Atom(std::move(element)));
