@@ -58,13 +58,13 @@ std::unique_ptr<Quote> Quote::parse(std::shared_ptr<List> arguments) {
         auto element = cons->left;
 
         if (cons->right->to_cons()) {
-            throw std::runtime_error("quote has more than one argument");
+            throw std::runtime_error("`quote` takes 1 argument, provided more than one");
         }
 
         return std::make_unique<Quote>(Quote(element));
     }
 
-    throw std::runtime_error("quote has zero arguments");
+    throw std::runtime_error("`quote` takes 1 argument, provided 0");
 }
 
 std::shared_ptr<Element> Quote::evaluate() const { return this->element; }
