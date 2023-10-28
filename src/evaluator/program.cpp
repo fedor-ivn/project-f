@@ -111,7 +111,7 @@ Func::Func(std::shared_ptr<ast::Symbol> name, std::shared_ptr<ast::List> argumen
 
 std::unique_ptr<Func> Func::parse(std::shared_ptr<ast::List> arguments) {
     if (!arguments->to_cons()) {
-        throw std::runtime_error("func has zero arguments");
+        throw std::runtime_error("`func` takes at least 3 arguments, provided 0");
     }
 
     auto cons = arguments->to_cons();
@@ -119,13 +119,13 @@ std::unique_ptr<Func> Func::parse(std::shared_ptr<ast::List> arguments) {
     auto name = std::dynamic_pointer_cast<ast::Symbol>(cons->left);
 
     if (!cons->right->to_cons()) {
-        throw std::runtime_error("func has only one argument");
+        throw std::runtime_error("`func` takes at least 3 arguments, provided 1");
     }
 
     auto func_arguments = std::dynamic_pointer_cast<ast::List>(cons->right->to_cons()->left);
 
     if (!cons->right->to_cons()->right->to_cons()) {
-        throw std::runtime_error("func has only two arguments");
+        throw std::runtime_error("`func` takes at least 3 arguments, provided 2");
     }
 
     auto body_element = std::static_pointer_cast<ast::Element>(cons->right->to_cons()->right);
