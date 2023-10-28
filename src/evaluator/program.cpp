@@ -14,21 +14,22 @@ std::unique_ptr<Expression>
 Expression::from_element(std::shared_ptr<Element> element) {
     if (auto cons = element->to_cons()) {
         auto symbol = cons->left->to_symbol();
+        auto arguments = cons->right;
 
         if (symbol == "quote") {
-            return Quote::parse(cons->right);
+            return Quote::parse(arguments);
         }
 
         else if (symbol == "setq") {
-            return Setq::parse(cons->right);
+            return Setq::parse(arguments);
         }
 
         else if (symbol == "func") {
-            return Func::parse(cons->right);
+            return Func::parse(arguments);
         }
 
         else if (symbol == "lambda") {
-            return Lambda::parse(cons->right);
+            return Lambda::parse(arguments);
         }
     }
 
