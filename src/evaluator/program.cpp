@@ -142,6 +142,35 @@ void Func::display(std::ostream& stream) const {
     throw std::runtime_error("Not implemented");
 }
 
+Lambda::Lambda(std::shared_ptr<ast::List> arguments, std::unique_ptr<Expression> expression) : Expression(), arguments(arguments), expression(std::move(expression)) {}
+
+std::unique_ptr<Lambda> Lambda::parse(std::shared_ptr<ast::List> arguments) {
+    if (!arguments->to_cons()) {
+        throw std::runtime_error("`lambda` takes at least 2 arguments, provided 0");
+    }
+
+    auto cons = arguments->to_cons();
+
+    auto func_arguments = std::dynamic_pointer_cast<ast::List>(cons->left);
+
+    if (!cons->right->to_cons()) {
+        throw std::runtime_error("`lambda` takes at least 2 arguments, provided 1");
+    }
+
+    auto body_element = std::static_pointer_cast<ast::Element>(cons->right);
+    auto body = Expression::from_element(body_element);
+
+    return std::make_unique<Lambda>(Lambda(func_arguments, std::move(body)));
+}
+
+std::shared_ptr<ast::Element> Lambda::evaluate() const {
+    throw std::runtime_error("Not implemented");
+}
+
+void Lambda::display(std::ostream& stream) const {
+    throw std::runtime_error("Not implemented");
+}
+
 Program::Program(std::vector<std::unique_ptr<Expression>> program)
     : program(std::move(program)) {}
 
