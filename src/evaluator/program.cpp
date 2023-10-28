@@ -72,24 +72,25 @@ Setq::Setq(std::shared_ptr<ast::Symbol> symbol, std::shared_ptr<Element> element
 }
 
 std::unique_ptr<Setq> Setq::parse(std::shared_ptr<ast::List> arguments) {
-    if (auto cons = arguments->to_cons()) {
-        auto symbol_value = cons->left->to_symbol().value();
-        auto symbol = std::make_shared<ast::Symbol>(ast::Symbol(std::string(symbol_value), Span(Position(0, 0), Position(0, 0))));
+    if (!arguments->to_cons()) {
+        throw std::runtime_error("setq has zero arguments");
+    }
 
-        if (auto remaining_cons = cons->right->to_cons()) {
-            auto element = remaining_cons->left;
+    auto cons = arguments->to_cons();
 
-            if (remaining_cons->right->to_cons()) {
-                throw std::runtime_error("setq has more than 2 arguments");
-            }
+    auto symbol = std::dynamic_pointer_cast<ast::Symbol>(cons->left);
 
-            return std::make_unique<Setq>(Setq(symbol, element));
-        }
-
+    if (!cons->right->to_cons()) {
         throw std::runtime_error("setq has one argument");
     }
 
-    throw std::runtime_error("setq has zero arguments");
+    auto expression = Expression::from_element(cons->right->to_cons()->left);
+
+    if (cons->right->to_cons()->to_cons()) {
+        throw std::runtime_error("setq has more than 2 arguments");
+    }
+
+    return std::make_unique<Setq>(Setq(symbol, std::move(expression)));
 }
 
 std::shared_ptr<ast::Element> Setq::evaluate() const {
