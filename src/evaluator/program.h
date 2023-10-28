@@ -44,7 +44,7 @@ class Setq : public Expression {
     std::unique_ptr<Expression> expression;
 
   public:
-    Setq(std::shared_ptr<ast::Symbol> symbol, std::shared_ptr<ast::Element> element);
+    Setq(std::shared_ptr<ast::Symbol> symbol, std::unique_ptr<Expression> expression);
     
     static std::unique_ptr<Setq> parse(std::shared_ptr<ast::List> arguments);
 

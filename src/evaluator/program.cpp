@@ -66,10 +66,7 @@ void Quote::display(std::ostream& stream) const {
     stream << "}";
 }
 
-Setq::Setq(std::shared_ptr<ast::Symbol> symbol, std::shared_ptr<Element> element) {
-    this->symbol = symbol;
-    this->expression = Expression::from_element(std::move(element));
-}
+Setq::Setq(std::shared_ptr<ast::Symbol> symbol, std::unique_ptr<Expression> expression) : Expression(), symbol(symbol), expression(std::move(expression)) {}
 
 std::unique_ptr<Setq> Setq::parse(std::shared_ptr<ast::List> arguments) {
     if (!arguments->to_cons()) {
