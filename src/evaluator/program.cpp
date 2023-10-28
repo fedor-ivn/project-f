@@ -83,7 +83,7 @@ std::unique_ptr<Setq> Setq::parse(std::shared_ptr<ast::List> arguments) {
 
     auto expression = Expression::from_element(cons->right->to_cons()->left);
 
-    if (cons->right->to_cons()->to_cons()) {
+    if (cons->right->to_cons()->right->to_cons()) {
         throw std::runtime_error("setq has more than 2 arguments");
     }
 
