@@ -79,7 +79,7 @@ Setq::Setq(std::shared_ptr<ast::Symbol> symbol, std::unique_ptr<Expression> expr
 
 std::unique_ptr<Setq> Setq::parse(std::shared_ptr<ast::List> arguments) {
     if (!arguments->to_cons()) {
-        throw std::runtime_error("setq has zero arguments");
+        throw std::runtime_error("`setq` takes 2 arguments, provided 0");
     }
 
     auto cons = arguments->to_cons();
@@ -87,13 +87,13 @@ std::unique_ptr<Setq> Setq::parse(std::shared_ptr<ast::List> arguments) {
     auto symbol = std::dynamic_pointer_cast<ast::Symbol>(cons->left);
 
     if (!cons->right->to_cons()) {
-        throw std::runtime_error("setq has one argument");
+        throw std::runtime_error("`setq` takes 2 arguments, provided 1");
     }
 
     auto expression = Expression::from_element(cons->right->to_cons()->left);
 
     if (cons->right->to_cons()->right->to_cons()) {
-        throw std::runtime_error("setq has more than 2 arguments");
+        throw std::runtime_error("`setq` takes 2 arguments, provided more than two");
     }
 
     return std::make_unique<Setq>(Setq(symbol, std::move(expression)));
