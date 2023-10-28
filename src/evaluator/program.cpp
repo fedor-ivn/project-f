@@ -26,6 +26,10 @@ Expression::from_element(std::shared_ptr<Element> element) {
         else if (symbol == "func") {
             return Func::parse(cons->right);
         }
+
+        else if (symbol == "lambda") {
+            return Lambda::parse(cons->right);
+        }
     }
 
     return std::make_unique<Atom>(Atom(std::move(element)));
