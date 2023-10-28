@@ -98,6 +98,41 @@ void Setq::display(std::ostream& stream) const {
     throw std::runtime_error("Not implemented");
 }
 
+Func::Func(std::shared_ptr<ast::Symbol> name, std::shared_ptr<ast::List> arguments, std::unique_ptr<Expression> expression) : Expression(), name(name), arguments(arguments), expression(std::move(expression)) {}
+
+std::unique_ptr<Func> Func::parse(std::shared_ptr<ast::List> arguments) {
+    if (!arguments->to_cons()) {
+        throw std::runtime_error("func has zero arguments");
+    }
+
+    auto cons = arguments->to_cons();
+
+    auto name = std::dynamic_pointer_cast<ast::Symbol>(cons->left);
+
+    if (!cons->right->to_cons()) {
+        throw std::runtime_error("func has only one argument");
+    }
+
+    auto func_arguments = std::dynamic_pointer_cast<ast::List>(cons->right->to_cons()->left);
+
+    if (!cons->right->to_cons()->right->to_cons()) {
+        throw std::runtime_error("func has only two arguments");
+    }
+
+    auto body_element = std::static_pointer_cast<ast::Element>(cons->right->to_cons()->right);
+    auto body = Expression::from_element(body_element);
+
+    return std::make_unique<Func>(Func(name, func_arguments, std::move(body)));
+}
+
+std::shared_ptr<ast::Element> Func::evaluate() const {
+    throw std::runtime_error("Not implemented");
+}
+
+void Func::display(std::ostream& stream) const {
+    throw std::runtime_error("Not implemented");
+}
+
 Program::Program(std::vector<std::unique_ptr<Expression>> program)
     : program(std::move(program)) {}
 
