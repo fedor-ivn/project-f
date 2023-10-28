@@ -31,6 +31,10 @@ Expression::from_element(std::shared_ptr<Element> element) {
         else if (symbol == "lambda") {
             return Lambda::parse(arguments);
         }
+
+        else if (symbol == "prog") {
+            return Prog::parse(arguments);
+        }
     }
 
     return std::make_unique<Atom>(Atom(std::move(element)));
@@ -168,6 +172,35 @@ std::shared_ptr<ast::Element> Lambda::evaluate() const {
 }
 
 void Lambda::display(std::ostream& stream) const {
+    throw std::runtime_error("Not implemented");
+}
+
+Prog::Prog(std::shared_ptr<ast::List> arguments, std::unique_ptr<Expression> expression) : Expression(), arguments(arguments), expression(std::move(expression)) {};
+
+std::unique_ptr<Prog> Prog::parse(std::shared_ptr<ast::List> arguments) {
+    if (!arguments->to_cons()) {
+        throw std::runtime_error("`prog` takes at least 2 arguments, provided 0");
+    }
+
+    auto cons = arguments->to_cons();
+
+    auto func_arguments = std::dynamic_pointer_cast<ast::List>(cons->left);
+
+    if (!cons->right->to_cons()) {
+        throw std::runtime_error("`prog` takes at least 2 arguments, provided 1");
+    }
+
+    auto body_element = std::static_pointer_cast<ast::Element>(cons->right);
+    auto body = Expression::from_element(body_element);
+
+    return std::make_unique<Prog>(Prog(func_arguments, std::move(body)));
+}
+
+std::shared_ptr<ast::Element> Prog::evaluate() const {
+    throw std::runtime_error("Not implemented");
+}
+
+void Prog::display(std::ostream& stream) const {
     throw std::runtime_error("Not implemented");
 }
 
