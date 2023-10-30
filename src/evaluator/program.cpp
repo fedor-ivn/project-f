@@ -10,6 +10,18 @@ using ast::Null;
 using ast::Position;
 using ast::Span;
 
+template<typename T>
+std::shared_ptr<T> maybe_dynamic_cast(std::shared_ptr<ast::Element> element) {
+    auto symbol = std::dynamic_pointer_cast<T>(element);
+    
+    if (symbol == nullptr) {
+        std::string message = typeid(T).name();
+        throw std::runtime_error("Expected type: " + message);
+    }
+
+    return symbol;
+}
+
 std::unique_ptr<Expression>
 Expression::from_element(std::shared_ptr<Element> element) {
     if (auto cons = element->to_cons()) {
@@ -88,7 +100,7 @@ std::unique_ptr<Setq> Setq::parse(std::shared_ptr<ast::List> arguments) {
 
     auto cons = arguments->to_cons();
 
-    auto symbol = std::dynamic_pointer_cast<ast::Symbol>(cons->left);
+    auto symbol = maybe_dynamic_cast<ast::Symbol>(cons->left);
 
     if (!cons->right->to_cons()) {
         throw std::runtime_error("`setq` takes 2 arguments, provided 1");
@@ -120,13 +132,13 @@ std::unique_ptr<Func> Func::parse(std::shared_ptr<ast::List> arguments) {
 
     auto cons = arguments->to_cons();
 
-    auto name = std::dynamic_pointer_cast<ast::Symbol>(cons->left);
+    auto name = maybe_dynamic_cast<ast::Symbol>(cons->left);
 
     if (!cons->right->to_cons()) {
         throw std::runtime_error("`func` takes at least 3 arguments, provided 1");
     }
 
-    auto func_arguments = std::dynamic_pointer_cast<ast::List>(cons->right->to_cons()->left);
+    auto func_arguments = maybe_dynamic_cast<ast::List>(cons->left);
 
     if (!cons->right->to_cons()->right->to_cons()) {
         throw std::runtime_error("`func` takes at least 3 arguments, provided 2");
@@ -155,7 +167,7 @@ std::unique_ptr<Lambda> Lambda::parse(std::shared_ptr<ast::List> arguments) {
 
     auto cons = arguments->to_cons();
 
-    auto func_arguments = std::dynamic_pointer_cast<ast::List>(cons->left);
+    auto func_arguments = maybe_dynamic_cast<ast::List>(cons->left);
 
     if (!cons->right->to_cons()) {
         throw std::runtime_error("`lambda` takes at least 2 arguments, provided 1");
@@ -184,7 +196,7 @@ std::unique_ptr<Prog> Prog::parse(std::shared_ptr<ast::List> arguments) {
 
     auto cons = arguments->to_cons();
 
-    auto func_arguments = std::dynamic_pointer_cast<ast::List>(cons->left);
+    auto func_arguments = maybe_dynamic_cast<ast::List>(cons->left);
 
     if (!cons->right->to_cons()) {
         throw std::runtime_error("`prog` takes at least 2 arguments, provided 1");
