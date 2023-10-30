@@ -1,16 +1,52 @@
 #include "program.h"
+#include <memory>
+#include <stdexcept>
 
 namespace evaluator {
 
 using ast::Element;
+using ast::List;
 using ast::Null;
 using ast::Position;
 using ast::Span;
 
+template<typename T>
+std::shared_ptr<T> maybe_dynamic_cast(std::shared_ptr<ast::Element> element) {
+    auto symbol = std::dynamic_pointer_cast<T>(element);
+    
+    if (symbol == nullptr) {
+        std::string message = typeid(T).name();
+        throw std::runtime_error("Expected type: " + message);
+    }
+
+    return symbol;
+}
+
 std::unique_ptr<Expression>
-Expression::from_element(std::unique_ptr<Element> element) {
-    if (element->to_cons()) {
-        throw std::runtime_error("List evaluation is to be implemented");
+Expression::from_element(std::shared_ptr<Element> element) {
+    if (auto cons = element->to_cons()) {
+        auto symbol = cons->left->to_symbol();
+        auto arguments = cons->right;
+
+        if (symbol == "quote") {
+            return Quote::parse(arguments);
+        }
+
+        else if (symbol == "setq") {
+            return Setq::parse(arguments);
+        }
+
+        else if (symbol == "func") {
+            return Func::parse(arguments);
+        }
+
+        else if (symbol == "lambda") {
+            return Lambda::parse(arguments);
+        }
+
+        else if (symbol == "prog") {
+            return Prog::parse(arguments);
+        }
     }
 
     return std::make_unique<Atom>(Atom(std::move(element)));
@@ -24,6 +60,160 @@ std::shared_ptr<Element> Atom::evaluate() const {
     }
 
     return this->atom;
+}
+
+void Atom::display(std::ostream& stream) const {
+    stream << "Atom { element = " << this->atom->display_verbose() << "}";
+}
+
+Quote::Quote(std::shared_ptr<Element> element)
+    : Expression(), element(element) {}
+
+std::unique_ptr<Quote> Quote::parse(std::shared_ptr<List> arguments) {
+    if (auto cons = arguments->to_cons()) {
+        auto element = cons->left;
+
+        if (cons->right->to_cons()) {
+            throw std::runtime_error("`quote` takes 1 argument, provided more than one");
+        }
+
+        return std::make_unique<Quote>(Quote(element));
+    }
+
+    throw std::runtime_error("`quote` takes 1 argument, provided 0");
+}
+
+std::shared_ptr<Element> Quote::evaluate() const { return this->element; }
+
+void Quote::display(std::ostream& stream) const {
+    stream << "Quote {\n";
+    stream << "  element = " << this->element->display_verbose() << "\n";
+    stream << "}";
+}
+
+Setq::Setq(std::shared_ptr<ast::Symbol> symbol, std::unique_ptr<Expression> expression) : Expression(), symbol(symbol), expression(std::move(expression)) {}
+
+std::unique_ptr<Setq> Setq::parse(std::shared_ptr<ast::List> arguments) {
+    if (!arguments->to_cons()) {
+        throw std::runtime_error("`setq` takes 2 arguments, provided 0");
+    }
+
+    auto cons = arguments->to_cons();
+
+    auto symbol = maybe_dynamic_cast<ast::Symbol>(cons->left);
+
+    if (!cons->right->to_cons()) {
+        throw std::runtime_error("`setq` takes 2 arguments, provided 1");
+    }
+
+    auto expression = Expression::from_element(cons->right->to_cons()->left);
+
+    if (cons->right->to_cons()->right->to_cons()) {
+        throw std::runtime_error("`setq` takes 2 arguments, provided more than two");
+    }
+
+    return std::make_unique<Setq>(Setq(symbol, std::move(expression)));
+}
+
+std::shared_ptr<ast::Element> Setq::evaluate() const {
+    throw std::runtime_error("Not implemented");
+}
+
+void Setq::display(std::ostream& stream) const {
+    throw std::runtime_error("Not implemented");
+}
+
+Func::Func(std::shared_ptr<ast::Symbol> name, std::shared_ptr<ast::List> arguments, std::unique_ptr<Expression> expression) : Expression(), name(name), arguments(arguments), expression(std::move(expression)) {}
+
+std::unique_ptr<Func> Func::parse(std::shared_ptr<ast::List> arguments) {
+    if (!arguments->to_cons()) {
+        throw std::runtime_error("`func` takes at least 3 arguments, provided 0");
+    }
+
+    auto cons = arguments->to_cons();
+
+    auto name = maybe_dynamic_cast<ast::Symbol>(cons->left);
+
+    if (!cons->right->to_cons()) {
+        throw std::runtime_error("`func` takes at least 3 arguments, provided 1");
+    }
+
+    auto func_arguments = maybe_dynamic_cast<ast::List>(cons->left);
+
+    if (!cons->right->to_cons()->right->to_cons()) {
+        throw std::runtime_error("`func` takes at least 3 arguments, provided 2");
+    }
+
+    auto body_element = std::static_pointer_cast<ast::Element>(cons->right->to_cons()->right);
+    auto body = Expression::from_element(body_element);
+
+    return std::make_unique<Func>(Func(name, func_arguments, std::move(body)));
+}
+
+std::shared_ptr<ast::Element> Func::evaluate() const {
+    throw std::runtime_error("Not implemented");
+}
+
+void Func::display(std::ostream& stream) const {
+    throw std::runtime_error("Not implemented");
+}
+
+Lambda::Lambda(std::shared_ptr<ast::List> arguments, std::unique_ptr<Expression> expression) : Expression(), arguments(arguments), expression(std::move(expression)) {}
+
+std::unique_ptr<Lambda> Lambda::parse(std::shared_ptr<ast::List> arguments) {
+    if (!arguments->to_cons()) {
+        throw std::runtime_error("`lambda` takes at least 2 arguments, provided 0");
+    }
+
+    auto cons = arguments->to_cons();
+
+    auto func_arguments = maybe_dynamic_cast<ast::List>(cons->left);
+
+    if (!cons->right->to_cons()) {
+        throw std::runtime_error("`lambda` takes at least 2 arguments, provided 1");
+    }
+
+    auto body_element = std::static_pointer_cast<ast::Element>(cons->right);
+    auto body = Expression::from_element(body_element);
+
+    return std::make_unique<Lambda>(Lambda(func_arguments, std::move(body)));
+}
+
+std::shared_ptr<ast::Element> Lambda::evaluate() const {
+    throw std::runtime_error("Not implemented");
+}
+
+void Lambda::display(std::ostream& stream) const {
+    throw std::runtime_error("Not implemented");
+}
+
+Prog::Prog(std::shared_ptr<ast::List> arguments, std::unique_ptr<Expression> expression) : Expression(), arguments(arguments), expression(std::move(expression)) {};
+
+std::unique_ptr<Prog> Prog::parse(std::shared_ptr<ast::List> arguments) {
+    if (!arguments->to_cons()) {
+        throw std::runtime_error("`prog` takes at least 2 arguments, provided 0");
+    }
+
+    auto cons = arguments->to_cons();
+
+    auto func_arguments = maybe_dynamic_cast<ast::List>(cons->left);
+
+    if (!cons->right->to_cons()) {
+        throw std::runtime_error("`prog` takes at least 2 arguments, provided 1");
+    }
+
+    auto body_element = std::static_pointer_cast<ast::Element>(cons->right);
+    auto body = Expression::from_element(body_element);
+
+    return std::make_unique<Prog>(Prog(func_arguments, std::move(body)));
+}
+
+std::shared_ptr<ast::Element> Prog::evaluate() const {
+    throw std::runtime_error("Not implemented");
+}
+
+void Prog::display(std::ostream& stream) const {
+    throw std::runtime_error("Not implemented");
 }
 
 Program::Program(std::vector<std::unique_ptr<Expression>> program)
@@ -45,6 +235,18 @@ std::shared_ptr<Element> Program::evaluate() const {
         last_evaluated = expression->evaluate();
     }
     return last_evaluated;
+}
+
+std::ostream& operator<<(std::ostream& stream, const Program& program) {
+    stream << "Program [\n";
+
+    for (const auto& expression : program.program) {
+        expression->display(stream);
+        stream << ",\n";
+    }
+
+    stream << "]";
+    return stream;
 }
 
 } // namespace evaluator
