@@ -17,7 +17,7 @@ class Position {
     void to_next_column();
 
     friend std::ostream&
-    operator<<(std::ostream& stream, const Position& position);
+    operator<<(std::ostream& stream, Position const& position);
 };
 
 class Span {
@@ -27,7 +27,7 @@ class Span {
 
     Span(Position start, Position end);
 
-    friend std::ostream& operator<<(std::ostream& stream, const Span& span);
+    friend std::ostream& operator<<(std::ostream& stream, Span const& span);
 };
 
 } // namespace ast

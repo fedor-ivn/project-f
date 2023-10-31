@@ -45,7 +45,7 @@ class ArgumentError : public std::exception {
         : cause(cause), argument(argument) {}
 
     friend std::ostream&
-    operator<<(std::ostream& stream, const ArgumentError& error) {
+    operator<<(std::ostream& stream, ArgumentError const& error) {
         stream << "Error: ";
         switch (error.cause) {
         case ArgumentErrorCause::UnknownOption:
@@ -74,7 +74,7 @@ class Arguments {
     Mode mode = Mode::Auto;
     std::optional<std::string_view> file = std::nullopt;
 
-    void parse(int argc, const char** argv) {
+    void parse(int argc, char const** argv) {
         bool is_parsing_options = true;
         for (int at = 1; at < argc; ++at) {
             std::string_view argument(argv[at]);
@@ -114,7 +114,7 @@ class Arguments {
         }
     }
 
-    static void print_help(const char* program_name) {
+    static void print_help(char const* program_name) {
         std::cerr << "F language interpreter" << std::endl;
         std::cerr << std::endl;
         std::cerr << "Usage: " << program_name << " [...options] [file]"
@@ -261,7 +261,7 @@ void file(Mode mode, std::string_view path) {
     process(mode, evaluator, std::string_view(source), Position());
 }
 
-int main(int argc, const char** argv) {
+int main(int argc, char const** argv) {
     Arguments arguments;
     try {
         arguments.parse(argc, argv);
@@ -270,7 +270,7 @@ int main(int argc, const char** argv) {
         return 1;
     }
     if (arguments.help) {
-        const char* name = argc > 0 ? argv[0] : "project-f";
+        char const* name = argc > 0 ? argv[0] : "project-f";
         arguments.print_help(name);
         return 0;
     }

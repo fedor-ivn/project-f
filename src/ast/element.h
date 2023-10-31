@@ -37,9 +37,9 @@ class Element {
     virtual void _display_pretty(std::ostream& stream) const = 0;
 
     friend std::ostream&
-    operator<<(std::ostream& stream, const DisplayVerbose& self);
+    operator<<(std::ostream& stream, DisplayVerbose const& self);
     friend std::ostream&
-    operator<<(std::ostream& stream, const DisplayPretty& self);
+    operator<<(std::ostream& stream, DisplayPretty const& self);
     friend Cons;
 };
 
@@ -120,7 +120,7 @@ class DisplayVerbose {
     friend DisplayVerbose Element::display_verbose();
 
     friend std::ostream&
-    operator<<(std::ostream& stream, const DisplayVerbose& self);
+    operator<<(std::ostream& stream, DisplayVerbose const& self);
 };
 
 class DisplayPretty {
@@ -131,7 +131,7 @@ class DisplayPretty {
     friend DisplayPretty Element::display_pretty();
 
     friend std::ostream&
-    operator<<(std::ostream& stream, const DisplayPretty& self);
+    operator<<(std::ostream& stream, DisplayPretty const& self);
 };
 
 } // namespace ast

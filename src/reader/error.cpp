@@ -5,7 +5,7 @@ namespace reader {
 SyntaxError::SyntaxError(ErrorCause cause, ast::Span span, bool can_recover)
     : cause(cause), span(span), can_recover(can_recover) {}
 
-std::ostream& operator<<(std::ostream& stream, const SyntaxError& error) {
+std::ostream& operator<<(std::ostream& stream, SyntaxError const& error) {
     stream << "Syntax error at " << error.span << ": ";
 
     switch (error.cause) {

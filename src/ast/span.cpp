@@ -11,14 +11,14 @@ void Position::to_next_line() {
 
 void Position::to_next_column() { ++this->column; }
 
-std::ostream& operator<<(std::ostream& stream, const Position& position) {
+std::ostream& operator<<(std::ostream& stream, Position const& position) {
     stream << position.line << ':' << position.column;
     return stream;
 }
 
 Span::Span(Position start, Position end) : start(start), end(end) {}
 
-std::ostream& operator<<(std::ostream& stream, const Span& span) {
+std::ostream& operator<<(std::ostream& stream, Span const& span) {
     stream << span.start << ".." << span.end;
     return stream;
 }

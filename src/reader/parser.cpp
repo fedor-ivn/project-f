@@ -44,7 +44,7 @@ std::unique_ptr<ast::List> Parser::parse_list() {
 }
 
 std::unique_ptr<ast::Element> Parser::parse_element() {
-    const auto token = this->next_token();
+    auto const token = this->next_token();
 
     if (token->is_null()) {
         return std::make_unique<ast::Null>(ast::Null(token->span));
