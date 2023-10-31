@@ -55,9 +55,8 @@ DisplayPretty Element::display_pretty() { return DisplayPretty(this); }
 
 Integer::Integer(int64_t value, Span span) : Element(span), value(value) {}
 
-void Integer::_display_verbose(std::ostream& stream, size_t depth) const {
-    stream << Depth(depth) << "Integer(" << this->value << ", " << this->span
-           << ")";
+void Integer::_display_verbose(std::ostream& stream, size_t) const {
+    stream << "Integer(" << this->value << ", " << this->span << ")";
 }
 
 void Integer::_display_pretty(std::ostream& stream) const {
@@ -66,9 +65,8 @@ void Integer::_display_pretty(std::ostream& stream) const {
 
 Real::Real(double value, Span span) : Element(span), value(value) {}
 
-void Real::_display_verbose(std::ostream& stream, size_t depth) const {
-    stream << Depth(depth) << "Real(" << this->value << ", " << this->span
-           << ")";
+void Real::_display_verbose(std::ostream& stream, size_t) const {
+    stream << "Real(" << this->value << ", " << this->span << ")";
 }
 
 void Real::_display_pretty(std::ostream& stream) const {
@@ -95,9 +93,9 @@ void Real::_display_pretty(std::ostream& stream) const {
 
 Boolean::Boolean(bool value, Span span) : Element(span), value(value) {}
 
-void Boolean::_display_verbose(std::ostream& stream, size_t depth) const {
+void Boolean::_display_verbose(std::ostream& stream, size_t) const {
     auto value = this->value ? "true" : "false";
-    stream << Depth(depth) << "Boolean(" << value << ", " << this->span << ")";
+    stream << "Boolean(" << value << ", " << this->span << ")";
 }
 
 void Boolean::_display_pretty(std::ostream& stream) const {
@@ -107,17 +105,16 @@ void Boolean::_display_pretty(std::ostream& stream) const {
 
 Symbol::Symbol(std::string value, Span span) : Element(span), value(value) {}
 
-void Symbol::_display_verbose(std::ostream& stream, size_t depth) const {
-    stream << Depth(depth) << "Symbol(" << this->value << ", " << this->span
-           << ")";
+void Symbol::_display_verbose(std::ostream& stream, size_t) const {
+    stream << "Symbol(" << this->value << ", " << this->span << ")";
 }
 
 void Symbol::_display_pretty(std::ostream& stream) const {
     stream << this->value;
 }
 
-void Null::_display_verbose(std::ostream& stream, size_t depth) const {
-    stream << Depth(depth) << "Null(" << this->span << ")";
+void Null::_display_verbose(std::ostream& stream, size_t) const {
+    stream << "Null(" << this->span << ")";
 }
 
 void Null::_display_pretty(std::ostream& stream) const { stream << "null"; }
@@ -128,11 +125,13 @@ Cons::Cons(
     : List(span), left(left), right(right) {}
 
 void Cons::_display_verbose(std::ostream& stream, size_t depth) const {
-    stream << Depth(depth) << "Cons(\n";
+    stream << "Cons(\n";
 
+    stream << Depth(depth + 1);
     this->left->_display_verbose(stream, depth + 1);
     stream << ",\n";
 
+    stream << Depth(depth + 1);
     this->right->_display_verbose(stream, depth + 1);
     stream << ",\n";
 
