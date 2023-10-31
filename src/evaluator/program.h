@@ -40,8 +40,8 @@ class Quote : public Expression {
 };
 
 class Setq : public Expression {
-    std::shared_ptr<ast::Symbol> symbol;
-    std::unique_ptr<Expression> expression;
+    std::shared_ptr<ast::Symbol> variable;
+    std::unique_ptr<Expression> initializer;
 
   public:
     Setq(
@@ -90,7 +90,7 @@ class Lambda : public Expression {
 };
 
 class Prog : public Expression {
-    std::shared_ptr<ast::List> arguments;
+    std::shared_ptr<ast::List> variables;
     std::unique_ptr<Expression> expression;
 
   public:

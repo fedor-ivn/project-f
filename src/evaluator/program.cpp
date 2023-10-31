@@ -103,7 +103,7 @@ void Quote::display(std::ostream& stream, size_t depth) const {
 Setq::Setq(
     std::shared_ptr<ast::Symbol> symbol, std::unique_ptr<Expression> expression
 )
-    : Expression(), symbol(symbol), expression(std::move(expression)) {}
+    : Expression(), variable(symbol), initializer(std::move(expression)) {}
 
 std::unique_ptr<Setq> Setq::parse(std::shared_ptr<ast::List> arguments) {
     if (!arguments->to_cons()) {
@@ -134,7 +134,17 @@ std::shared_ptr<ast::Element> Setq::evaluate() const {
 }
 
 void Setq::display(std::ostream& stream, size_t depth) const {
-    throw std::runtime_error("Not implemented");
+    stream << "Setq {\n";
+
+    stream << Depth(depth + 1)
+           << "variable = " << this->variable->display_verbose(depth + 1)
+           << '\n';
+
+    stream << Depth(depth + 1) << "initializer = ";
+    this->initializer->display(stream, depth + 1);
+    stream << '\n';
+
+    stream << Depth(depth) << '}';
 }
 
 Func::Func(
@@ -179,7 +189,20 @@ std::shared_ptr<ast::Element> Func::evaluate() const {
 }
 
 void Func::display(std::ostream& stream, size_t depth) const {
-    throw std::runtime_error("Not implemented");
+    stream << "Func {\n";
+
+    stream << Depth(depth + 1)
+           << "name = " << this->name->display_verbose(depth + 1) << '\n';
+
+    stream << Depth(depth + 1)
+           << "arguments = " << this->arguments->display_verbose(depth + 1)
+           << '\n';
+
+    stream << Depth(depth + 1) << "body = ";
+    this->expression->display(stream, depth + 1);
+    stream << '\n';
+
+    stream << Depth(depth) << '}';
 }
 
 Lambda::Lambda(
@@ -215,13 +238,23 @@ std::shared_ptr<ast::Element> Lambda::evaluate() const {
 }
 
 void Lambda::display(std::ostream& stream, size_t depth) const {
-    throw std::runtime_error("Not implemented");
+    stream << "Lambda {\n";
+
+    stream << Depth(depth + 1)
+           << "arguments = " << this->arguments->display_verbose(depth + 1)
+           << '\n';
+
+    stream << Depth(depth + 1) << "body = ";
+    this->expression->display(stream, depth + 1);
+    stream << '\n';
+
+    stream << Depth(depth) << '}';
 }
 
 Prog::Prog(
     std::shared_ptr<ast::List> arguments, std::unique_ptr<Expression> expression
 )
-    : Expression(), arguments(arguments), expression(std::move(expression)){};
+    : Expression(), variables(arguments), expression(std::move(expression)){};
 
 std::unique_ptr<Prog> Prog::parse(std::shared_ptr<ast::List> arguments) {
     if (!arguments->to_cons()) {
@@ -249,7 +282,17 @@ std::shared_ptr<ast::Element> Prog::evaluate() const {
 }
 
 void Prog::display(std::ostream& stream, size_t depth) const {
-    throw std::runtime_error("Not implemented");
+    stream << "Prog {\n";
+
+    stream << Depth(depth + 1)
+           << "variables = " << this->variables->display_verbose(depth + 1)
+           << '\n';
+
+    stream << Depth(depth + 1) << "body = ";
+    this->expression->display(stream, depth + 1);
+    stream << '\n';
+
+    stream << Depth(depth) << '}';
 }
 
 Program::Program(std::vector<std::unique_ptr<Expression>> program)
