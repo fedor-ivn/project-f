@@ -29,7 +29,7 @@ class Element {
     std::optional<std::string_view> to_symbol() const;
     std::optional<Cons> to_cons() const;
 
-    DisplayVerbose display_verbose();
+    DisplayVerbose display_verbose(size_t depth = 0);
     DisplayPretty display_pretty();
 
   private:
@@ -114,10 +114,11 @@ class Cons : public List {
 
 class DisplayVerbose {
     Element* element;
+    size_t depth;
 
-    DisplayVerbose(Element* element);
+    DisplayVerbose(Element* element, size_t depth);
 
-    friend DisplayVerbose Element::display_verbose();
+    friend DisplayVerbose Element::display_verbose(size_t depth);
 
     friend std::ostream&
     operator<<(std::ostream& stream, DisplayVerbose const& self);

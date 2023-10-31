@@ -50,7 +50,9 @@ std::optional<Cons> Element::to_cons() const {
     return std::nullopt;
 }
 
-DisplayVerbose Element::display_verbose() { return DisplayVerbose(this); }
+DisplayVerbose Element::display_verbose(size_t depth) {
+    return DisplayVerbose(this, depth);
+}
 DisplayPretty Element::display_pretty() { return DisplayPretty(this); }
 
 Integer::Integer(int64_t value, Span span) : Element(span), value(value) {}
@@ -153,10 +155,11 @@ void Cons::_display_pretty(std::ostream& stream) const {
     stream << ')';
 }
 
-DisplayVerbose::DisplayVerbose(Element* element) : element(element) {}
+DisplayVerbose::DisplayVerbose(Element* element, size_t depth)
+    : element(element), depth(depth) {}
 
 std::ostream& operator<<(std::ostream& stream, DisplayVerbose const& self) {
-    self.element->_display_verbose(stream, 0);
+    self.element->_display_verbose(stream, self.depth);
     return stream;
 }
 
