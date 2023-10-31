@@ -14,7 +14,7 @@ class Expression {
     virtual ~Expression() = default;
 
     virtual std::shared_ptr<ast::Element> evaluate() const = 0;
-    virtual void display(std::ostream& stream) const = 0;
+    virtual void display(std::ostream& stream, size_t depth) const = 0;
 };
 
 class Atom : public Expression {
@@ -24,7 +24,7 @@ class Atom : public Expression {
     Atom(std::shared_ptr<ast::Element> atom);
 
     virtual std::shared_ptr<ast::Element> evaluate() const;
-    virtual void display(std::ostream& stream) const;
+    virtual void display(std::ostream& stream, size_t depth) const;
 };
 
 class Quote : public Expression {
@@ -36,7 +36,7 @@ class Quote : public Expression {
     static std::unique_ptr<Quote> parse(std::shared_ptr<ast::List> arguments);
 
     virtual std::shared_ptr<ast::Element> evaluate() const;
-    virtual void display(std::ostream& stream) const;
+    virtual void display(std::ostream& stream, size_t depth) const;
 };
 
 class Setq : public Expression {
@@ -52,7 +52,7 @@ class Setq : public Expression {
     static std::unique_ptr<Setq> parse(std::shared_ptr<ast::List> arguments);
 
     virtual std::shared_ptr<ast::Element> evaluate() const;
-    virtual void display(std::ostream& stream) const;
+    virtual void display(std::ostream& stream, size_t depth) const;
 };
 
 class Func : public Expression {
@@ -70,7 +70,7 @@ class Func : public Expression {
     static std::unique_ptr<Func> parse(std::shared_ptr<ast::List> arguments);
 
     virtual std::shared_ptr<ast::Element> evaluate() const;
-    virtual void display(std::ostream& stream) const;
+    virtual void display(std::ostream& stream, size_t depth) const;
 };
 
 class Lambda : public Expression {
@@ -86,7 +86,7 @@ class Lambda : public Expression {
     static std::unique_ptr<Lambda> parse(std::shared_ptr<ast::List> arguments);
 
     virtual std::shared_ptr<ast::Element> evaluate() const;
-    virtual void display(std::ostream& stream) const;
+    virtual void display(std::ostream& stream, size_t depth) const;
 };
 
 class Prog : public Expression {
@@ -102,7 +102,7 @@ class Prog : public Expression {
     static std::unique_ptr<Prog> parse(std::shared_ptr<ast::List> arguments);
 
     virtual std::shared_ptr<ast::Element> evaluate() const;
-    virtual void display(std::ostream& stream) const;
+    virtual void display(std::ostream& stream, size_t depth) const;
 };
 
 class Program {
@@ -116,6 +116,7 @@ class Program {
 
     std::shared_ptr<ast::Element> evaluate() const;
 
+    void display(std::ostream& stream, size_t depth) const;
     friend std::ostream&
     operator<<(std::ostream& stream, Program const& program);
 };
