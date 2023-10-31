@@ -78,11 +78,7 @@ std::unique_ptr<Token> Scanner::parse_numeral() {
     }
 
     if (!this->can_peek(end) || !std::isdigit(this->peek(end))) {
-        throw SyntaxError(
-            ErrorCause::MissingNumber,
-            this->advance(end),
-            false
-        );
+        throw SyntaxError(ErrorCause::MissingNumber, this->advance(end), false);
     }
     while (this->can_peek(end) && std::isdigit(this->peek(end))) {
         ++end;
@@ -93,9 +89,7 @@ std::unique_ptr<Token> Scanner::parse_numeral() {
 
         if (!this->can_peek(end) || !std::isdigit(this->peek(end))) {
             throw SyntaxError(
-                ErrorCause::MissingFractionalPart,
-                this->advance(end),
-                false
+                ErrorCause::MissingFractionalPart, this->advance(end), false
             );
         }
         while (this->can_peek(end) && std::isdigit(this->peek(end))) {

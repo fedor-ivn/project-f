@@ -50,7 +50,7 @@ bool test_file(std::filesystem::path path) {
 std::vector<std::filesystem::path> get_paths() {
     std::vector<std::filesystem::path> paths;
 
-    for (const auto& entry :
+    for (auto const& entry :
          std::filesystem::directory_iterator("tests/syntax")) {
         if (entry.path().extension() == ".lispf") {
             paths.push_back(entry.path());

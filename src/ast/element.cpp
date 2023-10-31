@@ -11,7 +11,7 @@ class Depth {
 
     Depth(size_t depth) : depth(depth) {}
 
-    friend std::ostream& operator<<(std::ostream& stream, const Depth& self) {
+    friend std::ostream& operator<<(std::ostream& stream, Depth const& self) {
         for (size_t i = 0; i < self.depth; ++i) {
             stream << "  ";
         }
@@ -22,32 +22,32 @@ class Depth {
 Element::Element(Span span) : span(span) {}
 
 bool Element::is_null() const {
-    return dynamic_cast<const Null*>(this) != nullptr;
+    return dynamic_cast<Null const*>(this) != nullptr;
 }
 
 std::optional<int64_t> Element::to_integer() const {
-    if (auto element = dynamic_cast<const Integer*>(this)) {
+    if (auto element = dynamic_cast<Integer const*>(this)) {
         return std::optional<int64_t>(element->value);
     }
     return std::nullopt;
 }
 
 std::optional<double> Element::to_real() const {
-    if (auto element = dynamic_cast<const Real*>(this)) {
+    if (auto element = dynamic_cast<Real const*>(this)) {
         return std::optional<double>(element->value);
     }
     return std::nullopt;
 }
 
 std::optional<bool> Element::to_boolean() const {
-    if (auto element = dynamic_cast<const Boolean*>(this)) {
+    if (auto element = dynamic_cast<Boolean const*>(this)) {
         return std::optional<bool>(element->value);
     }
     return std::nullopt;
 }
 
 std::optional<std::string_view> Element::to_symbol() const {
-    if (auto element = dynamic_cast<const Symbol*>(this)) {
+    if (auto element = dynamic_cast<Symbol const*>(this)) {
         return std::optional<std::string_view>(std::string_view(element->value)
         );
     }
@@ -55,7 +55,7 @@ std::optional<std::string_view> Element::to_symbol() const {
 }
 
 std::optional<Cons> Element::to_cons() const {
-    if (auto element = dynamic_cast<const Cons*>(this)) {
+    if (auto element = dynamic_cast<Cons const*>(this)) {
         return std::optional<Cons>(*element);
     }
     return std::nullopt;
@@ -167,14 +167,14 @@ void Cons::_display_pretty(std::ostream& stream) const {
 
 DisplayVerbose::DisplayVerbose(Element* element) : element(element) {}
 
-std::ostream& operator<<(std::ostream& stream, const DisplayVerbose& self) {
+std::ostream& operator<<(std::ostream& stream, DisplayVerbose const& self) {
     self.element->_display_verbose(stream, 0);
     return stream;
 }
 
 DisplayPretty::DisplayPretty(Element* element) : element(element) {}
 
-std::ostream& operator<<(std::ostream& stream, const DisplayPretty& self) {
+std::ostream& operator<<(std::ostream& stream, DisplayPretty const& self) {
     self.element->_display_pretty(stream);
     return stream;
 }

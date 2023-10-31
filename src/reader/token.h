@@ -27,7 +27,7 @@ class Token {
     bool is_null() const;
     bool is_end_of_file() const;
 
-    friend std::ostream& operator<<(std::ostream& stream, const Token& token);
+    friend std::ostream& operator<<(std::ostream& stream, Token const& token);
 };
 
 class LeftParenthesis : public Token {

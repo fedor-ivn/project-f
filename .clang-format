@@ -3,3 +3,4 @@ PointerAlignment: Left
 AlignAfterOpenBracket: BlockIndent
 BinPackArguments: false
 BinPackParameters: false
+QualifierAlignment: Right

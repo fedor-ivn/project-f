@@ -26,7 +26,7 @@ class SyntaxError : public std::exception {
     bool can_recover;
 
     friend std::ostream&
-    operator<<(std::ostream& stream, const SyntaxError& error);
+    operator<<(std::ostream& stream, SyntaxError const& error);
 };
 
 } // namespace reader
