@@ -16,6 +16,7 @@ add_library(internals
     src/reader/parser.cpp
     src/reader/reader.cpp
     src/reader/error.cpp
+    src/utils.cpp
 )
 
 add_executable(project-f

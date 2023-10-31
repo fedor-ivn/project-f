@@ -1,23 +1,12 @@
 #include <iomanip>
 #include <memory>
 
+#include "../utils.h"
 #include "element.h"
 
 namespace ast {
 
-class Depth {
-  public:
-    size_t depth;
-
-    Depth(size_t depth) : depth(depth) {}
-
-    friend std::ostream& operator<<(std::ostream& stream, Depth const& self) {
-        for (size_t i = 0; i < self.depth; ++i) {
-            stream << "  ";
-        }
-        return stream;
-    }
-};
+using utils::Depth;
 
 Element::Element(Span span) : span(span) {}
 
