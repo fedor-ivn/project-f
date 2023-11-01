@@ -12,7 +12,7 @@ class Parser {
   public:
     Parser(Scanner scanner);
 
-    std::vector<std::unique_ptr<ast::Element>> parse();
+    std::vector<std::shared_ptr<ast::Element>> parse();
 
   private:
     Scanner scanner;

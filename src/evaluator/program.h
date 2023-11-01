@@ -112,7 +112,7 @@ class Program {
     Program(std::vector<std::unique_ptr<Expression>> program);
 
     static Program
-    from_elements(std::vector<std::unique_ptr<ast::Element>> elements);
+    from_elements(std::vector<std::shared_ptr<ast::Element>> elements);
 
     std::shared_ptr<ast::Element> evaluate() const;
 

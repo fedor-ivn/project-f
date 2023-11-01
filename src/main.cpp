@@ -164,7 +164,7 @@ void print_tokens(Scanner& scanner) {
     }
 }
 
-void print_ast(std::vector<std::unique_ptr<Element>>& ast) {
+void print_ast(std::vector<std::shared_ptr<Element>>& ast) {
     for (auto& element : ast) {
         std::cout << element->display_verbose() << std::endl;
     }
@@ -191,7 +191,7 @@ void process(
             return;
         }
 
-        auto program = Program::from_elements(std::move(ast));
+        auto program = Program::from_elements(ast);
         if (mode == Mode::SemanticAnalysis) {
             std::cout << program << std::endl;
             return;

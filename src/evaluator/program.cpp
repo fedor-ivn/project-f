@@ -302,7 +302,7 @@ void Prog::display(std::ostream& stream, size_t depth) const {
 Program::Program(std::vector<std::unique_ptr<Expression>> program)
     : program(std::move(program)) {}
 
-Program Program::from_elements(std::vector<std::unique_ptr<Element>> elements) {
+Program Program::from_elements(std::vector<std::shared_ptr<Element>> elements) {
     std::vector<std::unique_ptr<Expression>> program;
     for (auto&& element : elements) {
         program.push_back(Expression::from_element(std::move(element)));
