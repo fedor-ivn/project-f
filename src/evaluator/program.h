@@ -124,7 +124,7 @@ class Program {
 class Func : public Expression {
     std::shared_ptr<ast::Symbol> name;
     std::shared_ptr<ast::List> arguments;
-    std::shared_ptr<Program> program;
+    Program body;
 
   public:
     Func(
