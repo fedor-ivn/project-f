@@ -121,4 +121,21 @@ class Program {
     operator<<(std::ostream& stream, Program const& program);
 };
 
+class Func : public Expression {
+    std::shared_ptr<ast::Symbol> name;
+    std::shared_ptr<ast::List> arguments;
+    std::shared_ptr<Program> program;
+
+  public:
+    Func(
+      std::shared_ptr<ast::Symbol> name,
+      std::shared_ptr<ast::List> arguments,
+      std::shared_ptr<Program> program);
+    
+    static std::unique_ptr<Func> parse(std::shared_ptr<ast::List> arguments);
+
+    virtual std::shared_ptr<ast::Element> evaluate() const;
+    virtual void display(std::ostream& stream, size_t depth) const;
+};
+
 } // namespace evaluator

@@ -150,10 +150,8 @@ void Setq::display(std::ostream& stream, size_t depth) const {
 Func::Func(
     std::shared_ptr<ast::Symbol> name,
     std::shared_ptr<ast::List> arguments,
-    std::unique_ptr<Expression> expression
-)
-    : Expression(), name(name), arguments(arguments),
-      expression(std::move(expression)) {}
+    std::shared_ptr<Program> program) 
+    : Expression(), name(name), arguments(arguments), program(program) {}
 
 std::unique_ptr<Func> Func::parse(std::shared_ptr<ast::List> arguments) {
     if (!arguments->to_cons()) {
@@ -165,23 +163,29 @@ std::unique_ptr<Func> Func::parse(std::shared_ptr<ast::List> arguments) {
 
     auto name = maybe_dynamic_cast<ast::Symbol>(cons->left);
 
-    if (!cons->right->to_cons()) {
-        throw std::runtime_error("`func` takes at least 3 arguments, provided 1"
-        );
+    cons = cons->right->to_cons();
+
+    if (!cons) {
+        throw std::runtime_error("`func` takes at least 3 arguments, provided 1");
     }
 
     auto func_arguments = maybe_dynamic_cast<ast::List>(cons->left);
 
-    if (!cons->right->to_cons()->right->to_cons()) {
-        throw std::runtime_error("`func` takes at least 3 arguments, provided 2"
-        );
+    if (!cons->right->to_cons()) {
+        throw std::runtime_error("`func` takes at least 3 arguments, provided 2");
+    }
+    
+    std::vector<std::shared_ptr<Element>> elements;
+
+    while (cons) {
+        auto element = std::shared_ptr<Element>(std::move(cons->left));
+        elements.push_back(element);
+        cons = cons->right->to_cons();
     }
 
-    auto body_element =
-        std::static_pointer_cast<ast::Element>(cons->right->to_cons()->right);
-    auto body = Expression::from_element(body_element);
+    auto program = std::make_shared<Program>(Program::from_elements(elements));
 
-    return std::make_unique<Func>(Func(name, func_arguments, std::move(body)));
+    return std::make_unique<Func>(Func(name, func_arguments, program));
 }
 
 std::shared_ptr<ast::Element> Func::evaluate() const {
@@ -199,7 +203,7 @@ void Func::display(std::ostream& stream, size_t depth) const {
            << '\n';
 
     stream << Depth(depth + 1) << "body = ";
-    this->expression->display(stream, depth + 1);
+    this->program->display(stream, depth + 1);
     stream << '\n';
 
     stream << Depth(depth) << '}';
