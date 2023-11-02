@@ -27,7 +27,7 @@ std::shared_ptr<T> maybe_dynamic_cast(std::shared_ptr<ast::Element> element) {
 
 void test_parameters(std::shared_ptr<ast::List> parameters) {
     if (!parameters->to_cons()) {
-        throw std::runtime_error("Empty parameters");
+        return;
     }
 
     auto cons = parameters->to_cons();
