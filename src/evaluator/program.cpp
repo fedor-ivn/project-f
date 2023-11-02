@@ -150,8 +150,8 @@ void Setq::display(std::ostream& stream, size_t depth) const {
 Func::Func(
     std::shared_ptr<ast::Symbol> name,
     std::shared_ptr<ast::List> arguments,
-    std::shared_ptr<Program> program) 
-    : Expression(), name(name), arguments(arguments), program(program) {}
+    Program body) 
+    : Expression(), name(name), arguments(arguments), body(std::move(body)) {}
 
 std::unique_ptr<Func> Func::parse(std::shared_ptr<ast::List> arguments) {
     if (!arguments->to_cons()) {
@@ -183,9 +183,9 @@ std::unique_ptr<Func> Func::parse(std::shared_ptr<ast::List> arguments) {
         cons = cons->right->to_cons();
     }
 
-    auto program = std::make_shared<Program>(Program::from_elements(elements));
+    auto program = Program::from_elements(elements);
 
-    return std::make_unique<Func>(Func(name, func_arguments, program));
+    return std::make_unique<Func>(Func(name, func_arguments, std::move(program)));
 }
 
 std::shared_ptr<ast::Element> Func::evaluate() const {
@@ -203,7 +203,7 @@ void Func::display(std::ostream& stream, size_t depth) const {
            << '\n';
 
     stream << Depth(depth + 1) << "body = ";
-    this->program->display(stream, depth + 1);
+    this->body.display(stream, depth + 1);
     stream << '\n';
 
     stream << Depth(depth) << '}';

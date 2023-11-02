@@ -130,7 +130,7 @@ class Func : public Expression {
     Func(
       std::shared_ptr<ast::Symbol> name,
       std::shared_ptr<ast::List> arguments,
-      std::shared_ptr<Program> program);
+      Program body);
     
     static std::unique_ptr<Func> parse(std::shared_ptr<ast::List> arguments);
 
