@@ -25,6 +25,31 @@ std::shared_ptr<T> maybe_dynamic_cast(std::shared_ptr<ast::Element> element) {
     return symbol;
 }
 
+void test_parameters(std::shared_ptr<ast::List> parameters) {
+    if (!parameters->to_cons()) {
+        throw std::runtime_error("Empty parameters");
+    }
+
+    auto cons = parameters->to_cons();
+
+    std::vector<std::string_view> elements;
+
+    while (cons) {
+        auto argument = cons->left->to_symbol().value();
+
+        for (auto element : elements) {
+            if (element == argument) {
+                std::string error_message = "There is repeating argument: " + std::string(argument);
+                throw std::runtime_error(error_message);
+            }
+        }
+
+        elements.push_back(argument);
+
+        cons = cons->right->to_cons();
+    }
+}
+
 std::unique_ptr<Expression>
 Expression::from_element(std::shared_ptr<Element> element) {
     if (auto cons = element->to_cons()) {
@@ -170,6 +195,8 @@ std::unique_ptr<Func> Func::parse(std::shared_ptr<ast::List> arguments) {
     }
 
     auto func_arguments = maybe_dynamic_cast<ast::List>(cons->left);
+
+    test_parameters(func_arguments);
 
     if (!cons->right->to_cons()) {
         throw std::runtime_error("`func` takes at least 3 arguments, provided 2");
