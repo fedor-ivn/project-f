@@ -59,6 +59,10 @@ Expression::from_element(std::shared_ptr<Element> element) {
         else if (symbol == "while") {
             return While::parse(arguments);
         }
+
+        else if (symbol == "break") {
+            return Break::parse(arguments);
+        }
     }
 
     return std::make_unique<Atom>(Atom(std::move(element)));
@@ -385,6 +389,41 @@ void While::display(std::ostream& stream, size_t depth) const {
 
     stream << Depth(depth + 1) << "body = ";
     this->body->display(stream, depth + 1);
+    stream << '\n';
+
+    stream << Depth(depth) << '}';
+}
+
+Break::Break(std::unique_ptr<Expression> expression)
+    : Expression(), expression(std::move(expression)) {}
+
+std::unique_ptr<Break> Break::parse(std::shared_ptr<ast::List> arguments) {
+    if (!arguments->to_cons()) {
+        auto null = Quote(std::make_shared<Null>(Null(arguments->span)));
+        return std::make_unique<Break>(Break(std::make_unique<Quote>(null)));
+    }
+
+    auto cons = arguments->to_cons();
+    auto expression = Expression::from_element(cons->left);
+
+    if (cons->right->to_cons()) {
+        throw std::runtime_error(
+            "`break` takes either 0 or 1 argument, provided more than one"
+        );
+    }
+
+    return std::make_unique<Break>(Break(std::move(expression)));
+}
+
+std::shared_ptr<ast::Element> Break::evaluate() const {
+    throw std::runtime_error("Not implemented");
+}
+
+void Break::display(std::ostream& stream, size_t depth) const {
+    stream << "Break {\n";
+
+    stream << Depth(depth + 1) << "expression = ";
+    this->expression->display(stream, depth + 1);
     stream << '\n';
 
     stream << Depth(depth) << '}';
