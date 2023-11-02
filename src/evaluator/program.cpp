@@ -318,7 +318,7 @@ std::unique_ptr<Return> Return::parse(std::shared_ptr<ast::List> arguments) {
 
     if (cons->right->to_cons()) {
         throw std::runtime_error(
-            "`return` takes 1 argument, provided more than one"
+            "`return` takes either 0 or 1 argument, provided more than one"
         );
     }
 
