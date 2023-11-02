@@ -1,4 +1,5 @@
 #include "program.h"
+#include <algorithm>
 #include <memory>
 #include <stdexcept>
 
@@ -49,6 +50,10 @@ Expression::from_element(std::shared_ptr<Element> element) {
 
         else if (symbol == "prog") {
             return Prog::parse(arguments);
+        }
+
+        else if (symbol == "return") {
+            return Return::parse(arguments);
         }
     }
 
@@ -294,6 +299,45 @@ void Prog::display(std::ostream& stream, size_t depth) const {
 
     stream << Depth(depth) << '}';
 }
+
+Return::Return(std::unique_ptr<Expression> expression)
+    : Expression(), expression(std::move(expression)) {}
+
+std::unique_ptr<Return> Return::parse(std::shared_ptr<ast::List> arguments) {
+    if (!arguments->to_cons()) {
+        auto null = Quote(std::make_shared<Null>(Null(arguments->span)));
+        return std::make_unique<Return>(Return(
+            std::make_unique<Quote>(null)
+        ));
+    }
+
+    auto cons = arguments->to_cons();
+    auto expression = Expression::from_element(cons->left);
+
+    if (cons->right->to_cons()) {
+        throw std::runtime_error(
+            "`return` takes 1 argument, provided more than one"
+        );
+    }
+
+    return std::make_unique<Return>(Return(std::move(expression)));
+}
+
+std::shared_ptr<ast::Element> Return::evaluate() const {
+    throw std::runtime_error("Not implemented");
+}
+
+void Return::display(std::ostream& stream, size_t depth) const {
+    stream << "Return {\n";
+
+    stream << Depth(depth + 1) << "expression = ";
+    this->expression->display(stream, depth + 1);
+    stream << '\n';
+
+    stream << Depth(depth) << '}';
+}
+
+
 
 Program::Program(std::vector<std::unique_ptr<Expression>> program)
     : program(std::move(program)) {}
