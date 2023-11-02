@@ -55,6 +55,10 @@ Expression::from_element(std::shared_ptr<Element> element) {
         else if (symbol == "return") {
             return Return::parse(arguments);
         }
+
+        else if (symbol == "while") {
+            return While::parse(arguments);
+        }
     }
 
     return std::make_unique<Atom>(Atom(std::move(element)));
@@ -306,9 +310,7 @@ Return::Return(std::unique_ptr<Expression> expression)
 std::unique_ptr<Return> Return::parse(std::shared_ptr<ast::List> arguments) {
     if (!arguments->to_cons()) {
         auto null = Quote(std::make_shared<Null>(Null(arguments->span)));
-        return std::make_unique<Return>(Return(
-            std::make_unique<Quote>(null)
-        ));
+        return std::make_unique<Return>(Return(std::make_unique<Quote>(null)));
     }
 
     auto cons = arguments->to_cons();
@@ -337,7 +339,56 @@ void Return::display(std::ostream& stream, size_t depth) const {
     stream << Depth(depth) << '}';
 }
 
+While::While(
+    std::unique_ptr<Expression> condition,
+    std::unique_ptr<Expression> body
+)
+    : Expression(), condition(std::move(condition)),
+      body(std::move(body)) {}
 
+std::unique_ptr<While> While::parse(std::shared_ptr<ast::List> arguments) {
+    if (!arguments->to_cons()) {
+        throw std::runtime_error("`while` takes 2 arguments, provided 0");
+    }
+
+    auto cons = arguments->to_cons();
+    auto condition = Expression::from_element(cons->left);
+
+    auto rest = cons->right->to_cons();
+    
+    if (!rest) {
+        throw std::runtime_error("`while` takes 2 arguments, provided 1");
+    }
+
+    if (rest->right->to_cons()) {
+        throw std::runtime_error(
+            "`while` takes 2 arguments, provided more than two"
+        );
+    }
+
+    auto body_element = cons->right->to_cons()->left;
+    auto body = Expression::from_element(body_element);
+
+    return std::make_unique<While>(While(std::move(condition), std::move(body)));
+}
+
+std::shared_ptr<ast::Element> While::evaluate() const {
+    throw std::runtime_error("Not implemented");
+}
+
+void While::display(std::ostream& stream, size_t depth) const {
+    stream << "While {\n";
+
+    stream << Depth(depth + 1) << "condition = ";
+    this->condition->display(stream, depth + 1);
+    stream << '\n';
+
+    stream << Depth(depth + 1) << "body = ";
+    this->body->display(stream, depth + 1);
+    stream << '\n';
+
+    stream << Depth(depth) << '}';
+}
 
 Program::Program(std::vector<std::unique_ptr<Expression>> program)
     : program(std::move(program)) {}
