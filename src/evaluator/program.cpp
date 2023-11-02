@@ -149,9 +149,9 @@ void Setq::display(std::ostream& stream, size_t depth) const {
 
 Func::Func(
     std::shared_ptr<ast::Symbol> name,
-    std::shared_ptr<ast::List> arguments,
+    std::shared_ptr<ast::List> parameters,
     Program body) 
-    : Expression(), name(name), arguments(arguments), body(std::move(body)) {}
+    : Expression(), name(name), parameters(parameters), body(std::move(body)) {}
 
 std::unique_ptr<Func> Func::parse(std::shared_ptr<ast::List> arguments) {
     if (!arguments->to_cons()) {
@@ -199,7 +199,7 @@ void Func::display(std::ostream& stream, size_t depth) const {
            << "name = " << this->name->display_verbose(depth + 1) << '\n';
 
     stream << Depth(depth + 1)
-           << "arguments = " << this->arguments->display_verbose(depth + 1)
+           << "arguments = " << this->parameters->display_verbose(depth + 1)
            << '\n';
 
     stream << Depth(depth + 1) << "body = ";

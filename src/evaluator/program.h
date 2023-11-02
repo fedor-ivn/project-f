@@ -123,13 +123,13 @@ class Program {
 
 class Func : public Expression {
     std::shared_ptr<ast::Symbol> name;
-    std::shared_ptr<ast::List> arguments;
+    std::shared_ptr<ast::List> parameters;
     Program body;
 
   public:
     Func(
       std::shared_ptr<ast::Symbol> name,
-      std::shared_ptr<ast::List> arguments,
+      std::shared_ptr<ast::List> parameters,
       Program body);
     
     static std::unique_ptr<Func> parse(std::shared_ptr<ast::List> arguments);
