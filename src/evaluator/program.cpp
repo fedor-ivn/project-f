@@ -35,6 +35,10 @@ void test_parameters(std::shared_ptr<ast::List> parameters) {
     std::vector<std::string_view> elements;
 
     while (cons) {
+        if (!cons->left->to_symbol()) {
+            throw std::runtime_error("Argument is not symbol");
+        }
+
         auto argument = cons->left->to_symbol().value();
 
         for (auto element : elements) {
