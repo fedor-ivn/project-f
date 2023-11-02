@@ -299,7 +299,8 @@ std::unique_ptr<Prog> Prog::parse(std::shared_ptr<ast::List> arguments) {
 
     auto cons = arguments->to_cons();
 
-    auto func_arguments = maybe_dynamic_cast<ast::List>(cons->left);
+    auto parameters = maybe_dynamic_cast<ast::List>(cons->left);
+    test_parameters(parameters);
 
     if (!cons->right->to_cons()) {
         throw std::runtime_error("`prog` takes at least 2 arguments, provided 1"
@@ -309,7 +310,7 @@ std::unique_ptr<Prog> Prog::parse(std::shared_ptr<ast::List> arguments) {
     auto body_element = std::static_pointer_cast<ast::Element>(cons->right);
     auto body = Expression::from_element(body_element);
 
-    return std::make_unique<Prog>(Prog(func_arguments, std::move(body)));
+    return std::make_unique<Prog>(Prog(parameters, std::move(body)));
 }
 
 std::shared_ptr<ast::Element> Prog::evaluate() const {
