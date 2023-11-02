@@ -55,40 +55,6 @@ class Setq : public Expression {
     virtual void display(std::ostream& stream, size_t depth) const;
 };
 
-class Func : public Expression {
-    std::shared_ptr<ast::Symbol> name;
-    std::shared_ptr<ast::List> arguments;
-    std::unique_ptr<Expression> expression;
-
-  public:
-    Func(
-        std::shared_ptr<ast::Symbol> name,
-        std::shared_ptr<ast::List> arguments,
-        std::unique_ptr<Expression> expression
-    );
-
-    static std::unique_ptr<Func> parse(std::shared_ptr<ast::List> arguments);
-
-    virtual std::shared_ptr<ast::Element> evaluate() const;
-    virtual void display(std::ostream& stream, size_t depth) const;
-};
-
-class Lambda : public Expression {
-    std::shared_ptr<ast::List> arguments;
-    std::unique_ptr<Expression> expression;
-
-  public:
-    Lambda(
-        std::shared_ptr<ast::List> arguments,
-        std::unique_ptr<Expression> expression
-    );
-
-    static std::unique_ptr<Lambda> parse(std::shared_ptr<ast::List> arguments);
-
-    virtual std::shared_ptr<ast::Element> evaluate() const;
-    virtual void display(std::ostream& stream, size_t depth) const;
-};
-
 class Prog : public Expression {
     std::shared_ptr<ast::List> variables;
     std::unique_ptr<Expression> expression;
@@ -103,6 +69,30 @@ class Prog : public Expression {
 
     virtual std::shared_ptr<ast::Element> evaluate() const;
     virtual void display(std::ostream& stream, size_t depth) const;
+};
+
+class Cond : public Expression {
+    std::unique_ptr<ast::Boolean> condition;
+    std::unique_ptr<Expression> true_case;
+    std::unique_ptr<Expression> false_case;
+
+  public:
+    Cond(
+      std::unique_ptr<ast::Boolean> condition,
+      std::unique_ptr<Expression> true_case
+    );
+
+    // If false case is provided
+    Cond(
+      std::unique_ptr<ast::Boolean> condition,
+      std::unique_ptr<Expression> true_case,
+      std::unique_ptr<Expression> false_case
+    );
+
+    static std::unique_ptr<Cond> parse(std::shared_ptr<ast::List> arguments);
+
+    virtual std::shared_ptr<ast::Element> evaluate() const;
+    virtual void display(std::ostream& stream) const;
 };
 
 class Program {
@@ -133,6 +123,22 @@ class Func : public Expression {
       Program body);
     
     static std::unique_ptr<Func> parse(std::shared_ptr<ast::List> arguments);
+
+    virtual std::shared_ptr<ast::Element> evaluate() const;
+    virtual void display(std::ostream& stream, size_t depth) const;
+};
+
+class Lambda : public Expression {
+    std::shared_ptr<ast::List> arguments;
+    Program body;
+
+  public:
+    Lambda(
+        std::shared_ptr<ast::List> arguments,
+        Program body
+    );
+
+    static std::unique_ptr<Lambda> parse(std::shared_ptr<ast::List> arguments);
 
     virtual std::shared_ptr<ast::Element> evaluate() const;
     virtual void display(std::ostream& stream, size_t depth) const;
