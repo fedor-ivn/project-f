@@ -13,7 +13,7 @@ class Reader {
   public:
     Reader(std::string_view source, ast::Position position = ast::Position());
 
-    std::vector<std::unique_ptr<ast::Element>> read();
+    std::vector<std::shared_ptr<ast::Element>> read();
 
   private:
     std::string_view source;
