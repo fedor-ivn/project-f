@@ -117,22 +117,6 @@ class Return : public Expression {
     virtual void display(std::ostream& stream, size_t depth) const;
 };
 
-class While : public Expression {
-    std::unique_ptr<Expression> condition;
-    std::unique_ptr<Expression> body;
-
-  public:
-    While(
-        std::unique_ptr<Expression> condition,
-        std::unique_ptr<Expression> expression
-    );
-
-    static std::unique_ptr<While> parse(std::shared_ptr<ast::List> arguments);
-
-    virtual std::shared_ptr<ast::Element> evaluate() const;
-    virtual void display(std::ostream& stream, size_t depth) const;
-};
-
 class Break : public Expression {
     std::unique_ptr<Expression> expression;
 
@@ -152,13 +136,29 @@ class Program {
     Program(std::vector<std::unique_ptr<Expression>> program);
 
     static Program
-    from_elements(std::vector<std::unique_ptr<ast::Element>> elements);
+    from_elements(std::vector<std::shared_ptr<ast::Element>> elements);
 
     std::shared_ptr<ast::Element> evaluate() const;
 
     void display(std::ostream& stream, size_t depth) const;
     friend std::ostream&
     operator<<(std::ostream& stream, Program const& program);
+};
+
+class While : public Expression {
+    std::unique_ptr<Expression> condition;
+    Program body;
+
+  public:
+    While(
+        std::unique_ptr<Expression> condition,
+        Program body
+    );
+
+    static std::unique_ptr<While> parse(std::shared_ptr<ast::List> arguments);
+
+    virtual std::shared_ptr<ast::Element> evaluate() const;
+    virtual void display(std::ostream& stream, size_t depth) const;
 };
 
 } // namespace evaluator

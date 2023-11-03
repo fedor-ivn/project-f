@@ -115,8 +115,8 @@ std::unique_ptr<ast::Element> Parser::parse_element() {
     throw SyntaxError(ErrorCause::UnclosedList, token->span, true);
 }
 
-std::vector<std::unique_ptr<ast::Element>> Parser::parse() {
-    std::vector<std::unique_ptr<ast::Element>> ast;
+std::vector<std::shared_ptr<ast::Element>> Parser::parse() {
+    std::vector<std::shared_ptr<ast::Element>> ast;
 
     while (!this->peek_token()->is_end_of_file()) {
         auto element = this->parse_element();

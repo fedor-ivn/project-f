@@ -344,35 +344,37 @@ void Return::display(std::ostream& stream, size_t depth) const {
 
 While::While(
     std::unique_ptr<Expression> condition,
-    std::unique_ptr<Expression> body
+    Program body
 )
     : Expression(), condition(std::move(condition)),
       body(std::move(body)) {}
 
 std::unique_ptr<While> While::parse(std::shared_ptr<ast::List> arguments) {
     if (!arguments->to_cons()) {
-        throw std::runtime_error("`while` takes 2 arguments, provided 0");
+        throw std::runtime_error(
+            "`while` takes at least 2 arguments, provided 0"
+        );
     }
 
     auto cons = arguments->to_cons();
     auto condition = Expression::from_element(cons->left);
 
-    auto rest = cons->right->to_cons();
-    
-    if (!rest) {
-        throw std::runtime_error("`while` takes 2 arguments, provided 1");
-    }
-
-    if (rest->right->to_cons()) {
+    auto body = cons->right->to_cons();
+    if (!body) {
         throw std::runtime_error(
-            "`while` takes 2 arguments, provided more than two"
+            "`while` takes at least 2 arguments, provided 1"
         );
     }
 
-    auto body_element = cons->right->to_cons()->left;
-    auto body = Expression::from_element(body_element);
+    std::vector<std::shared_ptr<Element>> elements;
+    while (body) {
+        elements.push_back(body->left);
+        body = body->right->to_cons();
+    }
 
-    return std::make_unique<While>(While(std::move(condition), std::move(body)));
+    auto program = Program::from_elements(elements);
+
+    return std::make_unique<While>(While(std::move(condition), std::move(program)));
 }
 
 std::shared_ptr<ast::Element> While::evaluate() const {
@@ -387,7 +389,7 @@ void While::display(std::ostream& stream, size_t depth) const {
     stream << '\n';
 
     stream << Depth(depth + 1) << "body = ";
-    this->body->display(stream, depth + 1);
+    this->body.display(stream, depth + 1);
     stream << '\n';
 
     stream << Depth(depth) << '}';
@@ -431,7 +433,7 @@ void Break::display(std::ostream& stream, size_t depth) const {
 Program::Program(std::vector<std::unique_ptr<Expression>> program)
     : program(std::move(program)) {}
 
-Program Program::from_elements(std::vector<std::unique_ptr<Element>> elements) {
+Program Program::from_elements(std::vector<std::shared_ptr<Element>> elements) {
     std::vector<std::unique_ptr<Expression>> program;
     for (auto&& element : elements) {
         program.push_back(Expression::from_element(std::move(element)));
