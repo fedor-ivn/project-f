@@ -25,28 +25,28 @@ std::shared_ptr<T> maybe_dynamic_cast(std::shared_ptr<ast::Element> element) {
     return symbol;
 }
 
-void test_parameters(std::shared_ptr<ast::List> parameters) {
-    if (!parameters->to_cons()) {
-        return;
-    }
-
-    auto cons = parameters->to_cons();
-
-    std::vector<std::string_view> elements;
+std::vector<std::shared_ptr<ast::Symbol>> list_to_symbols_vector(std::shared_ptr<ast::List> list) {
+    auto cons = list->to_cons();
+    std::vector<std::shared_ptr<ast::Symbol>> symbols;
 
     while (cons) {
-        if (!cons->left->to_symbol()) {
-            throw std::runtime_error("Argument is not symbol");
+        auto element = cons->left;
+
+        if (!element->to_symbol()) {
+            throw std::runtime_error("Parameter is not a symbol");
         }
 
-        auto argument = cons->left->to_symbol().value();
+        auto symbol = std::make_shared<ast::Symbol>(
+            ast::Symbol(std::string(element->to_symbol().value()), element->span)
+        );
 
-        for (auto element : elements) {
-            if (element == argument) {
-                std::string error_message = "There is repeating argument: " + std::string(argument);
-                throw std::runtime_error(error_message);
-            }
-        }
+        symbols.push_back(symbol);
+
+        cons = cons->right->to_cons();
+    }
+
+    return symbols;
+}
 
         elements.push_back(argument);
 
@@ -178,7 +178,7 @@ void Setq::display(std::ostream& stream, size_t depth) const {
 
 Func::Func(
     std::shared_ptr<ast::Symbol> name,
-    std::shared_ptr<ast::List> parameters,
+    std::vector<std::shared_ptr<ast::Symbol>> parameters,
     Program body) 
     : Expression(), name(name), parameters(parameters), body(std::move(body)) {}
 
@@ -200,7 +200,8 @@ std::unique_ptr<Func> Func::parse(std::shared_ptr<ast::List> arguments) {
 
     auto func_arguments = maybe_dynamic_cast<ast::List>(cons->left);
 
-    test_parameters(func_arguments);
+    auto parameters_symbols = list_to_symbols_vector(func_arguments);
+    test_parameters(parameters_symbols);
 
     if (!cons->right->to_cons()) {
         throw std::runtime_error("`func` takes at least 3 arguments, provided 2");
@@ -216,7 +217,7 @@ std::unique_ptr<Func> Func::parse(std::shared_ptr<ast::List> arguments) {
 
     auto program = Program::from_elements(elements);
 
-    return std::make_unique<Func>(Func(name, func_arguments, std::move(program)));
+    return std::make_unique<Func>(Func(name, parameters_symbols, std::move(program)));
 }
 
 std::shared_ptr<ast::Element> Func::evaluate() const {
@@ -252,7 +253,8 @@ std::unique_ptr<Lambda> Lambda::parse(std::shared_ptr<ast::List> arguments) {
 
     auto cons = arguments->to_cons();
 
-    auto parameters = maybe_dynamic_cast<ast::List>(cons->left);
+    auto parameters_list = maybe_dynamic_cast<ast::List>(cons->left);
+    auto parameters = list_to_symbols_vector(parameters_list);
     test_parameters(parameters);
 
     cons = cons->right->to_cons();
@@ -305,7 +307,8 @@ std::unique_ptr<Prog> Prog::parse(std::shared_ptr<ast::List> arguments) {
 
     auto cons = arguments->to_cons();
 
-    auto parameters = maybe_dynamic_cast<ast::List>(cons->left);
+    auto parameters_list = maybe_dynamic_cast<ast::List>(cons->left);
+    auto parameters = list_to_symbols_vector(parameters_list);
     test_parameters(parameters);
 
     if (!cons->right->to_cons()) {
