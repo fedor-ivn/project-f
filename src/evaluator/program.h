@@ -105,6 +105,22 @@ class Prog : public Expression {
     virtual void display(std::ostream& stream, size_t depth) const;
 };
 
+class Call : public Expression {
+    std::unique_ptr<Expression> function;
+    std::vector<std::unique_ptr<Expression>> arguments;
+
+  public:
+    Call(
+        std::unique_ptr<Expression> function,
+        std::vector<std::unique_ptr<Expression>> arguments
+    );
+
+    static std::unique_ptr<Call> parse(ast::Cons const& arguments);
+
+    virtual std::shared_ptr<ast::Element> evaluate() const;
+    virtual void display(std::ostream& stream, size_t depth) const;
+};
+
 class Program {
     std::vector<std::unique_ptr<Expression>> program;
 

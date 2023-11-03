@@ -50,6 +50,8 @@ Expression::from_element(std::shared_ptr<Element> element) {
         else if (symbol == "prog") {
             return Prog::parse(arguments);
         }
+
+        return Call::parse(*cons);
     }
 
     return std::make_unique<Atom>(Atom(std::move(element)));
@@ -291,6 +293,49 @@ void Prog::display(std::ostream& stream, size_t depth) const {
     stream << Depth(depth + 1) << "body = ";
     this->expression->display(stream, depth + 1);
     stream << '\n';
+
+    stream << Depth(depth) << '}';
+}
+
+Call::Call(
+    std::unique_ptr<Expression> function,
+    std::vector<std::unique_ptr<Expression>> arguments
+)
+    : function(std::move(function)), arguments(std::move(arguments)) {}
+
+std::unique_ptr<Call> Call::parse(ast::Cons const& expression) {
+    auto function = Expression::from_element(expression.left);
+
+    std::vector<std::unique_ptr<Expression>> arguments;
+    auto raw_arguments = expression.right;
+    while (auto cons = raw_arguments->to_cons()) {
+        arguments.push_back(Expression::from_element(cons->left));
+        raw_arguments = cons->right;
+    }
+
+    return std::make_unique<Call>(
+        Call(std::move(function), std::move(arguments))
+    );
+}
+
+std::shared_ptr<Element> Call::evaluate() const {
+    throw std::runtime_error("Not implemented");
+}
+
+void Call::display(std::ostream& stream, size_t depth) const {
+    stream << "Call {\n";
+
+    stream << Depth(depth + 1) << "function = ";
+    this->function->display(stream, depth + 1);
+    stream << '\n';
+
+    stream << Depth(depth + 1) << "arguments = [\n";
+    for (auto const& argument : this->arguments) {
+        stream << Depth(depth + 2);
+        argument->display(stream, depth + 2);
+        stream << ",\n";
+    }
+    stream << Depth(depth + 1) << "]\n";
 
     stream << Depth(depth) << '}';
 }
