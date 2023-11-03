@@ -56,12 +56,12 @@ class Setq : public Expression {
 };
 
 class Prog : public Expression {
-    std::shared_ptr<ast::List> variables;
+    std::vector<std::shared_ptr<ast::Symbol>> parameters;
     std::unique_ptr<Expression> expression;
 
   public:
     Prog(
-        std::shared_ptr<ast::List> arguments,
+        std::vector<std::shared_ptr<ast::Symbol>> parameters,
         std::unique_ptr<Expression> expression
     );
 
@@ -113,13 +113,13 @@ class Program {
 
 class Func : public Expression {
     std::shared_ptr<ast::Symbol> name;
-    std::shared_ptr<ast::List> parameters;
+    std::vector<std::shared_ptr<ast::Symbol>> parameters;
     Program body;
 
   public:
     Func(
       std::shared_ptr<ast::Symbol> name,
-      std::shared_ptr<ast::List> parameters,
+      std::vector<std::shared_ptr<ast::Symbol>> parameters,
       Program body);
     
     static std::unique_ptr<Func> parse(std::shared_ptr<ast::List> arguments);
@@ -129,12 +129,12 @@ class Func : public Expression {
 };
 
 class Lambda : public Expression {
-    std::shared_ptr<ast::List> arguments;
+    std::vector<std::shared_ptr<ast::Symbol>> parameters;
     Program body;
 
   public:
     Lambda(
-        std::shared_ptr<ast::List> arguments,
+        std::vector<std::shared_ptr<ast::Symbol>> parameters,
         Program body
     );
 

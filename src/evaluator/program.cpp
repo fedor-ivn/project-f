@@ -254,9 +254,9 @@ void Func::display(std::ostream& stream, size_t depth) const {
 }
 
 Lambda::Lambda(
-    std::shared_ptr<ast::List> arguments, Program body
+    std::vector<std::shared_ptr<ast::Symbol>> parameters, Program body
 )
-    : Expression(), arguments(arguments), body(std::move(body)) {}
+    : Expression(), parameters(parameters), body(std::move(body)) {}
 
 std::unique_ptr<Lambda> Lambda::parse(std::shared_ptr<ast::List> arguments) {
     if (!arguments->to_cons()) {
@@ -310,9 +310,9 @@ void Lambda::display(std::ostream& stream, size_t depth) const {
 }
 
 Prog::Prog(
-    std::shared_ptr<ast::List> arguments, std::unique_ptr<Expression> expression
+    std::vector<std::shared_ptr<ast::Symbol>> parameters, std::unique_ptr<Expression> expression
 )
-    : Expression(), variables(arguments), expression(std::move(expression)){};
+    : Expression(), parameters(parameters), expression(std::move(expression)){};
 
 std::unique_ptr<Prog> Prog::parse(std::shared_ptr<ast::List> arguments) {
     if (!arguments->to_cons()) {
