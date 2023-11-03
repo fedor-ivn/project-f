@@ -15,6 +15,8 @@ class Expression {
 
     virtual std::shared_ptr<ast::Element> evaluate() const = 0;
     virtual void display(std::ostream& stream, size_t depth) const = 0;
+
+    virtual bool can_evaluate_to_function() const = 0;
 };
 
 class Atom : public Expression {
@@ -25,6 +27,8 @@ class Atom : public Expression {
 
     virtual std::shared_ptr<ast::Element> evaluate() const;
     virtual void display(std::ostream& stream, size_t depth) const;
+
+    virtual bool can_evaluate_to_function() const;
 };
 
 class Quote : public Expression {
@@ -37,6 +41,8 @@ class Quote : public Expression {
 
     virtual std::shared_ptr<ast::Element> evaluate() const;
     virtual void display(std::ostream& stream, size_t depth) const;
+
+    virtual bool can_evaluate_to_function() const;
 };
 
 class Setq : public Expression {
@@ -53,6 +59,8 @@ class Setq : public Expression {
 
     virtual std::shared_ptr<ast::Element> evaluate() const;
     virtual void display(std::ostream& stream, size_t depth) const;
+
+    virtual bool can_evaluate_to_function() const;
 };
 
 class Func : public Expression {
@@ -71,6 +79,8 @@ class Func : public Expression {
 
     virtual std::shared_ptr<ast::Element> evaluate() const;
     virtual void display(std::ostream& stream, size_t depth) const;
+
+    virtual bool can_evaluate_to_function() const;
 };
 
 class Lambda : public Expression {
@@ -87,6 +97,8 @@ class Lambda : public Expression {
 
     virtual std::shared_ptr<ast::Element> evaluate() const;
     virtual void display(std::ostream& stream, size_t depth) const;
+
+    virtual bool can_evaluate_to_function() const;
 };
 
 class Prog : public Expression {
@@ -103,6 +115,26 @@ class Prog : public Expression {
 
     virtual std::shared_ptr<ast::Element> evaluate() const;
     virtual void display(std::ostream& stream, size_t depth) const;
+
+    virtual bool can_evaluate_to_function() const;
+};
+
+class Call : public Expression {
+    std::unique_ptr<Expression> function;
+    std::vector<std::unique_ptr<Expression>> arguments;
+
+  public:
+    Call(
+        std::unique_ptr<Expression> function,
+        std::vector<std::unique_ptr<Expression>> arguments
+    );
+
+    static std::unique_ptr<Call> parse(ast::Cons const& arguments);
+
+    virtual std::shared_ptr<ast::Element> evaluate() const;
+    virtual void display(std::ostream& stream, size_t depth) const;
+
+    virtual bool can_evaluate_to_function() const;
 };
 
 class Program {
