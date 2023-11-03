@@ -239,9 +239,12 @@ void Func::display(std::ostream& stream, size_t depth) const {
     stream << Depth(depth + 1)
            << "name = " << this->name->display_verbose(depth + 1) << '\n';
 
-    stream << Depth(depth + 1)
-           << "arguments = " << this->parameters->display_verbose(depth + 1)
-           << '\n';
+    stream << Depth(depth + 1) << "arguments = [\n";
+    for (auto parameter : this->parameters) {
+        stream << Depth(depth + 2) << parameter->display_verbose(depth+2);
+        stream << ",\n";
+    }
+    stream << Depth(depth+1) << "]\n";
 
     stream << Depth(depth + 1) << "body = ";
     this->body.display(stream, depth + 1);
@@ -292,9 +295,12 @@ std::shared_ptr<ast::Element> Lambda::evaluate() const {
 void Lambda::display(std::ostream& stream, size_t depth) const {
     stream << "Lambda {\n";
 
-    stream << Depth(depth + 1)
-           << "arguments = " << this->arguments->display_verbose(depth + 1)
-           << '\n';
+    stream << Depth(depth + 1) << "arguments = [\n";
+    for (auto parameter : this->parameters) {
+        stream << Depth(depth + 2) << parameter->display_verbose(depth+2);
+        stream << ",\n";
+    }
+    stream << Depth(depth+1) << "]\n";
 
     stream << Depth(depth + 1) << "body = ";
     this->body.display(stream, depth + 1);
@@ -338,9 +344,12 @@ std::shared_ptr<ast::Element> Prog::evaluate() const {
 void Prog::display(std::ostream& stream, size_t depth) const {
     stream << "Prog {\n";
 
-    stream << Depth(depth + 1)
-           << "variables = " << this->variables->display_verbose(depth + 1)
-           << '\n';
+    stream << Depth(depth + 1) << "arguments = [\n";
+    for (auto parameter : this->parameters) {
+        stream << Depth(depth + 2) << parameter->display_verbose(depth+2);
+        stream << ",\n";
+    }
+    stream << Depth(depth+1) << "]\n";
 
     stream << Depth(depth + 1) << "body = ";
     this->expression->display(stream, depth + 1);
