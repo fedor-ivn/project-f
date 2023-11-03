@@ -19,11 +19,11 @@ class Expression {
     virtual bool can_evaluate_to_function() const = 0;
 };
 
-class Atom : public Expression {
-    std::shared_ptr<ast::Element> atom;
+class Symbol : public Expression {
+    std::shared_ptr<ast::Symbol> symbol;
 
   public:
-    Atom(std::shared_ptr<ast::Element> atom);
+    Symbol(std::shared_ptr<ast::Symbol> symbol);
 
     virtual std::shared_ptr<ast::Element> evaluate() const;
     virtual void display(std::ostream& stream, size_t depth) const;
