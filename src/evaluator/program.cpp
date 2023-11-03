@@ -66,29 +66,28 @@ Expression::from_element(std::shared_ptr<Element> element) {
         return Call::parse(*cons);
     }
 
-    return std::make_unique<Atom>(Atom(std::move(element)));
-}
-
-Atom::Atom(std::shared_ptr<Element> atom) : Expression(), atom(atom) {}
-
-std::shared_ptr<Element> Atom::evaluate() const {
-    if (this->atom->to_symbol()) {
-        throw std::runtime_error("Symbol evaluation is to be implemented");
+    if (auto symbol = std::dynamic_pointer_cast<ast::Symbol>(element)) {
+        return std::make_unique<Symbol>(Symbol(std::move(symbol)));
     }
 
-    return this->atom;
+    return std::make_unique<Quote>(Quote(std::move(element)));
 }
 
-void Atom::display(std::ostream& stream, size_t depth) const {
-    stream << "Atom {\n";
+Symbol::Symbol(std::shared_ptr<ast::Symbol> symbol)
+    : Expression(), symbol(symbol) {}
+
+std::shared_ptr<Element> Symbol::evaluate() const {
+    throw std::runtime_error("Symbol evaluation is to be implemented");
+}
+
+void Symbol::display(std::ostream& stream, size_t depth) const {
+    stream << "Symbol {\n";
     stream << Depth(depth + 1)
-           << "element = " << this->atom->display_verbose(depth + 1) << '\n';
+           << "symbol = " << this->symbol->display_verbose(depth + 1) << '\n';
     stream << Depth(depth) << '}';
 }
 
-bool Atom::can_evaluate_to_function() const {
-    return bool(this->atom->to_symbol());
-}
+bool Symbol::can_evaluate_to_function() const { return true; }
 
 Quote::Quote(std::shared_ptr<Element> element)
     : Expression(), element(element) {}
