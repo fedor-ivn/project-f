@@ -48,9 +48,18 @@ std::vector<std::shared_ptr<ast::Symbol>> list_to_symbols_vector(std::shared_ptr
     return symbols;
 }
 
-        elements.push_back(argument);
+void test_parameters(std::vector<std::shared_ptr<ast::Symbol>> parameters) {
+    std::vector<std::string> set;
 
-        cons = cons->right->to_cons();
+    for (auto parameter : parameters) {
+        for (auto set_element : set) {
+            if (parameter->value == set_element) {
+                std::string message = "There is a duplicate argument: " + parameter->value;
+                throw std::runtime_error(message);
+            }
+
+        }
+        set.push_back(parameter->value);
     }
 }
 
