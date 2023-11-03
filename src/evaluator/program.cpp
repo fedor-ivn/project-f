@@ -1,5 +1,4 @@
 #include "program.h"
-#include <algorithm>
 #include <memory>
 #include <stdexcept>
 
