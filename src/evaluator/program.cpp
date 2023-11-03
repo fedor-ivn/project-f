@@ -18,8 +18,20 @@ std::shared_ptr<T> maybe_dynamic_cast(std::shared_ptr<ast::Element> element) {
     auto symbol = std::dynamic_pointer_cast<T>(element);
 
     if (symbol == nullptr) {
-        std::string message = typeid(T).name();
-        throw std::runtime_error("Expected type: " + message);
+        std::string type_name = typeid(T).name();
+        std::string message;
+
+        if (type_name == "N3ast6SymbolE") {
+            message = "Expected type: Symbol";
+        }
+        else if (type_name == "N3ast4ListE") {
+            message = "Expected type: List";
+        }
+        else {
+            message = "Unexpected type" + type_name;
+        }
+
+        throw std::runtime_error(message);
     }
 
     return symbol;
