@@ -74,6 +74,10 @@ void Atom::display(std::ostream& stream, size_t depth) const {
     stream << Depth(depth) << '}';
 }
 
+bool Atom::can_evaluate_to_function() const {
+    return bool(this->atom->to_symbol());
+}
+
 Quote::Quote(std::shared_ptr<Element> element)
     : Expression(), element(element) {}
 
@@ -101,6 +105,8 @@ void Quote::display(std::ostream& stream, size_t depth) const {
            << "element = " << this->element->display_verbose(depth + 1) << '\n';
     stream << Depth(depth) << '}';
 }
+
+bool Quote::can_evaluate_to_function() const { return false; }
 
 Setq::Setq(
     std::shared_ptr<ast::Symbol> symbol, std::unique_ptr<Expression> expression
@@ -133,6 +139,10 @@ std::unique_ptr<Setq> Setq::parse(std::shared_ptr<ast::List> arguments) {
 
 std::shared_ptr<ast::Element> Setq::evaluate() const {
     throw std::runtime_error("Not implemented");
+}
+
+bool Setq::can_evaluate_to_function() const {
+    return this->initializer->can_evaluate_to_function();
 }
 
 void Setq::display(std::ostream& stream, size_t depth) const {
@@ -190,6 +200,8 @@ std::shared_ptr<ast::Element> Func::evaluate() const {
     throw std::runtime_error("Not implemented");
 }
 
+bool Func::can_evaluate_to_function() const { return true; }
+
 void Func::display(std::ostream& stream, size_t depth) const {
     stream << "Func {\n";
 
@@ -238,6 +250,8 @@ std::unique_ptr<Lambda> Lambda::parse(std::shared_ptr<ast::List> arguments) {
 std::shared_ptr<ast::Element> Lambda::evaluate() const {
     throw std::runtime_error("Not implemented");
 }
+
+bool Lambda::can_evaluate_to_function() const { return true; }
 
 void Lambda::display(std::ostream& stream, size_t depth) const {
     stream << "Lambda {\n";
@@ -297,6 +311,10 @@ void Prog::display(std::ostream& stream, size_t depth) const {
     stream << Depth(depth) << '}';
 }
 
+bool Prog::can_evaluate_to_function() const {
+    return this->expression->can_evaluate_to_function();
+}
+
 Call::Call(
     std::unique_ptr<Expression> function,
     std::vector<std::unique_ptr<Expression>> arguments
@@ -305,6 +323,10 @@ Call::Call(
 
 std::unique_ptr<Call> Call::parse(ast::Cons const& expression) {
     auto function = Expression::from_element(expression.left);
+    if (!function->can_evaluate_to_function()) {
+        throw std::runtime_error("Calling an expression which is statically "
+                                 "known not to evaluate to a function");
+    }
 
     std::vector<std::unique_ptr<Expression>> arguments;
     auto raw_arguments = expression.right;
@@ -339,6 +361,8 @@ void Call::display(std::ostream& stream, size_t depth) const {
 
     stream << Depth(depth) << '}';
 }
+
+bool Call::can_evaluate_to_function() const { return true; }
 
 Program::Program(std::vector<std::unique_ptr<Expression>> program)
     : program(std::move(program)) {}
