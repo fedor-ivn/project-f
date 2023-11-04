@@ -370,7 +370,7 @@ Prog::Prog(std::vector<std::shared_ptr<ast::Symbol>> variables, Program body)
 std::unique_ptr<Prog> Prog::parse(std::shared_ptr<ast::List> arguments) {
     if (!arguments->to_cons()) {
         throw EvaluationError(
-            "`prog` takes at least 2 arguments, provided 0", arguments->span
+            "`prog` needs a variable list and a body", arguments->span
         );
     }
 
