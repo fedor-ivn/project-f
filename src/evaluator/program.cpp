@@ -311,7 +311,7 @@ Lambda::Lambda(
 std::unique_ptr<Lambda> Lambda::parse(std::shared_ptr<ast::List> arguments) {
     if (!arguments->to_cons()) {
         throw EvaluationError(
-            "`lambda` takes at least 2 arguments, provided 0", arguments->span
+            "`lambda` needs a parameter list and a body", arguments->span
         );
     }
 
