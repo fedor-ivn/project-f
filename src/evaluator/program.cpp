@@ -619,11 +619,10 @@ std::unique_ptr<Cond> Cond::parse(std::shared_ptr<ast::List> arguments) {
     cons = cons->right->to_cons();
 
     std::unique_ptr<Expression> otherwise;
-    if (!cons) {
-        otherwise = Expression::from_element(std::make_shared<Null>(Null(arguments->span)));
-    }
-    else {
+    if (cons) {
         otherwise = Expression::from_element(cons->left);
+    } else {
+        otherwise = Expression::from_element(std::make_shared<Null>(Null(arguments->span)));
     }
 
     auto cond = Cond(std::move(condition), std::move(then), std::move(otherwise));
