@@ -3,6 +3,7 @@
 #include <stdexcept>
 
 #include "../utils.h"
+#include "error.h"
 
 namespace evaluator {
 
@@ -93,19 +94,20 @@ Quote::Quote(std::shared_ptr<Element> element)
     : Expression(), element(element) {}
 
 std::unique_ptr<Quote> Quote::parse(std::shared_ptr<List> arguments) {
-    if (auto cons = arguments->to_cons()) {
-        auto element = cons->left;
-
-        if (cons->right->to_cons()) {
-            throw std::runtime_error(
-                "`quote` takes 1 argument, provided more than one"
-            );
-        }
-
-        return std::make_unique<Quote>(Quote(element));
+    auto form_span = arguments->span;
+    auto cons = arguments->to_cons();
+    if (!cons) {
+        throw EvaluationError("`quote` is empty", form_span);
     }
 
-    throw std::runtime_error("`quote` takes 1 argument, provided 0");
+    auto element = cons->left;
+
+    cons = cons->right->to_cons();
+    if (cons) {
+        throw EvaluationError("`quote` has extra arguments", cons->span);
+    }
+
+    return std::make_unique<Quote>(Quote(element));
 }
 
 std::shared_ptr<Element> Quote::evaluate() const { return this->element; }
@@ -125,24 +127,26 @@ Setq::Setq(
     : Expression(), variable(symbol), initializer(std::move(expression)) {}
 
 std::unique_ptr<Setq> Setq::parse(std::shared_ptr<ast::List> arguments) {
-    if (!arguments->to_cons()) {
-        throw std::runtime_error("`setq` takes 2 arguments, provided 0");
-    }
-
+    auto form_span = arguments->span;
     auto cons = arguments->to_cons();
+    if (!cons) {
+        throw EvaluationError(
+            "`setq` without a variable name and an initializer", form_span
+        );
+    }
 
     auto symbol = maybe_dynamic_cast<ast::Symbol>(cons->left);
 
-    if (!cons->right->to_cons()) {
-        throw std::runtime_error("`setq` takes 2 arguments, provided 1");
+    cons = cons->right->to_cons();
+    if (!cons) {
+        throw EvaluationError("`setq` without an initializer", form_span);
     }
 
-    auto expression = Expression::from_element(cons->right->to_cons()->left);
+    auto expression = Expression::from_element(cons->left);
 
-    if (cons->right->to_cons()->right->to_cons()) {
-        throw std::runtime_error(
-            "`setq` takes 2 arguments, provided more than two"
-        );
+    cons = cons->right->to_cons();
+    if (cons) {
+        throw EvaluationError("`setq` has extra arguments", cons->span);
     }
 
     return std::make_unique<Setq>(Setq(symbol, std::move(expression)));
@@ -330,18 +334,17 @@ Return::Return(std::unique_ptr<Expression> expression)
     : Expression(), expression(std::move(expression)) {}
 
 std::unique_ptr<Return> Return::parse(std::shared_ptr<ast::List> arguments) {
-    if (!arguments->to_cons()) {
+    auto cons = arguments->to_cons();
+    if (!cons) {
         auto null = Quote(std::make_shared<Null>(Null(arguments->span)));
         return std::make_unique<Return>(Return(std::make_unique<Quote>(null)));
     }
 
-    auto cons = arguments->to_cons();
     auto expression = Expression::from_element(cons->left);
 
-    if (cons->right->to_cons()) {
-        throw std::runtime_error(
-            "`return` takes either 0 or 1 argument, provided more than one"
-        );
+    cons = cons->right->to_cons();
+    if (cons) {
+        throw EvaluationError("`return` has extra arguments", cons->span);
     }
 
     return std::make_unique<Return>(Return(std::move(expression)));
@@ -367,28 +370,24 @@ While::While(std::unique_ptr<Expression> condition, Program body)
     : Expression(), condition(std::move(condition)), body(std::move(body)) {}
 
 std::unique_ptr<While> While::parse(std::shared_ptr<ast::List> arguments) {
-    if (!arguments->to_cons()) {
-        throw std::runtime_error(
-            "`while` takes at least 2 arguments, provided 0"
-        );
+    auto form_span = arguments->span;
+    auto cons = arguments->to_cons();
+    if (!cons) {
+        throw EvaluationError("`while` is empty", form_span);
     }
 
-    auto cons = arguments->to_cons();
     auto condition = Expression::from_element(cons->left);
 
-    auto body = cons->right->to_cons();
-    if (!body) {
-        throw std::runtime_error(
-            "`while` takes at least 2 arguments, provided 1"
-        );
+    cons = cons->right->to_cons();
+    if (!cons) {
+        throw EvaluationError("`while` without a body", form_span);
     }
 
     std::vector<std::shared_ptr<Element>> elements;
-    while (body) {
-        elements.push_back(body->left);
-        body = body->right->to_cons();
+    while (cons) {
+        elements.push_back(cons->left);
+        cons = cons->right->to_cons();
     }
-
     auto program = Program::from_elements(elements);
 
     return std::make_unique<While>(
@@ -420,18 +419,17 @@ Break::Break(std::unique_ptr<Expression> expression)
     : Expression(), expression(std::move(expression)) {}
 
 std::unique_ptr<Break> Break::parse(std::shared_ptr<ast::List> arguments) {
-    if (!arguments->to_cons()) {
+    auto cons = arguments->to_cons();
+    if (!cons) {
         auto null = Quote(std::make_shared<Null>(Null(arguments->span)));
         return std::make_unique<Break>(Break(std::make_unique<Quote>(null)));
     }
 
-    auto cons = arguments->to_cons();
     auto expression = Expression::from_element(cons->left);
 
-    if (cons->right->to_cons()) {
-        throw std::runtime_error(
-            "`break` takes either 0 or 1 argument, provided more than one"
-        );
+    cons = cons->right->to_cons();
+    if (cons) {
+        throw EvaluationError("`break` has extra arguments", cons->span);
     }
 
     return std::make_unique<Break>(Break(std::move(expression)));
@@ -459,18 +457,21 @@ Call::Call(
 )
     : function(std::move(function)), arguments(std::move(arguments)) {}
 
-std::unique_ptr<Call> Call::parse(ast::Cons const& expression) {
-    auto function = Expression::from_element(expression.left);
+std::unique_ptr<Call> Call::parse(ast::Cons const& form) {
+    auto function = Expression::from_element(form.left);
     if (!function->can_evaluate_to_function()) {
-        throw std::runtime_error("Calling an expression which is statically "
-                                 "known not to evaluate to a function");
+        throw EvaluationError(
+            "function (or a special form) expected, but this expression will "
+            "never evaluate to a function",
+            form.left->span
+        );
     }
 
     std::vector<std::unique_ptr<Expression>> arguments;
-    auto raw_arguments = expression.right;
-    while (auto cons = raw_arguments->to_cons()) {
+    auto cons = form.right->to_cons();
+    while (cons) {
         arguments.push_back(Expression::from_element(cons->left));
-        raw_arguments = cons->right;
+        cons = cons->right->to_cons();
     }
 
     return std::make_unique<Call>(
