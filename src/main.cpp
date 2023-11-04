@@ -8,6 +8,7 @@
 
 #include "ast/element.h"
 #include "ast/span.h"
+#include "evaluator/error.h"
 #include "evaluator/evaluator.h"
 #include "evaluator/program.h"
 #include "reader/error.h"
@@ -16,6 +17,7 @@
 
 using ast::Element;
 using ast::Position;
+using evaluator::EvaluationError;
 using evaluator::Evaluator;
 using evaluator::Program;
 using reader::Parser;
@@ -205,6 +207,8 @@ void process(
         if (ignore_recoverable && error.can_recover) {
             return;
         }
+        std::cerr << error << std::endl;
+    } catch (EvaluationError const& error) {
         std::cerr << error << std::endl;
     }
 }
