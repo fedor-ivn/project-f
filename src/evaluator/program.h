@@ -70,12 +70,13 @@ class Cond : public Expression {
 
   public:
     Cond(
-      std::unique_ptr<Expression> condition,
-      std::unique_ptr<Expression> then,
-      std::unique_ptr<Expression> otherwise);
+        std::unique_ptr<Expression> condition,
+        std::unique_ptr<Expression> then,
+        std::unique_ptr<Expression> otherwise
+    );
 
     static std::unique_ptr<Cond> parse(std::shared_ptr<ast::List> arguments);
-    
+
     virtual std::shared_ptr<ast::Element> evaluate() const;
     virtual void display(std::ostream& stream, size_t depth) const;
 
@@ -153,10 +154,11 @@ class Func : public Expression {
 
   public:
     Func(
-      std::shared_ptr<ast::Symbol> name,
-      std::vector<std::shared_ptr<ast::Symbol>> parameters,
-      Program body);
-    
+        std::shared_ptr<ast::Symbol> name,
+        std::vector<std::shared_ptr<ast::Symbol>> parameters,
+        Program body
+    );
+
     static std::unique_ptr<Func> parse(std::shared_ptr<ast::List> arguments);
 
     virtual std::shared_ptr<ast::Element> evaluate() const;
@@ -170,10 +172,7 @@ class Lambda : public Expression {
     Program body;
 
   public:
-    Lambda(
-        std::vector<std::shared_ptr<ast::Symbol>> parameters,
-        Program body
-    );
+    Lambda(std::vector<std::shared_ptr<ast::Symbol>> parameters, Program body);
 
     static std::unique_ptr<Lambda> parse(std::shared_ptr<ast::List> arguments);
 
@@ -188,10 +187,7 @@ class Prog : public Expression {
     Program body;
 
   public:
-    Prog(
-        std::vector<std::shared_ptr<ast::Symbol>> variables,
-        Program body
-    );
+    Prog(std::vector<std::shared_ptr<ast::Symbol>> variables, Program body);
 
     static std::unique_ptr<Prog> parse(std::shared_ptr<ast::List> arguments);
 

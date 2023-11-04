@@ -24,14 +24,11 @@ std::shared_ptr<T> maybe_dynamic_cast(std::shared_ptr<ast::Element> element) {
 
         if (type_name == "N3ast6SymbolE") {
             message = "expected type - Symbol";
-        }
-        else if (type_name == "N3ast4ListE") {
+        } else if (type_name == "N3ast4ListE") {
             message = "expected type - List";
-        }
-        else if (type_name == "N3ast7BooleanE") {
+        } else if (type_name == "N3ast7BooleanE") {
             message = "expected type - Boolean";
-        }
-        else {
+        } else {
             message = "unexpected type - " + type_name;
         }
 
@@ -41,7 +38,8 @@ std::shared_ptr<T> maybe_dynamic_cast(std::shared_ptr<ast::Element> element) {
     return symbol;
 }
 
-std::vector<std::shared_ptr<ast::Symbol>> list_to_symbols_vector(std::shared_ptr<ast::List> list) {
+std::vector<std::shared_ptr<ast::Symbol>>
+list_to_symbols_vector(std::shared_ptr<ast::List> list) {
     auto cons = list->to_cons();
     std::vector<std::shared_ptr<ast::Symbol>> symbols;
 
@@ -68,10 +66,10 @@ void test_parameters(std::vector<std::shared_ptr<ast::Symbol>> parameters) {
     for (auto parameter : parameters) {
         for (auto set_element : set) {
             if (parameter->value == set_element) {
-                std::string message = "there is a duplicate argument: " + parameter->value;
+                std::string message =
+                    "there is a duplicate argument: " + parameter->value;
                 throw EvaluationError(message, parameter->span);
             }
-
         }
         set.push_back(parameter->value);
     }
@@ -232,12 +230,14 @@ void Setq::display(std::ostream& stream, size_t depth) const {
 Func::Func(
     std::shared_ptr<ast::Symbol> name,
     std::vector<std::shared_ptr<ast::Symbol>> parameters,
-    Program body) 
+    Program body
+)
     : Expression(), name(name), parameters(parameters), body(std::move(body)) {}
 
 std::unique_ptr<Func> Func::parse(std::shared_ptr<ast::List> arguments) {
     if (!arguments->to_cons()) {
-        throw EvaluationError("`func` takes at least 3 arguments, provided 0", arguments->span
+        throw EvaluationError(
+            "`func` takes at least 3 arguments, provided 0", arguments->span
         );
     }
 
@@ -246,7 +246,9 @@ std::unique_ptr<Func> Func::parse(std::shared_ptr<ast::List> arguments) {
     auto name = maybe_dynamic_cast<ast::Symbol>(cons->left);
 
     if (!cons->right->to_cons()) {
-        throw EvaluationError("`func` takes at least 3 arguments, provided 1", cons->span);
+        throw EvaluationError(
+            "`func` takes at least 3 arguments, provided 1", cons->span
+        );
     }
     cons = cons->right->to_cons();
 
@@ -256,9 +258,11 @@ std::unique_ptr<Func> Func::parse(std::shared_ptr<ast::List> arguments) {
     test_parameters(parameters_symbols);
 
     if (!cons->right->to_cons()) {
-        throw EvaluationError("`func` takes at least 3 arguments, provided 2", cons->span);
+        throw EvaluationError(
+            "`func` takes at least 3 arguments, provided 2", cons->span
+        );
     }
-    
+
     std::vector<std::shared_ptr<Element>> elements;
 
     while (cons) {
@@ -268,7 +272,9 @@ std::unique_ptr<Func> Func::parse(std::shared_ptr<ast::List> arguments) {
 
     auto program = Program::from_elements(elements);
 
-    return std::make_unique<Func>(Func(name, parameters_symbols, std::move(program)));
+    return std::make_unique<Func>(
+        Func(name, parameters_symbols, std::move(program))
+    );
 }
 
 std::shared_ptr<ast::Element> Func::evaluate() const {
@@ -285,10 +291,10 @@ void Func::display(std::ostream& stream, size_t depth) const {
 
     stream << Depth(depth + 1) << "arguments = [\n";
     for (auto parameter : this->parameters) {
-        stream << Depth(depth + 2) << parameter->display_verbose(depth+2);
+        stream << Depth(depth + 2) << parameter->display_verbose(depth + 2);
         stream << ",\n";
     }
-    stream << Depth(depth+1) << "]\n";
+    stream << Depth(depth + 1) << "]\n";
 
     stream << Depth(depth + 1) << "body = ";
     this->body.display(stream, depth + 1);
@@ -304,7 +310,9 @@ Lambda::Lambda(
 
 std::unique_ptr<Lambda> Lambda::parse(std::shared_ptr<ast::List> arguments) {
     if (!arguments->to_cons()) {
-        throw EvaluationError("`lambda` takes at least 2 arguments, provided 0", arguments->span);
+        throw EvaluationError(
+            "`lambda` takes at least 2 arguments, provided 0", arguments->span
+        );
     }
 
     auto cons = arguments->to_cons();
@@ -314,10 +322,12 @@ std::unique_ptr<Lambda> Lambda::parse(std::shared_ptr<ast::List> arguments) {
     test_parameters(parameters);
 
     if (!cons->right->to_cons()) {
-        throw EvaluationError("`lambda` takes at least 2 arguments, provided 1", cons->span);
+        throw EvaluationError(
+            "`lambda` takes at least 2 arguments, provided 1", cons->span
+        );
     }
     cons = cons->right->to_cons();
-    
+
     std::vector<std::shared_ptr<Element>> elements;
 
     while (cons) {
@@ -342,10 +352,10 @@ void Lambda::display(std::ostream& stream, size_t depth) const {
 
     stream << Depth(depth + 1) << "arguments = [\n";
     for (auto parameter : this->parameters) {
-        stream << Depth(depth + 2) << parameter->display_verbose(depth+2);
+        stream << Depth(depth + 2) << parameter->display_verbose(depth + 2);
         stream << ",\n";
     }
-    stream << Depth(depth+1) << "]\n";
+    stream << Depth(depth + 1) << "]\n";
 
     stream << Depth(depth + 1) << "body = ";
     this->body.display(stream, depth + 1);
@@ -354,15 +364,14 @@ void Lambda::display(std::ostream& stream, size_t depth) const {
     stream << Depth(depth) << '}';
 }
 
-Prog::Prog(
-    std::vector<std::shared_ptr<ast::Symbol>> variables,
-    Program body
-)
+Prog::Prog(std::vector<std::shared_ptr<ast::Symbol>> variables, Program body)
     : Expression(), variables(variables), body(std::move(body)){};
 
 std::unique_ptr<Prog> Prog::parse(std::shared_ptr<ast::List> arguments) {
     if (!arguments->to_cons()) {
-        throw EvaluationError("`prog` takes at least 2 arguments, provided 0", arguments->span);
+        throw EvaluationError(
+            "`prog` takes at least 2 arguments, provided 0", arguments->span
+        );
     }
 
     auto cons = arguments->to_cons();
@@ -372,10 +381,12 @@ std::unique_ptr<Prog> Prog::parse(std::shared_ptr<ast::List> arguments) {
     test_parameters(parameters);
 
     if (!cons->right->to_cons()) {
-        throw EvaluationError("`prog` takes at least 2 arguments, provided 1", cons->span);
+        throw EvaluationError(
+            "`prog` takes at least 2 arguments, provided 1", cons->span
+        );
     }
     cons = cons->right->to_cons();
-    
+
     std::vector<std::shared_ptr<Element>> elements;
 
     while (cons) {
@@ -398,10 +409,10 @@ void Prog::display(std::ostream& stream, size_t depth) const {
 
     stream << Depth(depth + 1) << "arguments = [\n";
     for (auto parameter : this->variables) {
-        stream << Depth(depth + 2) << parameter->display_verbose(depth+2);
+        stream << Depth(depth + 2) << parameter->display_verbose(depth + 2);
         stream << ",\n";
     }
-    stream << Depth(depth+1) << "]\n";
+    stream << Depth(depth + 1) << "]\n";
 
     stream << Depth(depth + 1) << "body = ";
     this->body.display(stream, depth + 1);
@@ -594,20 +605,26 @@ bool Call::can_evaluate_to_function() const { return true; }
 Cond::Cond(
     std::unique_ptr<Expression> condition,
     std::unique_ptr<Expression> then,
-    std::unique_ptr<Expression> otherwise)
-    : Expression(), condition(std::move(condition)), then(std::move(then)), otherwise(std::move(otherwise)) {}
+    std::unique_ptr<Expression> otherwise
+)
+    : Expression(), condition(std::move(condition)), then(std::move(then)),
+      otherwise(std::move(otherwise)) {}
 
 std::unique_ptr<Cond> Cond::parse(std::shared_ptr<ast::List> arguments) {
     auto cons = arguments->to_cons();
 
     if (!cons) {
-        throw EvaluationError("`cond` takes 2 or 3 arguments, provided 0", arguments->span);
+        throw EvaluationError(
+            "`cond` takes 2 or 3 arguments, provided 0", arguments->span
+        );
     }
 
     auto condition = Expression::from_element(cons->left);
 
     if (!cons->right->to_cons()) {
-        throw EvaluationError("`cond` takes 2 or 3 arguments, provided 1", cons->span);
+        throw EvaluationError(
+            "`cond` takes 2 or 3 arguments, provided 1", cons->span
+        );
     }
     cons = cons->right->to_cons();
 
@@ -620,13 +637,19 @@ std::unique_ptr<Cond> Cond::parse(std::shared_ptr<ast::List> arguments) {
         otherwise = Expression::from_element(cons->left);
 
         if (cons->right->to_cons()) {
-            throw EvaluationError("`cond` takes 2 or 3 arguments, provided more than 3", cons->span);
+            throw EvaluationError(
+                "`cond` takes 2 or 3 arguments, provided more than 3",
+                cons->span
+            );
         }
     } else {
-        otherwise = Expression::from_element(std::make_shared<Null>(Null(arguments->span)));
+        otherwise = Expression::from_element(
+            std::make_shared<Null>(Null(arguments->span))
+        );
     }
 
-    auto cond = Cond(std::move(condition), std::move(then), std::move(otherwise));
+    auto cond =
+        Cond(std::move(condition), std::move(then), std::move(otherwise));
     return std::make_unique<Cond>(std::move(cond));
 }
 
@@ -638,22 +661,23 @@ void Cond::display(std::ostream& stream, size_t depth) const {
     stream << "Cond {\n";
 
     stream << Depth(depth + 1) << "condition = ";
-    this->condition->display(stream, depth+1);
+    this->condition->display(stream, depth + 1);
     stream << '\n';
 
     stream << Depth(depth + 1) << "then = ";
-    this->then->display(stream, depth+1);
+    this->then->display(stream, depth + 1);
     stream << '\n';
-    
+
     stream << Depth(depth + 1) << "otherwise = ";
-    this->otherwise->display(stream, depth+1);
+    this->otherwise->display(stream, depth + 1);
     stream << "\n";
 
     stream << Depth(depth) << ']';
 }
 
-bool Cond::can_evaluate_to_function() const { 
-    return this->then->can_evaluate_to_function() || this->otherwise->can_evaluate_to_function();
+bool Cond::can_evaluate_to_function() const {
+    return this->then->can_evaluate_to_function() ||
+           this->otherwise->can_evaluate_to_function();
 }
 
 Program::Program(std::vector<std::unique_ptr<Expression>> program)
