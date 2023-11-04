@@ -634,18 +634,18 @@ std::shared_ptr<Element> Cond::evaluate() const {
 }
 
 void Cond::display(std::ostream& stream, size_t depth) const {
-    stream << "Cond [\n";
+    stream << "Cond {\n";
 
-    stream << Depth(depth + 1) << "Condition: \n" << Depth(depth+2);
-    this->condition->display(stream, depth+2);
-    stream << "\n";
+    stream << Depth(depth + 1) << "condition = ";
+    this->condition->display(stream, depth+1);
+    stream << '\n';
 
-    stream << Depth(depth + 1) << "Then: \n" << Depth(depth+2);
-    this->then->display(stream, depth+2);
-    stream << "\n";
+    stream << Depth(depth + 1) << "then = ";
+    this->then->display(stream, depth+1);
+    stream << '\n';
     
-    stream << Depth(depth + 1) << "Otherwise: \n" << Depth(depth+2);
-    this->otherwise->display(stream, depth+2);
+    stream << Depth(depth + 1) << "otherwise = ";
+    this->otherwise->display(stream, depth+1);
     stream << "\n";
 
     stream << Depth(depth) << ']';
