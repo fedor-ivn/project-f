@@ -48,9 +48,7 @@ std::vector<std::shared_ptr<ast::Symbol>> list_to_symbols_vector(std::shared_ptr
             throw std::runtime_error("Parameter is not a symbol");
         }
 
-        auto symbol = std::make_shared<ast::Symbol>(
-            ast::Symbol(std::string(element->to_symbol().value()), element->span)
-        );
+        auto symbol = maybe_dynamic_cast<ast::Symbol>(element);
 
         symbols.push_back(symbol);
 
