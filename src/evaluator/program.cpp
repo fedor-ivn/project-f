@@ -638,7 +638,7 @@ std::unique_ptr<Cond> Cond::parse(std::shared_ptr<ast::List> arguments) {
 
         if (cons->right->to_cons()) {
             throw EvaluationError(
-                "`cond` takes 2 or 3 arguments, provided more than 3",
+                "`cond` has extra arguments",
                 cons->span
             );
         }
