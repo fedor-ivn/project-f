@@ -672,7 +672,7 @@ void Cond::display(std::ostream& stream, size_t depth) const {
     this->otherwise->display(stream, depth + 1);
     stream << "\n";
 
-    stream << Depth(depth) << ']';
+    stream << Depth(depth) << '}';
 }
 
 bool Cond::can_evaluate_to_function() const {
