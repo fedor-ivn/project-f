@@ -23,19 +23,19 @@ std::shared_ptr<T> maybe_dynamic_cast(std::shared_ptr<ast::Element> element) {
         std::string message;
 
         if (type_name == "N3ast6SymbolE") {
-            message = "Expected type: Symbol";
+            message = "expected type - Symbol";
         }
         else if (type_name == "N3ast4ListE") {
-            message = "Expected type: List";
+            message = "expected type - List";
         }
         else if (type_name == "N3ast7BooleanE") {
-            message = "Expected type: Boolean";
+            message = "expected type - Boolean";
         }
         else {
-            message = "Unexpected type: " + type_name;
+            message = "unexpected type - " + type_name;
         }
 
-        throw std::runtime_error(message);
+        throw EvaluationError(message, element->span);
     }
 
     return symbol;
@@ -49,7 +49,7 @@ std::vector<std::shared_ptr<ast::Symbol>> list_to_symbols_vector(std::shared_ptr
         auto element = cons->left;
 
         if (!element->to_symbol()) {
-            throw std::runtime_error("Parameter is not a symbol");
+            throw EvaluationError("parameter is not a symbol", element->span);
         }
 
         auto symbol = maybe_dynamic_cast<ast::Symbol>(element);
@@ -68,8 +68,8 @@ void test_parameters(std::vector<std::shared_ptr<ast::Symbol>> parameters) {
     for (auto parameter : parameters) {
         for (auto set_element : set) {
             if (parameter->value == set_element) {
-                std::string message = "There is a duplicate argument: " + parameter->value;
-                throw std::runtime_error(message);
+                std::string message = "there is a duplicate argument: " + parameter->value;
+                throw EvaluationError(message, parameter->span);
             }
 
         }
@@ -237,7 +237,7 @@ Func::Func(
 
 std::unique_ptr<Func> Func::parse(std::shared_ptr<ast::List> arguments) {
     if (!arguments->to_cons()) {
-        throw std::runtime_error("`func` takes at least 3 arguments, provided 0"
+        throw EvaluationError("`func` takes at least 3 arguments, provided 0", arguments->span
         );
     }
 
@@ -245,11 +245,10 @@ std::unique_ptr<Func> Func::parse(std::shared_ptr<ast::List> arguments) {
 
     auto name = maybe_dynamic_cast<ast::Symbol>(cons->left);
 
-    cons = cons->right->to_cons();
-
-    if (!cons) {
-        throw std::runtime_error("`func` takes at least 3 arguments, provided 1");
+    if (!cons->right->to_cons()) {
+        throw EvaluationError("`func` takes at least 3 arguments, provided 1", cons->span);
     }
+    cons = cons->right->to_cons();
 
     auto func_arguments = maybe_dynamic_cast<ast::List>(cons->left);
 
@@ -257,7 +256,7 @@ std::unique_ptr<Func> Func::parse(std::shared_ptr<ast::List> arguments) {
     test_parameters(parameters_symbols);
 
     if (!cons->right->to_cons()) {
-        throw std::runtime_error("`func` takes at least 3 arguments, provided 2");
+        throw EvaluationError("`func` takes at least 3 arguments, provided 2", cons->span);
     }
     
     std::vector<std::shared_ptr<Element>> elements;
@@ -305,7 +304,7 @@ Lambda::Lambda(
 
 std::unique_ptr<Lambda> Lambda::parse(std::shared_ptr<ast::List> arguments) {
     if (!arguments->to_cons()) {
-        throw std::runtime_error("`lambda` takes at least 2 arguments, provided 0");
+        throw EvaluationError("`lambda` takes at least 2 arguments, provided 0", arguments->span);
     }
 
     auto cons = arguments->to_cons();
@@ -314,11 +313,10 @@ std::unique_ptr<Lambda> Lambda::parse(std::shared_ptr<ast::List> arguments) {
     auto parameters = list_to_symbols_vector(parameters_list);
     test_parameters(parameters);
 
-    cons = cons->right->to_cons();
-
-    if (!cons) {
-        throw std::runtime_error("`lambda` takes at least 2 arguments, provided 1");
+    if (!cons->right->to_cons()) {
+        throw EvaluationError("`lambda` takes at least 2 arguments, provided 1", cons->span);
     }
+    cons = cons->right->to_cons();
     
     std::vector<std::shared_ptr<Element>> elements;
 
@@ -364,7 +362,7 @@ Prog::Prog(
 
 std::unique_ptr<Prog> Prog::parse(std::shared_ptr<ast::List> arguments) {
     if (!arguments->to_cons()) {
-        throw std::runtime_error("`prog` takes at least 2 arguments, provided 0");
+        throw EvaluationError("`prog` takes at least 2 arguments, provided 0", arguments->span);
     }
 
     auto cons = arguments->to_cons();
@@ -373,11 +371,10 @@ std::unique_ptr<Prog> Prog::parse(std::shared_ptr<ast::List> arguments) {
     auto parameters = list_to_symbols_vector(parameters_list);
     test_parameters(parameters);
 
-    cons = cons->right->to_cons();
-
-    if (!cons) {
-        throw std::runtime_error("`prog` takes at least 2 arguments, provided 1");
+    if (!cons->right->to_cons()) {
+        throw EvaluationError("`prog` takes at least 2 arguments, provided 1", cons->span);
     }
+    cons = cons->right->to_cons();
     
     std::vector<std::shared_ptr<Element>> elements;
 
@@ -604,16 +601,15 @@ std::unique_ptr<Cond> Cond::parse(std::shared_ptr<ast::List> arguments) {
     auto cons = arguments->to_cons();
 
     if (!cons) {
-        throw EvaluationError("`cond` is empty", arguments->span);
+        throw EvaluationError("`cond` takes 2 or 3 arguments, provided 0", arguments->span);
     }
 
     auto condition = Expression::from_element(cons->left);
 
-    cons = cons->right->to_cons();
-
-    if (!cons) {
-        throw std::runtime_error("`cond` takes 2 or 3 arguments, provided 1");
+    if (!cons->right->to_cons()) {
+        throw EvaluationError("`cond` takes 2 or 3 arguments, provided 1", cons->span);
     }
+    cons = cons->right->to_cons();
 
     auto then = Expression::from_element(cons->left);
 
