@@ -98,27 +98,44 @@ Expression::from_element(std::shared_ptr<Element> element) {
         else if (symbol == "prog") {
             return Prog::parse(arguments);
         }
+
+        else if (symbol == "return") {
+            return Return::parse(arguments);
+        }
+
+        else if (symbol == "while") {
+            return While::parse(arguments);
+        }
+
+        else if (symbol == "break") {
+            return Break::parse(arguments);
+        }
+
+        return Call::parse(*cons);
     }
 
-    return std::make_unique<Atom>(Atom(std::move(element)));
-}
-
-Atom::Atom(std::shared_ptr<Element> atom) : Expression(), atom(atom) {}
-
-std::shared_ptr<Element> Atom::evaluate() const {
-    if (this->atom->to_symbol()) {
-        throw std::runtime_error("Symbol evaluation is to be implemented");
+    if (auto symbol = std::dynamic_pointer_cast<ast::Symbol>(element)) {
+        return std::make_unique<Symbol>(Symbol(std::move(symbol)));
     }
 
-    return this->atom;
+    return std::make_unique<Quote>(Quote(std::move(element)));
 }
 
-void Atom::display(std::ostream& stream, size_t depth) const {
-    stream << "Atom {\n";
+Symbol::Symbol(std::shared_ptr<ast::Symbol> symbol)
+    : Expression(), symbol(symbol) {}
+
+std::shared_ptr<Element> Symbol::evaluate() const {
+    throw std::runtime_error("Symbol evaluation is to be implemented");
+}
+
+void Symbol::display(std::ostream& stream, size_t depth) const {
+    stream << "Symbol {\n";
     stream << Depth(depth + 1)
-           << "element = " << this->atom->display_verbose(depth + 1) << '\n';
+           << "symbol = " << this->symbol->display_verbose(depth + 1) << '\n';
     stream << Depth(depth) << '}';
 }
+
+bool Symbol::can_evaluate_to_function() const { return true; }
 
 Quote::Quote(std::shared_ptr<Element> element)
     : Expression(), element(element) {}
@@ -147,6 +164,8 @@ void Quote::display(std::ostream& stream, size_t depth) const {
            << "element = " << this->element->display_verbose(depth + 1) << '\n';
     stream << Depth(depth) << '}';
 }
+
+bool Quote::can_evaluate_to_function() const { return false; }
 
 Setq::Setq(
     std::shared_ptr<ast::Symbol> symbol, std::unique_ptr<Expression> expression
@@ -179,6 +198,10 @@ std::unique_ptr<Setq> Setq::parse(std::shared_ptr<ast::List> arguments) {
 
 std::shared_ptr<ast::Element> Setq::evaluate() const {
     throw std::runtime_error("Not implemented");
+}
+
+bool Setq::can_evaluate_to_function() const {
+    return this->initializer->can_evaluate_to_function();
 }
 
 void Setq::display(std::ostream& stream, size_t depth) const {
@@ -243,6 +266,8 @@ std::shared_ptr<ast::Element> Func::evaluate() const {
     throw std::runtime_error("Not implemented");
 }
 
+bool Func::can_evaluate_to_function() const { return true; }
+
 void Func::display(std::ostream& stream, size_t depth) const {
     stream << "Func {\n";
 
@@ -301,6 +326,8 @@ std::unique_ptr<Lambda> Lambda::parse(std::shared_ptr<ast::List> arguments) {
 std::shared_ptr<ast::Element> Lambda::evaluate() const {
     throw std::runtime_error("Not implemented");
 }
+
+bool Lambda::can_evaluate_to_function() const { return true; }
 
 void Lambda::display(std::ostream& stream, size_t depth) const {
     stream << "Lambda {\n";
@@ -375,6 +402,190 @@ void Prog::display(std::ostream& stream, size_t depth) const {
 
     stream << Depth(depth) << '}';
 }
+
+bool Program::can_evaluate_to_function() const {
+    return this->program[this->program.size() - 1]->can_evaluate_to_function();
+}
+
+bool Prog::can_evaluate_to_function() const {
+    return this->body.can_evaluate_to_function();
+}
+
+Return::Return(std::unique_ptr<Expression> expression)
+    : Expression(), expression(std::move(expression)) {}
+
+std::unique_ptr<Return> Return::parse(std::shared_ptr<ast::List> arguments) {
+    if (!arguments->to_cons()) {
+        auto null = Quote(std::make_shared<Null>(Null(arguments->span)));
+        return std::make_unique<Return>(Return(std::make_unique<Quote>(null)));
+    }
+
+    auto cons = arguments->to_cons();
+    auto expression = Expression::from_element(cons->left);
+
+    if (cons->right->to_cons()) {
+        throw std::runtime_error(
+            "`return` takes either 0 or 1 argument, provided more than one"
+        );
+    }
+
+    return std::make_unique<Return>(Return(std::move(expression)));
+}
+
+std::shared_ptr<ast::Element> Return::evaluate() const {
+    throw std::runtime_error("Not implemented");
+}
+
+bool Return::can_evaluate_to_function() const { return false; }
+
+void Return::display(std::ostream& stream, size_t depth) const {
+    stream << "Return {\n";
+
+    stream << Depth(depth + 1) << "expression = ";
+    this->expression->display(stream, depth + 1);
+    stream << '\n';
+
+    stream << Depth(depth) << '}';
+}
+
+While::While(std::unique_ptr<Expression> condition, Program body)
+    : Expression(), condition(std::move(condition)), body(std::move(body)) {}
+
+std::unique_ptr<While> While::parse(std::shared_ptr<ast::List> arguments) {
+    if (!arguments->to_cons()) {
+        throw std::runtime_error(
+            "`while` takes at least 2 arguments, provided 0"
+        );
+    }
+
+    auto cons = arguments->to_cons();
+    auto condition = Expression::from_element(cons->left);
+
+    auto body = cons->right->to_cons();
+    if (!body) {
+        throw std::runtime_error(
+            "`while` takes at least 2 arguments, provided 1"
+        );
+    }
+
+    std::vector<std::shared_ptr<Element>> elements;
+    while (body) {
+        elements.push_back(body->left);
+        body = body->right->to_cons();
+    }
+
+    auto program = Program::from_elements(elements);
+
+    return std::make_unique<While>(
+        While(std::move(condition), std::move(program))
+    );
+}
+
+std::shared_ptr<ast::Element> While::evaluate() const {
+    throw std::runtime_error("Not implemented");
+}
+
+void While::display(std::ostream& stream, size_t depth) const {
+    stream << "While {\n";
+
+    stream << Depth(depth + 1) << "condition = ";
+    this->condition->display(stream, depth + 1);
+    stream << '\n';
+
+    stream << Depth(depth + 1) << "body = ";
+    this->body.display(stream, depth + 1);
+    stream << '\n';
+
+    stream << Depth(depth) << '}';
+}
+
+bool While::can_evaluate_to_function() const { return false; }
+
+Break::Break(std::unique_ptr<Expression> expression)
+    : Expression(), expression(std::move(expression)) {}
+
+std::unique_ptr<Break> Break::parse(std::shared_ptr<ast::List> arguments) {
+    if (!arguments->to_cons()) {
+        auto null = Quote(std::make_shared<Null>(Null(arguments->span)));
+        return std::make_unique<Break>(Break(std::make_unique<Quote>(null)));
+    }
+
+    auto cons = arguments->to_cons();
+    auto expression = Expression::from_element(cons->left);
+
+    if (cons->right->to_cons()) {
+        throw std::runtime_error(
+            "`break` takes either 0 or 1 argument, provided more than one"
+        );
+    }
+
+    return std::make_unique<Break>(Break(std::move(expression)));
+}
+
+std::shared_ptr<ast::Element> Break::evaluate() const {
+    throw std::runtime_error("Not implemented");
+}
+
+void Break::display(std::ostream& stream, size_t depth) const {
+    stream << "Break {\n";
+
+    stream << Depth(depth + 1) << "expression = ";
+    this->expression->display(stream, depth + 1);
+    stream << '\n';
+
+    stream << Depth(depth) << '}';
+}
+
+bool Break::can_evaluate_to_function() const { return false; }
+
+Call::Call(
+    std::unique_ptr<Expression> function,
+    std::vector<std::unique_ptr<Expression>> arguments
+)
+    : function(std::move(function)), arguments(std::move(arguments)) {}
+
+std::unique_ptr<Call> Call::parse(ast::Cons const& expression) {
+    auto function = Expression::from_element(expression.left);
+    if (!function->can_evaluate_to_function()) {
+        throw std::runtime_error("Calling an expression which is statically "
+                                 "known not to evaluate to a function");
+    }
+
+    std::vector<std::unique_ptr<Expression>> arguments;
+    auto raw_arguments = expression.right;
+    while (auto cons = raw_arguments->to_cons()) {
+        arguments.push_back(Expression::from_element(cons->left));
+        raw_arguments = cons->right;
+    }
+
+    return std::make_unique<Call>(
+        Call(std::move(function), std::move(arguments))
+    );
+}
+
+std::shared_ptr<Element> Call::evaluate() const {
+    throw std::runtime_error("Not implemented");
+}
+
+void Call::display(std::ostream& stream, size_t depth) const {
+    stream << "Call {\n";
+
+    stream << Depth(depth + 1) << "function = ";
+    this->function->display(stream, depth + 1);
+    stream << '\n';
+
+    stream << Depth(depth + 1) << "arguments = [\n";
+    for (auto const& argument : this->arguments) {
+        stream << Depth(depth + 2);
+        argument->display(stream, depth + 2);
+        stream << ",\n";
+    }
+    stream << Depth(depth + 1) << "]\n";
+
+    stream << Depth(depth) << '}';
+}
+
+bool Call::can_evaluate_to_function() const { return true; }
 
 Program::Program(std::vector<std::unique_ptr<Expression>> program)
     : program(std::move(program)) {}
