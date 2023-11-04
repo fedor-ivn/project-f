@@ -618,6 +618,10 @@ std::unique_ptr<Cond> Cond::parse(std::shared_ptr<ast::List> arguments) {
     std::unique_ptr<Expression> otherwise;
     if (cons) {
         otherwise = Expression::from_element(cons->left);
+
+        if (cons->right->to_cons()) {
+            throw EvaluationError("`cond` takes 2 or 3 arguments, provided more than 3", cons->span);
+        }
     } else {
         otherwise = Expression::from_element(std::make_shared<Null>(Null(arguments->span)));
     }
