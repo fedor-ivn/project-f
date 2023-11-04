@@ -603,7 +603,7 @@ std::unique_ptr<Cond> Cond::parse(std::shared_ptr<ast::List> arguments) {
     auto cons = arguments->to_cons();
 
     if (!cons) {
-        throw std::runtime_error("`cond` takes 2 or 3 arguments, provided 0");
+        throw EvaluationError("`cond` is empty", arguments->span);
     }
 
     auto condition = Expression::from_element(cons->left);
