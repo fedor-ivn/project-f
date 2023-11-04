@@ -615,7 +615,7 @@ std::unique_ptr<Cond> Cond::parse(std::shared_ptr<ast::List> arguments) {
 
     if (!cons) {
         throw EvaluationError(
-            "`cond` takes 2 or 3 arguments, provided 0", arguments->span
+            "`cond` needs a condition, a `then` branch, and optionally an `else` branch", arguments->span
         );
     }
 
