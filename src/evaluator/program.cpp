@@ -320,14 +320,14 @@ void Lambda::display(std::ostream& stream, size_t depth) const {
 }
 
 Prog::Prog(
-    std::vector<std::shared_ptr<ast::Symbol>> parameters, std::unique_ptr<Expression> expression
+    std::vector<std::shared_ptr<ast::Symbol>> parameters,
+    Program body
 )
-    : Expression(), parameters(parameters), expression(std::move(expression)){};
+    : Expression(), parameters(parameters), body(std::move(body)){};
 
 std::unique_ptr<Prog> Prog::parse(std::shared_ptr<ast::List> arguments) {
     if (!arguments->to_cons()) {
-        throw std::runtime_error("`prog` takes at least 2 arguments, provided 0"
-        );
+        throw std::runtime_error("`prog` takes at least 2 arguments, provided 0");
     }
 
     auto cons = arguments->to_cons();
@@ -336,15 +336,23 @@ std::unique_ptr<Prog> Prog::parse(std::shared_ptr<ast::List> arguments) {
     auto parameters = list_to_symbols_vector(parameters_list);
     test_parameters(parameters);
 
-    if (!cons->right->to_cons()) {
-        throw std::runtime_error("`prog` takes at least 2 arguments, provided 1"
-        );
+    cons = cons->right->to_cons();
+
+    if (!cons) {
+        throw std::runtime_error("`prog` takes at least 2 arguments, provided 1");
+    }
+    
+    std::vector<std::shared_ptr<Element>> elements;
+
+    while (cons) {
+        auto element = std::shared_ptr<Element>(cons->left);
+        elements.push_back(element);
+        cons = cons->right->to_cons();
     }
 
-    auto body_element = std::static_pointer_cast<ast::Element>(cons->right);
-    auto body = Expression::from_element(body_element);
+    auto program = Program::from_elements(elements);
 
-    return std::make_unique<Prog>(Prog(parameters, std::move(body)));
+    return std::make_unique<Prog>(Prog(parameters, std::move(program)));
 }
 
 std::shared_ptr<ast::Element> Prog::evaluate() const {
@@ -362,7 +370,7 @@ void Prog::display(std::ostream& stream, size_t depth) const {
     stream << Depth(depth+1) << "]\n";
 
     stream << Depth(depth + 1) << "body = ";
-    this->expression->display(stream, depth + 1);
+    this->body.display(stream, depth + 1);
     stream << '\n';
 
     stream << Depth(depth) << '}';

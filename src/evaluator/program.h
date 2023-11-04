@@ -55,22 +55,6 @@ class Setq : public Expression {
     virtual void display(std::ostream& stream, size_t depth) const;
 };
 
-class Prog : public Expression {
-    std::vector<std::shared_ptr<ast::Symbol>> parameters;
-    std::unique_ptr<Expression> expression;
-
-  public:
-    Prog(
-        std::vector<std::shared_ptr<ast::Symbol>> parameters,
-        std::unique_ptr<Expression> expression
-    );
-
-    static std::unique_ptr<Prog> parse(std::shared_ptr<ast::List> arguments);
-
-    virtual std::shared_ptr<ast::Element> evaluate() const;
-    virtual void display(std::ostream& stream, size_t depth) const;
-};
-
 class Cond : public Expression {
     std::unique_ptr<ast::Boolean> condition;
     std::unique_ptr<Expression> true_case;
@@ -139,6 +123,22 @@ class Lambda : public Expression {
     );
 
     static std::unique_ptr<Lambda> parse(std::shared_ptr<ast::List> arguments);
+
+    virtual std::shared_ptr<ast::Element> evaluate() const;
+    virtual void display(std::ostream& stream, size_t depth) const;
+};
+
+class Prog : public Expression {
+    std::vector<std::shared_ptr<ast::Symbol>> parameters;
+    Program body;
+
+  public:
+    Prog(
+        std::vector<std::shared_ptr<ast::Symbol>> parameters,
+        Program body
+    );
+
+    static std::unique_ptr<Prog> parse(std::shared_ptr<ast::List> arguments);
 
     virtual std::shared_ptr<ast::Element> evaluate() const;
     virtual void display(std::ostream& stream, size_t depth) const;
