@@ -47,7 +47,7 @@ list_to_symbols_vector(std::shared_ptr<ast::List> list) {
         auto element = cons->left;
 
         if (!element->to_symbol()) {
-            throw EvaluationError("parameter is not a symbol", element->span);
+            throw EvaluationError("a parameter must be a symbol", element->span);
         }
 
         auto symbol = maybe_dynamic_cast<ast::Symbol>(element);
