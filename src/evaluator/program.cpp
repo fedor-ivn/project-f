@@ -247,7 +247,7 @@ std::unique_ptr<Func> Func::parse(std::shared_ptr<ast::List> arguments) {
 
     if (!cons->right->to_cons()) {
         throw EvaluationError(
-            "`func` takes at least 3 arguments, provided 1", cons->span
+            "`func` needs a parameter list and a body", cons->span
         );
     }
     cons = cons->right->to_cons();
