@@ -653,7 +653,7 @@ void Cond::display(std::ostream& stream, size_t depth) const {
 }
 
 bool Cond::can_evaluate_to_function() const { 
-    return this->then->can_evaluate_to_function() && this->otherwise->can_evaluate_to_function();
+    return this->then->can_evaluate_to_function() || this->otherwise->can_evaluate_to_function();
 }
 
 Program::Program(std::vector<std::unique_ptr<Expression>> program)
