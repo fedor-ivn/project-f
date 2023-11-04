@@ -259,8 +259,7 @@ std::unique_ptr<Func> Func::parse(std::shared_ptr<ast::List> arguments) {
     std::vector<std::shared_ptr<Element>> elements;
 
     while (cons) {
-        auto element = std::shared_ptr<Element>(cons->left);
-        elements.push_back(element);
+        elements.push_back(cons->left);
         cons = cons->right->to_cons();
     }
 
