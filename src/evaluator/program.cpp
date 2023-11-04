@@ -382,7 +382,7 @@ std::unique_ptr<Prog> Prog::parse(std::shared_ptr<ast::List> arguments) {
 
     if (!cons->right->to_cons()) {
         throw EvaluationError(
-            "`prog` takes at least 2 arguments, provided 1", cons->span
+            "`prog` needs a body", cons->span
         );
     }
     cons = cons->right->to_cons();
