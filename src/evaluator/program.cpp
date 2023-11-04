@@ -27,8 +27,11 @@ std::shared_ptr<T> maybe_dynamic_cast(std::shared_ptr<ast::Element> element) {
         else if (type_name == "N3ast4ListE") {
             message = "Expected type: List";
         }
+        else if (type_name == "N3ast7BooleanE") {
+            message = "Expected type: Boolean";
+        }
         else {
-            message = "Unexpected type" + type_name;
+            message = "Unexpected type: " + type_name;
         }
 
         throw std::runtime_error(message);
@@ -109,6 +112,10 @@ Expression::from_element(std::shared_ptr<Element> element) {
 
         else if (symbol == "break") {
             return Break::parse(arguments);
+        }
+
+        else if (symbol == "cond") {
+            return Cond::parse(arguments);
         }
 
         return Call::parse(*cons);
@@ -586,6 +593,69 @@ void Call::display(std::ostream& stream, size_t depth) const {
 }
 
 bool Call::can_evaluate_to_function() const { return true; }
+
+Cond::Cond(
+    std::unique_ptr<Expression> condition,
+    std::unique_ptr<Expression> then,
+    std::unique_ptr<Expression> otherwise)
+    : Expression(), condition(std::move(condition)), then(std::move(then)), otherwise(std::move(otherwise)) {}
+
+std::unique_ptr<Cond> Cond::parse(std::shared_ptr<ast::List> arguments) {
+    auto cons = arguments->to_cons();
+
+    if (!cons) {
+        throw std::runtime_error("`cond` takes 2 or 3 arguments, provided 0");
+    }
+
+    auto condition = Expression::from_element(cons->left);
+
+    cons = cons->right->to_cons();
+
+    if (!cons) {
+        throw std::runtime_error("`cond` takes 2 or 3 arguments, provided 1");
+    }
+
+    auto then = Expression::from_element(cons->left);
+
+    cons = cons->right->to_cons();
+
+    std::unique_ptr<Expression> otherwise;
+    if (!cons) {
+        otherwise = Expression::from_element(std::make_shared<Null>(Null(arguments->span)));
+    }
+    else {
+        otherwise = Expression::from_element(cons->left);
+    }
+
+    auto cond = Cond(std::move(condition), std::move(then), std::move(otherwise));
+    return std::make_unique<Cond>(std::move(cond));
+}
+
+std::shared_ptr<Element> Cond::evaluate() const {
+    throw std::runtime_error("Not implemented");
+}
+
+void Cond::display(std::ostream& stream, size_t depth) const {
+    stream << "Cond [\n";
+
+    stream << Depth(depth + 1) << "Condition: \n" << Depth(depth+2);
+    this->condition->display(stream, depth+2);
+    stream << "\n";
+
+    stream << Depth(depth + 1) << "Then: \n" << Depth(depth+2);
+    this->then->display(stream, depth+2);
+    stream << "\n";
+    
+    stream << Depth(depth + 1) << "Otherwise: \n" << Depth(depth+2);
+    this->otherwise->display(stream, depth+2);
+    stream << "\n";
+
+    stream << Depth(depth) << ']';
+}
+
+bool Cond::can_evaluate_to_function() const { 
+    return this->then->can_evaluate_to_function() && this->otherwise->can_evaluate_to_function();
+}
 
 Program::Program(std::vector<std::unique_ptr<Expression>> program)
     : program(std::move(program)) {}

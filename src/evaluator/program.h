@@ -64,19 +64,18 @@ class Setq : public Expression {
 };
 
 class Cond : public Expression {
-    std::unique_ptr<ast::Boolean> condition;
+    std::unique_ptr<Expression> condition;
     std::unique_ptr<Expression> then;
     std::unique_ptr<Expression> otherwise;
 
   public:
     Cond(
-      std::unique_ptr<ast::Boolean> condition,
-      std::unique_ptr<Expression> true_case,
-      std::unique_ptr<Expression> otherwise
-    );
+      std::unique_ptr<Expression> condition,
+      std::unique_ptr<Expression> then,
+      std::unique_ptr<Expression> otherwise);
 
     static std::unique_ptr<Cond> parse(std::shared_ptr<ast::List> arguments);
-
+    
     virtual std::shared_ptr<ast::Element> evaluate() const;
     virtual void display(std::ostream& stream, size_t depth) const;
 
