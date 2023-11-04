@@ -67,7 +67,7 @@ void test_parameters(std::vector<std::shared_ptr<ast::Symbol>> parameters) {
         for (auto set_element : set) {
             if (parameter->value == set_element) {
                 std::string message =
-                    "there is a duplicate argument: " + parameter->value;
+                    "parameter `" + parameter->value + "` is duplicated";
                 throw EvaluationError(message, parameter->span);
             }
         }
