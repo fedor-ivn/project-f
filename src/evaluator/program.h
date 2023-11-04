@@ -57,8 +57,8 @@ class Setq : public Expression {
 
 class Cond : public Expression {
     std::unique_ptr<ast::Boolean> condition;
-    std::unique_ptr<Expression> true_case;
-    std::unique_ptr<Expression> false_case;
+    std::unique_ptr<Expression> then;
+    std::unique_ptr<Expression> otherwise;
 
   public:
     Cond(
