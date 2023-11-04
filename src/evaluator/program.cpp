@@ -347,10 +347,10 @@ void Lambda::display(std::ostream& stream, size_t depth) const {
 }
 
 Prog::Prog(
-    std::vector<std::shared_ptr<ast::Symbol>> parameters,
+    std::vector<std::shared_ptr<ast::Symbol>> variables,
     Program body
 )
-    : Expression(), parameters(parameters), body(std::move(body)){};
+    : Expression(), variables(variables), body(std::move(body)){};
 
 std::unique_ptr<Prog> Prog::parse(std::shared_ptr<ast::List> arguments) {
     if (!arguments->to_cons()) {
@@ -390,7 +390,7 @@ void Prog::display(std::ostream& stream, size_t depth) const {
     stream << "Prog {\n";
 
     stream << Depth(depth + 1) << "arguments = [\n";
-    for (auto parameter : this->parameters) {
+    for (auto parameter : this->variables) {
         stream << Depth(depth + 2) << parameter->display_verbose(depth+2);
         stream << ",\n";
     }

@@ -185,12 +185,12 @@ class Lambda : public Expression {
 };
 
 class Prog : public Expression {
-    std::vector<std::shared_ptr<ast::Symbol>> parameters;
+    std::vector<std::shared_ptr<ast::Symbol>> variables;
     Program body;
 
   public:
     Prog(
-        std::vector<std::shared_ptr<ast::Symbol>> parameters,
+        std::vector<std::shared_ptr<ast::Symbol>> variables,
         Program body
     );
 
