@@ -7,12 +7,13 @@ namespace evaluator {
 using ast::Element;
 using ast::List;
 using utils::Depth;
+using utils::to_cons;
 
 Lambda::Lambda(Parameters parameters, Body body)
     : Expression(), parameters(std::move(parameters)), body(std::move(body)) {}
 
 std::unique_ptr<Lambda> Lambda::parse(std::shared_ptr<ast::List> arguments) {
-    auto cons = arguments->to_cons();
+    auto cons = to_cons(arguments);
     if (!cons) {
         throw EvaluationError(
             "`lambda` needs a parameter list and a body", arguments->span

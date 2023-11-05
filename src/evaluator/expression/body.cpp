@@ -10,6 +10,7 @@ using ast::Null;
 using ast::Position;
 using ast::Span;
 using utils::Depth;
+using utils::to_cons;
 
 Body::Body(std::vector<std::unique_ptr<Expression>> body)
     : body(std::move(body)) {}
@@ -17,10 +18,10 @@ Body::Body(std::vector<std::unique_ptr<Expression>> body)
 Body Body::parse(std::shared_ptr<List> unparsed) {
     std::vector<std::unique_ptr<Expression>> body;
 
-    auto cons = unparsed->to_cons();
+    auto cons = to_cons(unparsed);
     while (cons) {
         body.push_back(Expression::parse(cons->left));
-        cons = cons->right->to_cons();
+        cons = to_cons(cons->right);
     }
     return Body(std::move(body));
 }

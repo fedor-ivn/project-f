@@ -8,6 +8,7 @@ using ast::Element;
 using ast::List;
 using ast::Null;
 using utils::Depth;
+using utils::to_cons;
 
 Cond::Cond(
     std::unique_ptr<Expression> condition,
@@ -18,8 +19,7 @@ Cond::Cond(
       otherwise(std::move(otherwise)) {}
 
 std::unique_ptr<Cond> Cond::parse(std::shared_ptr<List> arguments) {
-    auto cons = arguments->to_cons();
-
+    auto cons = to_cons(arguments);
     if (!cons) {
         throw EvaluationError(
             "`cond` needs a condition, a `then` branch, and optionally an "
@@ -37,22 +37,20 @@ std::unique_ptr<Cond> Cond::parse(std::shared_ptr<List> arguments) {
         );
     }
 
-    if (!cons->right->to_cons()) {
+    cons = to_cons(cons->right);
+    if (!cons) {
         throw EvaluationError(
             "`cond` needs at least a `then` branch", cons->span
         );
     }
-    cons = cons->right->to_cons();
-
     auto then = Expression::parse(cons->left);
 
-    cons = cons->right->to_cons();
-
+    cons = to_cons(cons->right);
     std::unique_ptr<Expression> otherwise;
     if (cons) {
         otherwise = Expression::parse(cons->left);
 
-        if (cons->right->to_cons()) {
+        if (to_cons(cons->right)) {
             throw EvaluationError("`cond` has extra arguments", cons->span);
         }
     } else {

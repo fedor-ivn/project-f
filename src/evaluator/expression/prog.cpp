@@ -7,12 +7,13 @@ namespace evaluator {
 using ast::Element;
 using ast::List;
 using utils::Depth;
+using utils::to_cons;
 
 Prog::Prog(Parameters variables, Body body)
     : Expression(), variables(std::move(variables)), body(std::move(body)) {}
 
 std::unique_ptr<Prog> Prog::parse(std::shared_ptr<List> arguments) {
-    auto cons = arguments->to_cons();
+    auto cons = to_cons(arguments);
     if (!cons) {
         throw EvaluationError(
             "`prog` needs a variable list and a body", arguments->span

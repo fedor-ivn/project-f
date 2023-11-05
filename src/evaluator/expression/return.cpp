@@ -8,12 +8,13 @@ using ast::Element;
 using ast::List;
 using ast::Null;
 using utils::Depth;
+using utils::to_cons;
 
 Return::Return(std::unique_ptr<Expression> expression)
     : Expression(), expression(std::move(expression)) {}
 
 std::unique_ptr<Return> Return::parse(std::shared_ptr<List> arguments) {
-    auto cons = arguments->to_cons();
+    auto cons = to_cons(arguments);
     if (!cons) {
         auto null = Quote(std::make_shared<Null>(Null(arguments->span)));
         return std::make_unique<Return>(Return(std::make_unique<Quote>(null)));
@@ -21,7 +22,7 @@ std::unique_ptr<Return> Return::parse(std::shared_ptr<List> arguments) {
 
     auto expression = Expression::parse(cons->left);
 
-    cons = cons->right->to_cons();
+    cons = to_cons(cons->right);
     if (cons) {
         throw EvaluationError("`return` has extra arguments", cons->span);
     }

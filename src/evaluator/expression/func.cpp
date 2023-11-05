@@ -7,13 +7,14 @@ namespace evaluator {
 using ast::Element;
 using ast::List;
 using utils::Depth;
+using utils::to_cons;
 
 Func::Func(std::shared_ptr<ast::Symbol> name, Parameters parameters, Body body)
     : Expression(), name(name), parameters(std::move(parameters)),
       body(std::move(body)) {}
 
 std::unique_ptr<Func> Func::parse(std::shared_ptr<List> arguments) {
-    auto cons = arguments->to_cons();
+    auto cons = to_cons(arguments);
     if (!cons) {
         throw EvaluationError(
             "`func` needs a function name, a parameter list and a body",
@@ -29,7 +30,7 @@ std::unique_ptr<Func> Func::parse(std::shared_ptr<List> arguments) {
         );
     }
 
-    cons = cons->right->to_cons();
+    cons = to_cons(cons->right);
     if (!cons) {
         throw EvaluationError(
             "`func` needs a parameter list and a body", cons->span

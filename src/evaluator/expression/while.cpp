@@ -7,13 +7,14 @@ namespace evaluator {
 using ast::Element;
 using ast::List;
 using utils::Depth;
+using utils::to_cons;
 
 While::While(std::unique_ptr<Expression> condition, Body body)
     : Expression(), condition(std::move(condition)), body(std::move(body)) {}
 
 std::unique_ptr<While> While::parse(std::shared_ptr<List> arguments) {
     auto form_span = arguments->span;
-    auto cons = arguments->to_cons();
+    auto cons = to_cons(arguments);
     if (!cons) {
         throw EvaluationError("`while` is empty", form_span);
     }

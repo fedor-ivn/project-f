@@ -7,6 +7,7 @@ namespace evaluator {
 using ast::Cons;
 using ast::Element;
 using utils::Depth;
+using utils::to_cons;
 
 Call::Call(
     std::unique_ptr<Expression> function,
@@ -25,10 +26,10 @@ std::unique_ptr<Call> Call::parse(Cons const& form) {
     }
 
     std::vector<std::unique_ptr<Expression>> arguments;
-    auto cons = form.right->to_cons();
+    auto cons = to_cons(form.right);
     while (cons) {
         arguments.push_back(Expression::parse(cons->left));
-        cons = cons->right->to_cons();
+        cons = to_cons(cons->right);
     }
 
     return std::make_unique<Call>(

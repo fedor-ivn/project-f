@@ -7,48 +7,9 @@
 namespace ast {
 
 using utils::Depth;
+using utils::to_cons;
 
 Element::Element(Span span) : span(span) {}
-
-bool Element::is_null() const {
-    return dynamic_cast<Null const*>(this) != nullptr;
-}
-
-std::optional<int64_t> Element::to_integer() const {
-    if (auto element = dynamic_cast<Integer const*>(this)) {
-        return std::optional<int64_t>(element->value);
-    }
-    return std::nullopt;
-}
-
-std::optional<double> Element::to_real() const {
-    if (auto element = dynamic_cast<Real const*>(this)) {
-        return std::optional<double>(element->value);
-    }
-    return std::nullopt;
-}
-
-std::optional<bool> Element::to_boolean() const {
-    if (auto element = dynamic_cast<Boolean const*>(this)) {
-        return std::optional<bool>(element->value);
-    }
-    return std::nullopt;
-}
-
-std::optional<std::string_view> Element::to_symbol() const {
-    if (auto element = dynamic_cast<Symbol const*>(this)) {
-        return std::optional<std::string_view>(std::string_view(element->value)
-        );
-    }
-    return std::nullopt;
-}
-
-std::optional<Cons> Element::to_cons() const {
-    if (auto element = dynamic_cast<Cons const*>(this)) {
-        return std::optional<Cons>(*element);
-    }
-    return std::nullopt;
-}
 
 DisplayVerbose Element::display_verbose(size_t depth) {
     return DisplayVerbose(this, depth);
@@ -146,7 +107,7 @@ void Cons::_display_pretty(std::ostream& stream) const {
     this->left->_display_pretty(stream);
 
     auto current = this;
-    while (auto next = current->right->to_cons()) {
+    while (auto next = to_cons(current->right)) {
         stream << ' ';
         next->left->_display_pretty(stream);
         current = &*next;

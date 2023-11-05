@@ -7,6 +7,7 @@ namespace evaluator {
 using ast::Element;
 using ast::List;
 using utils::Depth;
+using utils::to_cons;
 
 Setq::Setq(
     std::shared_ptr<ast::Symbol> symbol, std::unique_ptr<Expression> expression
@@ -15,7 +16,7 @@ Setq::Setq(
 
 std::unique_ptr<Setq> Setq::parse(std::shared_ptr<List> arguments) {
     auto form_span = arguments->span;
-    auto cons = arguments->to_cons();
+    auto cons = to_cons(arguments);
     if (!cons) {
         throw EvaluationError(
             "`setq` without a variable name and an initializer", form_span
@@ -30,14 +31,14 @@ std::unique_ptr<Setq> Setq::parse(std::shared_ptr<List> arguments) {
         );
     }
 
-    cons = cons->right->to_cons();
+    cons = to_cons(cons->right);
     if (!cons) {
         throw EvaluationError("`setq` without an initializer", form_span);
     }
 
     auto expression = Expression::parse(cons->left);
 
-    cons = cons->right->to_cons();
+    cons = to_cons(cons->right);
     if (cons) {
         throw EvaluationError("`setq` has extra arguments", cons->span);
     }

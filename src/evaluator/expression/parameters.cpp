@@ -8,6 +8,7 @@ namespace evaluator {
 
 using ast::List;
 using utils::Depth;
+using utils::to_cons;
 
 Parameters::Parameters(std::vector<std::shared_ptr<ast::Symbol>> parameters)
     : parameters(std::move(parameters)) {}
@@ -15,7 +16,7 @@ Parameters::Parameters(std::vector<std::shared_ptr<ast::Symbol>> parameters)
 Parameters Parameters::parse(std::shared_ptr<List> parameter_list) {
     std::vector<std::shared_ptr<ast::Symbol>> parameters;
 
-    auto cons = parameter_list->to_cons();
+    auto cons = to_cons(parameter_list);
     while (cons) {
         auto parameter = std::dynamic_pointer_cast<ast::Symbol>(cons->left);
         if (!parameter) {
@@ -38,7 +39,7 @@ Parameters Parameters::parse(std::shared_ptr<List> parameter_list) {
         }
 
         parameters.push_back(parameter);
-        cons = cons->right->to_cons();
+        cons = to_cons(cons->right);
     }
 
     return Parameters(std::move(parameters));
