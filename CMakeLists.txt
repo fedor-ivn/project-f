@@ -9,6 +9,7 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra")
 add_library(internals
     src/ast/element.cpp
     src/ast/span.cpp
+    src/evaluator/expression/body.cpp
     src/evaluator/expression/break.cpp
     src/evaluator/expression/call.cpp
     src/evaluator/expression/cond.cpp

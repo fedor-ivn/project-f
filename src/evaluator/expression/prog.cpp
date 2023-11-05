@@ -8,7 +8,7 @@ using ast::Element;
 using ast::List;
 using utils::Depth;
 
-Prog::Prog(Parameters variables, Program body)
+Prog::Prog(Parameters variables, Body body)
     : Expression(), variables(std::move(variables)), body(std::move(body)) {}
 
 std::unique_ptr<Prog> Prog::parse(std::shared_ptr<List> arguments) {
@@ -39,7 +39,7 @@ std::unique_ptr<Prog> Prog::parse(std::shared_ptr<List> arguments) {
         elements.push_back(element);
         cons = cons->right->to_cons();
     }
-    auto program = Program::from_elements(elements);
+    auto program = Body::from_elements(elements);
 
     return std::make_unique<Prog>(Prog(std::move(variables), std::move(program))
     );

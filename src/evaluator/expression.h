@@ -31,23 +31,39 @@ class Parameters {
     void display(std::ostream& stream, size_t depth) const;
 };
 
-class Program {
-    std::vector<std::unique_ptr<Expression>> program;
+class Program;
+
+class Body {
+    std::vector<std::unique_ptr<Expression>> body;
 
   public:
-    Program(std::vector<std::unique_ptr<Expression>> program);
+    Body(std::vector<std::unique_ptr<Expression>> body);
 
-    static Program
+    static Body
     from_elements(std::vector<std::shared_ptr<ast::Element>> elements);
 
     std::shared_ptr<ast::Element> evaluate() const;
 
     void display(std::ostream& stream, size_t depth) const;
-    friend std::ostream&
-    operator<<(std::ostream& stream, Program const& program);
 
     bool can_evaluate_to_function() const;
     bool can_evaluate_to_boolean() const;
+
+    friend std::ostream& operator<<(std::ostream& stream, Program const& self);
+};
+
+class Program {
+    Body program;
+
+  public:
+    Program(Body program);
+
+    static Program parse(std::vector<std::shared_ptr<ast::Element>> elements);
+
+    std::shared_ptr<ast::Element> evaluate() const;
+
+    void display(std::ostream& stream, size_t depth) const;
+    friend std::ostream& operator<<(std::ostream& stream, Program const& self);
 };
 
 class Symbol : public Expression {
@@ -170,12 +186,10 @@ class Call : public Expression {
 class Func : public Expression {
     std::shared_ptr<ast::Symbol> name;
     Parameters parameters;
-    Program body;
+    Body body;
 
   public:
-    Func(
-        std::shared_ptr<ast::Symbol> name, Parameters parameters, Program body
-    );
+    Func(std::shared_ptr<ast::Symbol> name, Parameters parameters, Body body);
 
     static std::unique_ptr<Func> parse(std::shared_ptr<ast::List> arguments);
 
@@ -188,10 +202,10 @@ class Func : public Expression {
 
 class Lambda : public Expression {
     Parameters parameters;
-    Program body;
+    Body body;
 
   public:
-    Lambda(Parameters parameters, Program body);
+    Lambda(Parameters parameters, Body body);
 
     static std::unique_ptr<Lambda> parse(std::shared_ptr<ast::List> arguments);
 
@@ -204,10 +218,10 @@ class Lambda : public Expression {
 
 class Prog : public Expression {
     Parameters variables;
-    Program body;
+    Body body;
 
   public:
-    Prog(Parameters variables, Program body);
+    Prog(Parameters variables, Body body);
 
     static std::unique_ptr<Prog> parse(std::shared_ptr<ast::List> arguments);
 
@@ -220,10 +234,10 @@ class Prog : public Expression {
 
 class While : public Expression {
     std::unique_ptr<Expression> condition;
-    Program body;
+    Body body;
 
   public:
-    While(std::unique_ptr<Expression> condition, Program body);
+    While(std::unique_ptr<Expression> condition, Body body);
 
     static std::unique_ptr<While> parse(std::shared_ptr<ast::List> arguments);
 

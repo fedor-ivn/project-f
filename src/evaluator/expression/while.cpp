@@ -8,7 +8,7 @@ using ast::Element;
 using ast::List;
 using utils::Depth;
 
-While::While(std::unique_ptr<Expression> condition, Program body)
+While::While(std::unique_ptr<Expression> condition, Body body)
     : Expression(), condition(std::move(condition)), body(std::move(body)) {}
 
 std::unique_ptr<While> While::parse(std::shared_ptr<List> arguments) {
@@ -37,7 +37,7 @@ std::unique_ptr<While> While::parse(std::shared_ptr<List> arguments) {
         elements.push_back(cons->left);
         cons = cons->right->to_cons();
     }
-    auto program = Program::from_elements(elements);
+    auto program = Body::from_elements(elements);
 
     return std::make_unique<While>(
         While(std::move(condition), std::move(program))

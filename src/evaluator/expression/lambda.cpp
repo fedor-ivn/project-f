@@ -8,7 +8,7 @@ using ast::Element;
 using ast::List;
 using utils::Depth;
 
-Lambda::Lambda(Parameters parameters, Program body)
+Lambda::Lambda(Parameters parameters, Body body)
     : Expression(), parameters(std::move(parameters)), body(std::move(body)) {}
 
 std::unique_ptr<Lambda> Lambda::parse(std::shared_ptr<ast::List> arguments) {
@@ -39,7 +39,7 @@ std::unique_ptr<Lambda> Lambda::parse(std::shared_ptr<ast::List> arguments) {
         elements.push_back(element);
         cons = cons->right->to_cons();
     }
-    auto program = Program::from_elements(elements);
+    auto program = Body::from_elements(elements);
 
     return std::make_unique<Lambda>(
         Lambda(std::move(parameters), std::move(program))

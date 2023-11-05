@@ -8,9 +8,7 @@ using ast::Element;
 using ast::List;
 using utils::Depth;
 
-Func::Func(
-    std::shared_ptr<ast::Symbol> name, Parameters parameters, Program body
-)
+Func::Func(std::shared_ptr<ast::Symbol> name, Parameters parameters, Body body)
     : Expression(), name(name), parameters(std::move(parameters)),
       body(std::move(body)) {}
 
@@ -57,7 +55,7 @@ std::unique_ptr<Func> Func::parse(std::shared_ptr<List> arguments) {
         elements.push_back(cons->left);
         cons = cons->right->to_cons();
     }
-    auto program = Program::from_elements(elements);
+    auto program = Body::from_elements(elements);
 
     return std::make_unique<Func>(
         Func(name, std::move(parameters), std::move(program))
