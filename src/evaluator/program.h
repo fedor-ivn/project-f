@@ -17,6 +17,7 @@ class Expression {
     virtual void display(std::ostream& stream, size_t depth) const = 0;
 
     virtual bool can_evaluate_to_function() const = 0;
+    virtual bool can_evaluate_to_boolean() const = 0;
 };
 
 class Symbol : public Expression {
@@ -29,6 +30,7 @@ class Symbol : public Expression {
     virtual void display(std::ostream& stream, size_t depth) const;
 
     virtual bool can_evaluate_to_function() const;
+    virtual bool can_evaluate_to_boolean() const;
 };
 
 class Quote : public Expression {
@@ -43,6 +45,7 @@ class Quote : public Expression {
     virtual void display(std::ostream& stream, size_t depth) const;
 
     virtual bool can_evaluate_to_function() const;
+    virtual bool can_evaluate_to_boolean() const;
 };
 
 class Setq : public Expression {
@@ -61,6 +64,7 @@ class Setq : public Expression {
     virtual void display(std::ostream& stream, size_t depth) const;
 
     virtual bool can_evaluate_to_function() const;
+    virtual bool can_evaluate_to_boolean() const;
 };
 
 class Cond : public Expression {
@@ -81,6 +85,7 @@ class Cond : public Expression {
     virtual void display(std::ostream& stream, size_t depth) const;
 
     virtual bool can_evaluate_to_function() const;
+    virtual bool can_evaluate_to_boolean() const;
 };
 
 class Return : public Expression {
@@ -95,6 +100,7 @@ class Return : public Expression {
     virtual void display(std::ostream& stream, size_t depth) const;
 
     virtual bool can_evaluate_to_function() const;
+    virtual bool can_evaluate_to_boolean() const;
 };
 
 class Break : public Expression {
@@ -109,6 +115,7 @@ class Break : public Expression {
     virtual void display(std::ostream& stream, size_t depth) const;
 
     virtual bool can_evaluate_to_function() const;
+    virtual bool can_evaluate_to_boolean() const;
 };
 
 class Call : public Expression {
@@ -127,6 +134,7 @@ class Call : public Expression {
     virtual void display(std::ostream& stream, size_t depth) const;
 
     virtual bool can_evaluate_to_function() const;
+    virtual bool can_evaluate_to_boolean() const;
 };
 
 class Program {
@@ -138,13 +146,14 @@ class Program {
     static Program
     from_elements(std::vector<std::shared_ptr<ast::Element>> elements);
 
-    bool can_evaluate_to_function() const;
-
     std::shared_ptr<ast::Element> evaluate() const;
 
     void display(std::ostream& stream, size_t depth) const;
     friend std::ostream&
     operator<<(std::ostream& stream, Program const& program);
+
+    bool can_evaluate_to_function() const;
+    bool can_evaluate_to_boolean() const;
 };
 
 class Func : public Expression {
@@ -165,6 +174,7 @@ class Func : public Expression {
     virtual void display(std::ostream& stream, size_t depth) const;
 
     virtual bool can_evaluate_to_function() const;
+    virtual bool can_evaluate_to_boolean() const;
 };
 
 class Lambda : public Expression {
@@ -180,6 +190,7 @@ class Lambda : public Expression {
     virtual void display(std::ostream& stream, size_t depth) const;
 
     virtual bool can_evaluate_to_function() const;
+    virtual bool can_evaluate_to_boolean() const;
 };
 
 class Prog : public Expression {
@@ -195,6 +206,7 @@ class Prog : public Expression {
     virtual void display(std::ostream& stream, size_t depth) const;
 
     virtual bool can_evaluate_to_function() const;
+    virtual bool can_evaluate_to_boolean() const;
 };
 
 class While : public Expression {
@@ -210,6 +222,7 @@ class While : public Expression {
     virtual void display(std::ostream& stream, size_t depth) const;
 
     virtual bool can_evaluate_to_function() const;
+    virtual bool can_evaluate_to_boolean() const;
 };
 
 } // namespace evaluator

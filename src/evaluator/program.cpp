@@ -47,7 +47,9 @@ list_to_symbols_vector(std::shared_ptr<ast::List> list) {
         auto element = cons->left;
 
         if (!element->to_symbol()) {
-            throw EvaluationError("a parameter must be a symbol", element->span);
+            throw EvaluationError(
+                "a parameter must be a symbol", element->span
+            );
         }
 
         auto symbol = maybe_dynamic_cast<ast::Symbol>(element);
@@ -142,6 +144,7 @@ void Symbol::display(std::ostream& stream, size_t depth) const {
 }
 
 bool Symbol::can_evaluate_to_function() const { return true; }
+bool Symbol::can_evaluate_to_boolean() const { return true; }
 
 Quote::Quote(std::shared_ptr<Element> element)
     : Expression(), element(element) {}
@@ -173,6 +176,9 @@ void Quote::display(std::ostream& stream, size_t depth) const {
 }
 
 bool Quote::can_evaluate_to_function() const { return false; }
+bool Quote::can_evaluate_to_boolean() const {
+    return this->element->to_boolean() != std::nullopt;
+}
 
 Setq::Setq(
     std::shared_ptr<ast::Symbol> symbol, std::unique_ptr<Expression> expression
@@ -213,6 +219,10 @@ bool Setq::can_evaluate_to_function() const {
     return this->initializer->can_evaluate_to_function();
 }
 
+bool Setq::can_evaluate_to_boolean() const {
+    return this->initializer->can_evaluate_to_boolean();
+}
+
 void Setq::display(std::ostream& stream, size_t depth) const {
     stream << "Setq {\n";
 
@@ -237,7 +247,8 @@ Func::Func(
 std::unique_ptr<Func> Func::parse(std::shared_ptr<ast::List> arguments) {
     if (!arguments->to_cons()) {
         throw EvaluationError(
-            "`func` needs a function name, a parameter list and a body", arguments->span
+            "`func` needs a function name, a parameter list and a body",
+            arguments->span
         );
     }
 
@@ -258,9 +269,7 @@ std::unique_ptr<Func> Func::parse(std::shared_ptr<ast::List> arguments) {
     test_parameters(parameters_symbols);
 
     if (!cons->right->to_cons()) {
-        throw EvaluationError(
-            "`func` needs a body", cons->span
-        );
+        throw EvaluationError("`func` needs a body", cons->span);
     }
 
     std::vector<std::shared_ptr<Element>> elements;
@@ -282,6 +291,7 @@ std::shared_ptr<ast::Element> Func::evaluate() const {
 }
 
 bool Func::can_evaluate_to_function() const { return true; }
+bool Func::can_evaluate_to_boolean() const { return false; }
 
 void Func::display(std::ostream& stream, size_t depth) const {
     stream << "Func {\n";
@@ -322,9 +332,7 @@ std::unique_ptr<Lambda> Lambda::parse(std::shared_ptr<ast::List> arguments) {
     test_parameters(parameters);
 
     if (!cons->right->to_cons()) {
-        throw EvaluationError(
-            "`lambda` needs a body", cons->span
-        );
+        throw EvaluationError("`lambda` needs a body", cons->span);
     }
     cons = cons->right->to_cons();
 
@@ -346,6 +354,7 @@ std::shared_ptr<ast::Element> Lambda::evaluate() const {
 }
 
 bool Lambda::can_evaluate_to_function() const { return true; }
+bool Lambda::can_evaluate_to_boolean() const { return false; }
 
 void Lambda::display(std::ostream& stream, size_t depth) const {
     stream << "Lambda {\n";
@@ -365,7 +374,7 @@ void Lambda::display(std::ostream& stream, size_t depth) const {
 }
 
 Prog::Prog(std::vector<std::shared_ptr<ast::Symbol>> variables, Program body)
-    : Expression(), variables(variables), body(std::move(body)){};
+    : Expression(), variables(variables), body(std::move(body)) {}
 
 std::unique_ptr<Prog> Prog::parse(std::shared_ptr<ast::List> arguments) {
     if (!arguments->to_cons()) {
@@ -381,9 +390,7 @@ std::unique_ptr<Prog> Prog::parse(std::shared_ptr<ast::List> arguments) {
     test_parameters(parameters);
 
     if (!cons->right->to_cons()) {
-        throw EvaluationError(
-            "`prog` needs a body", cons->span
-        );
+        throw EvaluationError("`prog` needs a body", cons->span);
     }
     cons = cons->right->to_cons();
 
@@ -421,12 +428,12 @@ void Prog::display(std::ostream& stream, size_t depth) const {
     stream << Depth(depth) << '}';
 }
 
-bool Program::can_evaluate_to_function() const {
-    return this->program[this->program.size() - 1]->can_evaluate_to_function();
-}
-
 bool Prog::can_evaluate_to_function() const {
     return this->body.can_evaluate_to_function();
+}
+
+bool Prog::can_evaluate_to_boolean() const {
+    return this->body.can_evaluate_to_boolean();
 }
 
 Return::Return(std::unique_ptr<Expression> expression)
@@ -454,6 +461,7 @@ std::shared_ptr<ast::Element> Return::evaluate() const {
 }
 
 bool Return::can_evaluate_to_function() const { return false; }
+bool Return::can_evaluate_to_boolean() const { return false; }
 
 void Return::display(std::ostream& stream, size_t depth) const {
     stream << "Return {\n";
@@ -476,6 +484,13 @@ std::unique_ptr<While> While::parse(std::shared_ptr<ast::List> arguments) {
     }
 
     auto condition = Expression::from_element(cons->left);
+    if (!condition->can_evaluate_to_boolean()) {
+        throw EvaluationError(
+            "a boolean is expected, but this expression will never evaluate to "
+            "a boolean",
+            cons->left->span
+        );
+    }
 
     cons = cons->right->to_cons();
     if (!cons) {
@@ -513,6 +528,7 @@ void While::display(std::ostream& stream, size_t depth) const {
 }
 
 bool While::can_evaluate_to_function() const { return false; }
+bool While::can_evaluate_to_boolean() const { return false; }
 
 Break::Break(std::unique_ptr<Expression> expression)
     : Expression(), expression(std::move(expression)) {}
@@ -549,6 +565,7 @@ void Break::display(std::ostream& stream, size_t depth) const {
 }
 
 bool Break::can_evaluate_to_function() const { return false; }
+bool Break::can_evaluate_to_boolean() const { return false; }
 
 Call::Call(
     std::unique_ptr<Expression> function,
@@ -601,6 +618,7 @@ void Call::display(std::ostream& stream, size_t depth) const {
 }
 
 bool Call::can_evaluate_to_function() const { return true; }
+bool Call::can_evaluate_to_boolean() const { return true; }
 
 Cond::Cond(
     std::unique_ptr<Expression> condition,
@@ -615,11 +633,20 @@ std::unique_ptr<Cond> Cond::parse(std::shared_ptr<ast::List> arguments) {
 
     if (!cons) {
         throw EvaluationError(
-            "`cond` needs a condition, a `then` branch, and optionally an `else` branch", arguments->span
+            "`cond` needs a condition, a `then` branch, and optionally an "
+            "`else` branch",
+            arguments->span
         );
     }
 
     auto condition = Expression::from_element(cons->left);
+    if (!condition->can_evaluate_to_boolean()) {
+        throw EvaluationError(
+            "a boolean is expected, but this expression will never evaluate to "
+            "a boolean",
+            cons->left->span
+        );
+    }
 
     if (!cons->right->to_cons()) {
         throw EvaluationError(
@@ -637,10 +664,7 @@ std::unique_ptr<Cond> Cond::parse(std::shared_ptr<ast::List> arguments) {
         otherwise = Expression::from_element(cons->left);
 
         if (cons->right->to_cons()) {
-            throw EvaluationError(
-                "`cond` has extra arguments",
-                cons->span
-            );
+            throw EvaluationError("`cond` has extra arguments", cons->span);
         }
     } else {
         otherwise = Expression::from_element(
@@ -680,6 +704,11 @@ bool Cond::can_evaluate_to_function() const {
            this->otherwise->can_evaluate_to_function();
 }
 
+bool Cond::can_evaluate_to_boolean() const {
+    return this->then->can_evaluate_to_boolean() ||
+           this->otherwise->can_evaluate_to_boolean();
+}
+
 Program::Program(std::vector<std::unique_ptr<Expression>> program)
     : program(std::move(program)) {}
 
@@ -716,6 +745,14 @@ void Program::display(std::ostream& stream, size_t depth) const {
 std::ostream& operator<<(std::ostream& stream, Program const& program) {
     program.display(stream, 0);
     return stream;
+}
+
+bool Program::can_evaluate_to_function() const {
+    return this->program[this->program.size() - 1]->can_evaluate_to_function();
+}
+
+bool Program::can_evaluate_to_boolean() const {
+    return this->program[this->program.size() - 1]->can_evaluate_to_boolean();
 }
 
 } // namespace evaluator
