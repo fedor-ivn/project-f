@@ -5,6 +5,7 @@
 namespace evaluator {
 
 using ast::Element;
+using ast::List;
 using ast::Null;
 using ast::Position;
 using ast::Span;
@@ -13,12 +14,15 @@ using utils::Depth;
 Body::Body(std::vector<std::unique_ptr<Expression>> body)
     : body(std::move(body)) {}
 
-Body Body::from_elements(std::vector<std::shared_ptr<Element>> elements) {
-    std::vector<std::unique_ptr<Expression>> program;
-    for (auto&& element : elements) {
-        program.push_back(Expression::from_element(std::move(element)));
+Body Body::parse(std::shared_ptr<List> unparsed) {
+    std::vector<std::unique_ptr<Expression>> body;
+
+    auto cons = unparsed->to_cons();
+    while (cons) {
+        body.push_back(Expression::from_element(cons->left));
+        cons = cons->right->to_cons();
     }
-    return Body(std::move(program));
+    return Body(std::move(body));
 }
 
 std::shared_ptr<Element> Body::evaluate() const {
@@ -44,11 +48,13 @@ void Body::display(std::ostream& stream, size_t depth) const {
 }
 
 bool Body::can_evaluate_to_function() const {
-    return this->body[this->body.size() - 1]->can_evaluate_to_function();
+    return this->body.size() > 0 &&
+           this->body[this->body.size() - 1]->can_evaluate_to_function();
 }
 
 bool Body::can_evaluate_to_boolean() const {
-    return this->body[this->body.size() - 1]->can_evaluate_to_boolean();
+    return this->body.size() > 0 &&
+           this->body[this->body.size() - 1]->can_evaluate_to_boolean();
 }
 
 } // namespace evaluator

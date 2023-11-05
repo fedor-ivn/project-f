@@ -28,21 +28,10 @@ std::unique_ptr<Lambda> Lambda::parse(std::shared_ptr<ast::List> arguments) {
     }
     auto parameters = Parameters::parse(parameter_list);
 
-    cons = cons->right->to_cons();
-    if (!cons) {
-        throw EvaluationError("`lambda` needs a body", cons->span);
-    }
-
-    std::vector<std::shared_ptr<Element>> elements;
-    while (cons) {
-        auto element = std::shared_ptr<Element>(cons->left);
-        elements.push_back(element);
-        cons = cons->right->to_cons();
-    }
-    auto program = Body::from_elements(elements);
+    auto body = Body::parse(cons->right);
 
     return std::make_unique<Lambda>(
-        Lambda(std::move(parameters), std::move(program))
+        Lambda(std::move(parameters), std::move(body))
     );
 }
 

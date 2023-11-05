@@ -28,21 +28,9 @@ std::unique_ptr<Prog> Prog::parse(std::shared_ptr<List> arguments) {
     }
     auto variables = Parameters::parse(variable_list);
 
-    cons = cons->right->to_cons();
-    if (!cons) {
-        throw EvaluationError("`prog` needs a body", cons->span);
-    }
+    auto body = Body::parse(cons->right);
 
-    std::vector<std::shared_ptr<Element>> elements;
-    while (cons) {
-        auto element = std::shared_ptr<Element>(cons->left);
-        elements.push_back(element);
-        cons = cons->right->to_cons();
-    }
-    auto program = Body::from_elements(elements);
-
-    return std::make_unique<Prog>(Prog(std::move(variables), std::move(program))
-    );
+    return std::make_unique<Prog>(Prog(std::move(variables), std::move(body)));
 }
 
 std::shared_ptr<Element> Prog::evaluate() const {

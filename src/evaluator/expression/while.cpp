@@ -27,20 +27,9 @@ std::unique_ptr<While> While::parse(std::shared_ptr<List> arguments) {
         );
     }
 
-    cons = cons->right->to_cons();
-    if (!cons) {
-        throw EvaluationError("`while` without a body", form_span);
-    }
+    auto body = Body::parse(cons->right);
 
-    std::vector<std::shared_ptr<Element>> elements;
-    while (cons) {
-        elements.push_back(cons->left);
-        cons = cons->right->to_cons();
-    }
-    auto program = Body::from_elements(elements);
-
-    return std::make_unique<While>(
-        While(std::move(condition), std::move(program))
+    return std::make_unique<While>(While(std::move(condition), std::move(body))
     );
 }
 

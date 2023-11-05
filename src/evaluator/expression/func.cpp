@@ -45,20 +45,10 @@ std::unique_ptr<Func> Func::parse(std::shared_ptr<List> arguments) {
     }
     auto parameters = Parameters::parse(parameter_list);
 
-    cons = cons->right->to_cons();
-    if (!cons) {
-        throw EvaluationError("`func` needs a body", cons->span);
-    }
-
-    std::vector<std::shared_ptr<Element>> elements;
-    while (cons) {
-        elements.push_back(cons->left);
-        cons = cons->right->to_cons();
-    }
-    auto program = Body::from_elements(elements);
+    auto body = Body::parse(cons->right);
 
     return std::make_unique<Func>(
-        Func(name, std::move(parameters), std::move(program))
+        Func(name, std::move(parameters), std::move(body))
     );
 }
 

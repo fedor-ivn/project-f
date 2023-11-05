@@ -39,8 +39,7 @@ class Body {
   public:
     Body(std::vector<std::unique_ptr<Expression>> body);
 
-    static Body
-    from_elements(std::vector<std::shared_ptr<ast::Element>> elements);
+    static Body parse(std::shared_ptr<ast::List> unparsed);
 
     std::shared_ptr<ast::Element> evaluate() const;
 
