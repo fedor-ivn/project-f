@@ -10,7 +10,6 @@
 #include "ast/span.h"
 #include "evaluator/error.h"
 #include "evaluator/evaluator.h"
-#include "evaluator/program.h"
 #include "reader/error.h"
 #include "reader/parser.h"
 #include "reader/scanner.h"

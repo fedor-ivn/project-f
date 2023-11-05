@@ -20,6 +20,36 @@ class Expression {
     virtual bool can_evaluate_to_boolean() const = 0;
 };
 
+class Parameters {
+    std::vector<std::shared_ptr<ast::Symbol>> parameters;
+
+  public:
+    Parameters(std::vector<std::shared_ptr<ast::Symbol>> parameters);
+
+    static Parameters parse(std::shared_ptr<ast::List> parameter_list);
+
+    void display(std::ostream& stream, size_t depth) const;
+};
+
+class Program {
+    std::vector<std::unique_ptr<Expression>> program;
+
+  public:
+    Program(std::vector<std::unique_ptr<Expression>> program);
+
+    static Program
+    from_elements(std::vector<std::shared_ptr<ast::Element>> elements);
+
+    std::shared_ptr<ast::Element> evaluate() const;
+
+    void display(std::ostream& stream, size_t depth) const;
+    friend std::ostream&
+    operator<<(std::ostream& stream, Program const& program);
+
+    bool can_evaluate_to_function() const;
+    bool can_evaluate_to_boolean() const;
+};
+
 class Symbol : public Expression {
     std::shared_ptr<ast::Symbol> symbol;
 
@@ -137,35 +167,14 @@ class Call : public Expression {
     virtual bool can_evaluate_to_boolean() const;
 };
 
-class Program {
-    std::vector<std::unique_ptr<Expression>> program;
-
-  public:
-    Program(std::vector<std::unique_ptr<Expression>> program);
-
-    static Program
-    from_elements(std::vector<std::shared_ptr<ast::Element>> elements);
-
-    std::shared_ptr<ast::Element> evaluate() const;
-
-    void display(std::ostream& stream, size_t depth) const;
-    friend std::ostream&
-    operator<<(std::ostream& stream, Program const& program);
-
-    bool can_evaluate_to_function() const;
-    bool can_evaluate_to_boolean() const;
-};
-
 class Func : public Expression {
     std::shared_ptr<ast::Symbol> name;
-    std::vector<std::shared_ptr<ast::Symbol>> parameters;
+    Parameters parameters;
     Program body;
 
   public:
     Func(
-        std::shared_ptr<ast::Symbol> name,
-        std::vector<std::shared_ptr<ast::Symbol>> parameters,
-        Program body
+        std::shared_ptr<ast::Symbol> name, Parameters parameters, Program body
     );
 
     static std::unique_ptr<Func> parse(std::shared_ptr<ast::List> arguments);
@@ -178,11 +187,11 @@ class Func : public Expression {
 };
 
 class Lambda : public Expression {
-    std::vector<std::shared_ptr<ast::Symbol>> parameters;
+    Parameters parameters;
     Program body;
 
   public:
-    Lambda(std::vector<std::shared_ptr<ast::Symbol>> parameters, Program body);
+    Lambda(Parameters parameters, Program body);
 
     static std::unique_ptr<Lambda> parse(std::shared_ptr<ast::List> arguments);
 
@@ -194,11 +203,11 @@ class Lambda : public Expression {
 };
 
 class Prog : public Expression {
-    std::vector<std::shared_ptr<ast::Symbol>> variables;
+    Parameters variables;
     Program body;
 
   public:
-    Prog(std::vector<std::shared_ptr<ast::Symbol>> variables, Program body);
+    Prog(Parameters variables, Program body);
 
     static std::unique_ptr<Prog> parse(std::shared_ptr<ast::List> arguments);
 
