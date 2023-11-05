@@ -193,7 +193,7 @@ void process(
             return;
         }
 
-        auto program = Program::from_elements(std::move(ast));
+        auto program = Program::from_elements(ast);
         if (mode == Mode::SemanticAnalysis) {
             std::cout << program << std::endl;
             return;

@@ -63,55 +63,19 @@ class Setq : public Expression {
     virtual bool can_evaluate_to_function() const;
 };
 
-class Func : public Expression {
-    std::shared_ptr<ast::Symbol> name;
-    std::shared_ptr<ast::List> arguments;
-    std::unique_ptr<Expression> expression;
+class Cond : public Expression {
+    std::unique_ptr<Expression> condition;
+    std::unique_ptr<Expression> then;
+    std::unique_ptr<Expression> otherwise;
 
   public:
-    Func(
-        std::shared_ptr<ast::Symbol> name,
-        std::shared_ptr<ast::List> arguments,
-        std::unique_ptr<Expression> expression
+    Cond(
+        std::unique_ptr<Expression> condition,
+        std::unique_ptr<Expression> then,
+        std::unique_ptr<Expression> otherwise
     );
 
-    static std::unique_ptr<Func> parse(std::shared_ptr<ast::List> arguments);
-
-    virtual std::shared_ptr<ast::Element> evaluate() const;
-    virtual void display(std::ostream& stream, size_t depth) const;
-
-    virtual bool can_evaluate_to_function() const;
-};
-
-class Lambda : public Expression {
-    std::shared_ptr<ast::List> arguments;
-    std::unique_ptr<Expression> expression;
-
-  public:
-    Lambda(
-        std::shared_ptr<ast::List> arguments,
-        std::unique_ptr<Expression> expression
-    );
-
-    static std::unique_ptr<Lambda> parse(std::shared_ptr<ast::List> arguments);
-
-    virtual std::shared_ptr<ast::Element> evaluate() const;
-    virtual void display(std::ostream& stream, size_t depth) const;
-
-    virtual bool can_evaluate_to_function() const;
-};
-
-class Prog : public Expression {
-    std::shared_ptr<ast::List> variables;
-    std::unique_ptr<Expression> expression;
-
-  public:
-    Prog(
-        std::shared_ptr<ast::List> arguments,
-        std::unique_ptr<Expression> expression
-    );
-
-    static std::unique_ptr<Prog> parse(std::shared_ptr<ast::List> arguments);
+    static std::unique_ptr<Cond> parse(std::shared_ptr<ast::List> arguments);
 
     virtual std::shared_ptr<ast::Element> evaluate() const;
     virtual void display(std::ostream& stream, size_t depth) const;
@@ -174,11 +138,63 @@ class Program {
     static Program
     from_elements(std::vector<std::shared_ptr<ast::Element>> elements);
 
+    bool can_evaluate_to_function() const;
+
     std::shared_ptr<ast::Element> evaluate() const;
 
     void display(std::ostream& stream, size_t depth) const;
     friend std::ostream&
     operator<<(std::ostream& stream, Program const& program);
+};
+
+class Func : public Expression {
+    std::shared_ptr<ast::Symbol> name;
+    std::vector<std::shared_ptr<ast::Symbol>> parameters;
+    Program body;
+
+  public:
+    Func(
+        std::shared_ptr<ast::Symbol> name,
+        std::vector<std::shared_ptr<ast::Symbol>> parameters,
+        Program body
+    );
+
+    static std::unique_ptr<Func> parse(std::shared_ptr<ast::List> arguments);
+
+    virtual std::shared_ptr<ast::Element> evaluate() const;
+    virtual void display(std::ostream& stream, size_t depth) const;
+
+    virtual bool can_evaluate_to_function() const;
+};
+
+class Lambda : public Expression {
+    std::vector<std::shared_ptr<ast::Symbol>> parameters;
+    Program body;
+
+  public:
+    Lambda(std::vector<std::shared_ptr<ast::Symbol>> parameters, Program body);
+
+    static std::unique_ptr<Lambda> parse(std::shared_ptr<ast::List> arguments);
+
+    virtual std::shared_ptr<ast::Element> evaluate() const;
+    virtual void display(std::ostream& stream, size_t depth) const;
+
+    virtual bool can_evaluate_to_function() const;
+};
+
+class Prog : public Expression {
+    std::vector<std::shared_ptr<ast::Symbol>> variables;
+    Program body;
+
+  public:
+    Prog(std::vector<std::shared_ptr<ast::Symbol>> variables, Program body);
+
+    static std::unique_ptr<Prog> parse(std::shared_ptr<ast::List> arguments);
+
+    virtual std::shared_ptr<ast::Element> evaluate() const;
+    virtual void display(std::ostream& stream, size_t depth) const;
+
+    virtual bool can_evaluate_to_function() const;
 };
 
 class While : public Expression {

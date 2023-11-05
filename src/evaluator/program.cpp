@@ -19,11 +19,60 @@ std::shared_ptr<T> maybe_dynamic_cast(std::shared_ptr<ast::Element> element) {
     auto symbol = std::dynamic_pointer_cast<T>(element);
 
     if (symbol == nullptr) {
-        std::string message = typeid(T).name();
-        throw std::runtime_error("Expected type: " + message);
+        std::string type_name = typeid(T).name();
+        std::string message;
+
+        if (type_name == "N3ast6SymbolE") {
+            message = "expected type - Symbol";
+        } else if (type_name == "N3ast4ListE") {
+            message = "expected type - List";
+        } else if (type_name == "N3ast7BooleanE") {
+            message = "expected type - Boolean";
+        } else {
+            message = "unexpected type - " + type_name;
+        }
+
+        throw EvaluationError(message, element->span);
     }
 
     return symbol;
+}
+
+std::vector<std::shared_ptr<ast::Symbol>>
+list_to_symbols_vector(std::shared_ptr<ast::List> list) {
+    auto cons = list->to_cons();
+    std::vector<std::shared_ptr<ast::Symbol>> symbols;
+
+    while (cons) {
+        auto element = cons->left;
+
+        if (!element->to_symbol()) {
+            throw EvaluationError("a parameter must be a symbol", element->span);
+        }
+
+        auto symbol = maybe_dynamic_cast<ast::Symbol>(element);
+
+        symbols.push_back(symbol);
+
+        cons = cons->right->to_cons();
+    }
+
+    return symbols;
+}
+
+void test_parameters(std::vector<std::shared_ptr<ast::Symbol>> parameters) {
+    std::vector<std::string> set;
+
+    for (auto parameter : parameters) {
+        for (auto set_element : set) {
+            if (parameter->value == set_element) {
+                std::string message =
+                    "parameter `" + parameter->value + "` is duplicated";
+                throw EvaluationError(message, parameter->span);
+            }
+        }
+        set.push_back(parameter->value);
+    }
 }
 
 std::unique_ptr<Expression>
@@ -62,6 +111,10 @@ Expression::from_element(std::shared_ptr<Element> element) {
 
         else if (symbol == "break") {
             return Break::parse(arguments);
+        }
+
+        else if (symbol == "cond") {
+            return Cond::parse(arguments);
         }
 
         return Call::parse(*cons);
@@ -176,15 +229,15 @@ void Setq::display(std::ostream& stream, size_t depth) const {
 
 Func::Func(
     std::shared_ptr<ast::Symbol> name,
-    std::shared_ptr<ast::List> arguments,
-    std::unique_ptr<Expression> expression
+    std::vector<std::shared_ptr<ast::Symbol>> parameters,
+    Program body
 )
-    : Expression(), name(name), arguments(arguments),
-      expression(std::move(expression)) {}
+    : Expression(), name(name), parameters(parameters), body(std::move(body)) {}
 
 std::unique_ptr<Func> Func::parse(std::shared_ptr<ast::List> arguments) {
     if (!arguments->to_cons()) {
-        throw std::runtime_error("`func` takes at least 3 arguments, provided 0"
+        throw EvaluationError(
+            "`func` needs a function name, a parameter list and a body", arguments->span
         );
     }
 
@@ -193,22 +246,35 @@ std::unique_ptr<Func> Func::parse(std::shared_ptr<ast::List> arguments) {
     auto name = maybe_dynamic_cast<ast::Symbol>(cons->left);
 
     if (!cons->right->to_cons()) {
-        throw std::runtime_error("`func` takes at least 3 arguments, provided 1"
+        throw EvaluationError(
+            "`func` needs a parameter list and a body", cons->span
         );
     }
+    cons = cons->right->to_cons();
 
     auto func_arguments = maybe_dynamic_cast<ast::List>(cons->left);
 
-    if (!cons->right->to_cons()->right->to_cons()) {
-        throw std::runtime_error("`func` takes at least 3 arguments, provided 2"
+    auto parameters_symbols = list_to_symbols_vector(func_arguments);
+    test_parameters(parameters_symbols);
+
+    if (!cons->right->to_cons()) {
+        throw EvaluationError(
+            "`func` needs a body", cons->span
         );
     }
 
-    auto body_element =
-        std::static_pointer_cast<ast::Element>(cons->right->to_cons()->right);
-    auto body = Expression::from_element(body_element);
+    std::vector<std::shared_ptr<Element>> elements;
 
-    return std::make_unique<Func>(Func(name, func_arguments, std::move(body)));
+    while (cons) {
+        elements.push_back(cons->left);
+        cons = cons->right->to_cons();
+    }
+
+    auto program = Program::from_elements(elements);
+
+    return std::make_unique<Func>(
+        Func(name, parameters_symbols, std::move(program))
+    );
 }
 
 std::shared_ptr<ast::Element> Func::evaluate() const {
@@ -223,43 +289,56 @@ void Func::display(std::ostream& stream, size_t depth) const {
     stream << Depth(depth + 1)
            << "name = " << this->name->display_verbose(depth + 1) << '\n';
 
-    stream << Depth(depth + 1)
-           << "arguments = " << this->arguments->display_verbose(depth + 1)
-           << '\n';
+    stream << Depth(depth + 1) << "arguments = [\n";
+    for (auto parameter : this->parameters) {
+        stream << Depth(depth + 2) << parameter->display_verbose(depth + 2);
+        stream << ",\n";
+    }
+    stream << Depth(depth + 1) << "]\n";
 
     stream << Depth(depth + 1) << "body = ";
-    this->expression->display(stream, depth + 1);
+    this->body.display(stream, depth + 1);
     stream << '\n';
 
     stream << Depth(depth) << '}';
 }
 
 Lambda::Lambda(
-    std::shared_ptr<ast::List> arguments, std::unique_ptr<Expression> expression
+    std::vector<std::shared_ptr<ast::Symbol>> parameters, Program body
 )
-    : Expression(), arguments(arguments), expression(std::move(expression)) {}
+    : Expression(), parameters(parameters), body(std::move(body)) {}
 
 std::unique_ptr<Lambda> Lambda::parse(std::shared_ptr<ast::List> arguments) {
     if (!arguments->to_cons()) {
-        throw std::runtime_error(
-            "`lambda` takes at least 2 arguments, provided 0"
+        throw EvaluationError(
+            "`lambda` needs a parameter list and a body", arguments->span
         );
     }
 
     auto cons = arguments->to_cons();
 
-    auto func_arguments = maybe_dynamic_cast<ast::List>(cons->left);
+    auto parameters_list = maybe_dynamic_cast<ast::List>(cons->left);
+    auto parameters = list_to_symbols_vector(parameters_list);
+    test_parameters(parameters);
 
     if (!cons->right->to_cons()) {
-        throw std::runtime_error(
-            "`lambda` takes at least 2 arguments, provided 1"
+        throw EvaluationError(
+            "`lambda` needs a body", cons->span
         );
     }
+    cons = cons->right->to_cons();
 
-    auto body_element = std::static_pointer_cast<ast::Element>(cons->right);
-    auto body = Expression::from_element(body_element);
+    std::vector<std::shared_ptr<Element>> elements;
 
-    return std::make_unique<Lambda>(Lambda(func_arguments, std::move(body)));
+    while (cons) {
+        auto element = std::shared_ptr<Element>(cons->left);
+        elements.push_back(element);
+        cons = cons->right->to_cons();
+    }
+
+    auto program = Program::from_elements(elements);
+
+    return std::make_unique<Lambda>(Lambda(parameters, std::move(program)));
 }
 
 std::shared_ptr<ast::Element> Lambda::evaluate() const {
@@ -271,41 +350,54 @@ bool Lambda::can_evaluate_to_function() const { return true; }
 void Lambda::display(std::ostream& stream, size_t depth) const {
     stream << "Lambda {\n";
 
-    stream << Depth(depth + 1)
-           << "arguments = " << this->arguments->display_verbose(depth + 1)
-           << '\n';
+    stream << Depth(depth + 1) << "arguments = [\n";
+    for (auto parameter : this->parameters) {
+        stream << Depth(depth + 2) << parameter->display_verbose(depth + 2);
+        stream << ",\n";
+    }
+    stream << Depth(depth + 1) << "]\n";
 
     stream << Depth(depth + 1) << "body = ";
-    this->expression->display(stream, depth + 1);
+    this->body.display(stream, depth + 1);
     stream << '\n';
 
     stream << Depth(depth) << '}';
 }
 
-Prog::Prog(
-    std::shared_ptr<ast::List> arguments, std::unique_ptr<Expression> expression
-)
-    : Expression(), variables(arguments), expression(std::move(expression)){};
+Prog::Prog(std::vector<std::shared_ptr<ast::Symbol>> variables, Program body)
+    : Expression(), variables(variables), body(std::move(body)){};
 
 std::unique_ptr<Prog> Prog::parse(std::shared_ptr<ast::List> arguments) {
     if (!arguments->to_cons()) {
-        throw std::runtime_error("`prog` takes at least 2 arguments, provided 0"
+        throw EvaluationError(
+            "`prog` needs a variable list and a body", arguments->span
         );
     }
 
     auto cons = arguments->to_cons();
 
-    auto func_arguments = maybe_dynamic_cast<ast::List>(cons->left);
+    auto parameters_list = maybe_dynamic_cast<ast::List>(cons->left);
+    auto parameters = list_to_symbols_vector(parameters_list);
+    test_parameters(parameters);
 
     if (!cons->right->to_cons()) {
-        throw std::runtime_error("`prog` takes at least 2 arguments, provided 1"
+        throw EvaluationError(
+            "`prog` needs a body", cons->span
         );
     }
+    cons = cons->right->to_cons();
 
-    auto body_element = std::static_pointer_cast<ast::Element>(cons->right);
-    auto body = Expression::from_element(body_element);
+    std::vector<std::shared_ptr<Element>> elements;
 
-    return std::make_unique<Prog>(Prog(func_arguments, std::move(body)));
+    while (cons) {
+        auto element = std::shared_ptr<Element>(cons->left);
+        elements.push_back(element);
+        cons = cons->right->to_cons();
+    }
+
+    auto program = Program::from_elements(elements);
+
+    return std::make_unique<Prog>(Prog(parameters, std::move(program)));
 }
 
 std::shared_ptr<ast::Element> Prog::evaluate() const {
@@ -315,19 +407,26 @@ std::shared_ptr<ast::Element> Prog::evaluate() const {
 void Prog::display(std::ostream& stream, size_t depth) const {
     stream << "Prog {\n";
 
-    stream << Depth(depth + 1)
-           << "variables = " << this->variables->display_verbose(depth + 1)
-           << '\n';
+    stream << Depth(depth + 1) << "arguments = [\n";
+    for (auto parameter : this->variables) {
+        stream << Depth(depth + 2) << parameter->display_verbose(depth + 2);
+        stream << ",\n";
+    }
+    stream << Depth(depth + 1) << "]\n";
 
     stream << Depth(depth + 1) << "body = ";
-    this->expression->display(stream, depth + 1);
+    this->body.display(stream, depth + 1);
     stream << '\n';
 
     stream << Depth(depth) << '}';
 }
 
+bool Program::can_evaluate_to_function() const {
+    return this->program[this->program.size() - 1]->can_evaluate_to_function();
+}
+
 bool Prog::can_evaluate_to_function() const {
-    return this->expression->can_evaluate_to_function();
+    return this->body.can_evaluate_to_function();
 }
 
 Return::Return(std::unique_ptr<Expression> expression)
@@ -502,6 +601,84 @@ void Call::display(std::ostream& stream, size_t depth) const {
 }
 
 bool Call::can_evaluate_to_function() const { return true; }
+
+Cond::Cond(
+    std::unique_ptr<Expression> condition,
+    std::unique_ptr<Expression> then,
+    std::unique_ptr<Expression> otherwise
+)
+    : Expression(), condition(std::move(condition)), then(std::move(then)),
+      otherwise(std::move(otherwise)) {}
+
+std::unique_ptr<Cond> Cond::parse(std::shared_ptr<ast::List> arguments) {
+    auto cons = arguments->to_cons();
+
+    if (!cons) {
+        throw EvaluationError(
+            "`cond` needs a condition, a `then` branch, and optionally an `else` branch", arguments->span
+        );
+    }
+
+    auto condition = Expression::from_element(cons->left);
+
+    if (!cons->right->to_cons()) {
+        throw EvaluationError(
+            "`cond` needs at least a `then` branch", cons->span
+        );
+    }
+    cons = cons->right->to_cons();
+
+    auto then = Expression::from_element(cons->left);
+
+    cons = cons->right->to_cons();
+
+    std::unique_ptr<Expression> otherwise;
+    if (cons) {
+        otherwise = Expression::from_element(cons->left);
+
+        if (cons->right->to_cons()) {
+            throw EvaluationError(
+                "`cond` has extra arguments",
+                cons->span
+            );
+        }
+    } else {
+        otherwise = Expression::from_element(
+            std::make_shared<Null>(Null(arguments->span))
+        );
+    }
+
+    auto cond =
+        Cond(std::move(condition), std::move(then), std::move(otherwise));
+    return std::make_unique<Cond>(std::move(cond));
+}
+
+std::shared_ptr<Element> Cond::evaluate() const {
+    throw std::runtime_error("Not implemented");
+}
+
+void Cond::display(std::ostream& stream, size_t depth) const {
+    stream << "Cond {\n";
+
+    stream << Depth(depth + 1) << "condition = ";
+    this->condition->display(stream, depth + 1);
+    stream << '\n';
+
+    stream << Depth(depth + 1) << "then = ";
+    this->then->display(stream, depth + 1);
+    stream << '\n';
+
+    stream << Depth(depth + 1) << "otherwise = ";
+    this->otherwise->display(stream, depth + 1);
+    stream << "\n";
+
+    stream << Depth(depth) << '}';
+}
+
+bool Cond::can_evaluate_to_function() const {
+    return this->then->can_evaluate_to_function() ||
+           this->otherwise->can_evaluate_to_function();
+}
 
 Program::Program(std::vector<std::unique_ptr<Expression>> program)
     : program(std::move(program)) {}
