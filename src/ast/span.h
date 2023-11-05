@@ -12,6 +12,7 @@ class Position {
     size_t column;
 
     Position(size_t line = 1, size_t column = 1);
+    auto operator<=>(Position const&) const = default;
 
     void to_next_line();
     void to_next_column();

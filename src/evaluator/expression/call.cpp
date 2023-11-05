@@ -67,4 +67,20 @@ void Call::display(std::ostream& stream, size_t depth) const {
 bool Call::can_evaluate_to_function() const { return true; }
 bool Call::can_evaluate_to_boolean() const { return true; }
 
+void Call::validate_no_free_break() const {
+    this->function->validate_no_free_break();
+
+    for (auto const& argument : this->arguments) {
+        argument->validate_no_free_break();
+    }
+}
+
+void Call::validate_no_break_with_value() const {
+    this->function->validate_no_break_with_value();
+
+    for (auto const& argument : this->arguments) {
+        argument->validate_no_break_with_value();
+    }
+}
+
 } // namespace evaluator

@@ -49,5 +49,7 @@ bool Quote::can_evaluate_to_function() const { return false; }
 bool Quote::can_evaluate_to_boolean() const {
     return bool(std::dynamic_pointer_cast<Boolean>(this->element));
 }
+void Quote::validate_no_free_break() const {}
+void Quote::validate_no_break_with_value() const {}
 
 } // namespace evaluator

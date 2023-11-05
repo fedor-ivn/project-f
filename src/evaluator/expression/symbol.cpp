@@ -17,5 +17,7 @@ void Symbol::display(std::ostream& stream, size_t depth) const {
 
 bool Symbol::can_evaluate_to_function() const { return true; }
 bool Symbol::can_evaluate_to_boolean() const { return true; }
+void Symbol::validate_no_free_break() const {}
+void Symbol::validate_no_break_with_value() const {}
 
 } // namespace evaluator

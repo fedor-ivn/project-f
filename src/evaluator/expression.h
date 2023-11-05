@@ -22,6 +22,8 @@ class Expression {
 
     virtual bool can_evaluate_to_function() const = 0;
     virtual bool can_evaluate_to_boolean() const = 0;
+    virtual void validate_no_free_break() const = 0;
+    virtual void validate_no_break_with_value() const = 0;
 };
 
 class Parameters {
@@ -54,6 +56,8 @@ class Body {
 
     bool can_evaluate_to_function() const;
     bool can_evaluate_to_boolean() const;
+    void validate_no_free_break() const;
+    void validate_no_break_with_value() const;
 
     friend std::ostream& operator<<(std::ostream& stream, Program const& self);
 };
@@ -83,6 +87,8 @@ class Symbol : public Expression {
 
     virtual bool can_evaluate_to_function() const;
     virtual bool can_evaluate_to_boolean() const;
+    virtual void validate_no_free_break() const;
+    virtual void validate_no_break_with_value() const;
 };
 
 class Quote : public Expression {
@@ -99,6 +105,8 @@ class Quote : public Expression {
 
     virtual bool can_evaluate_to_function() const;
     virtual bool can_evaluate_to_boolean() const;
+    virtual void validate_no_free_break() const;
+    virtual void validate_no_break_with_value() const;
 };
 
 class Setq : public Expression {
@@ -120,6 +128,8 @@ class Setq : public Expression {
 
     virtual bool can_evaluate_to_function() const;
     virtual bool can_evaluate_to_boolean() const;
+    virtual void validate_no_free_break() const;
+    virtual void validate_no_break_with_value() const;
 };
 
 class Cond : public Expression {
@@ -143,6 +153,8 @@ class Cond : public Expression {
 
     virtual bool can_evaluate_to_function() const;
     virtual bool can_evaluate_to_boolean() const;
+    virtual void validate_no_free_break() const;
+    virtual void validate_no_break_with_value() const;
 };
 
 class Return : public Expression {
@@ -159,6 +171,8 @@ class Return : public Expression {
 
     virtual bool can_evaluate_to_function() const;
     virtual bool can_evaluate_to_boolean() const;
+    virtual void validate_no_free_break() const;
+    virtual void validate_no_break_with_value() const;
 };
 
 class Break : public Expression {
@@ -175,6 +189,8 @@ class Break : public Expression {
 
     virtual bool can_evaluate_to_function() const;
     virtual bool can_evaluate_to_boolean() const;
+    virtual void validate_no_free_break() const;
+    virtual void validate_no_break_with_value() const;
 };
 
 class Call : public Expression {
@@ -195,6 +211,8 @@ class Call : public Expression {
 
     virtual bool can_evaluate_to_function() const;
     virtual bool can_evaluate_to_boolean() const;
+    virtual void validate_no_free_break() const;
+    virtual void validate_no_break_with_value() const;
 };
 
 class Func : public Expression {
@@ -218,6 +236,8 @@ class Func : public Expression {
 
     virtual bool can_evaluate_to_function() const;
     virtual bool can_evaluate_to_boolean() const;
+    virtual void validate_no_free_break() const;
+    virtual void validate_no_break_with_value() const;
 };
 
 class Lambda : public Expression {
@@ -235,6 +255,8 @@ class Lambda : public Expression {
 
     virtual bool can_evaluate_to_function() const;
     virtual bool can_evaluate_to_boolean() const;
+    virtual void validate_no_free_break() const;
+    virtual void validate_no_break_with_value() const;
 };
 
 class Prog : public Expression {
@@ -252,6 +274,8 @@ class Prog : public Expression {
 
     virtual bool can_evaluate_to_function() const;
     virtual bool can_evaluate_to_boolean() const;
+    virtual void validate_no_free_break() const;
+    virtual void validate_no_break_with_value() const;
 };
 
 class While : public Expression {
@@ -269,6 +293,8 @@ class While : public Expression {
 
     virtual bool can_evaluate_to_function() const;
     virtual bool can_evaluate_to_boolean() const;
+    virtual void validate_no_free_break() const;
+    virtual void validate_no_break_with_value() const;
 };
 
 } // namespace evaluator

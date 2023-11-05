@@ -55,4 +55,12 @@ void Return::display(std::ostream& stream, size_t depth) const {
 bool Return::can_evaluate_to_function() const { return false; }
 bool Return::can_evaluate_to_boolean() const { return false; }
 
+void Return::validate_no_free_break() const {
+    this->expression->validate_no_free_break();
+}
+
+void Return::validate_no_break_with_value() const {
+    this->expression->validate_no_break_with_value();
+}
+
 } // namespace evaluator

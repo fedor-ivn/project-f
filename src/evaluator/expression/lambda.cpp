@@ -33,6 +33,7 @@ Lambda::parse(Span span, std::shared_ptr<ast::List> arguments) {
     auto parameters = Parameters::parse(parameter_list);
 
     auto body = Body::parse(cons->right);
+    body.validate_no_free_break();
 
     return std::make_unique<Lambda>(
         Lambda(span, std::move(parameters), std::move(body))
@@ -61,5 +62,7 @@ void Lambda::display(std::ostream& stream, size_t depth) const {
 
 bool Lambda::can_evaluate_to_function() const { return true; }
 bool Lambda::can_evaluate_to_boolean() const { return false; }
+void Lambda::validate_no_free_break() const {}
+void Lambda::validate_no_break_with_value() const {}
 
 } // namespace evaluator

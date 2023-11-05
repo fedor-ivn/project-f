@@ -64,4 +64,7 @@ bool Prog::can_evaluate_to_boolean() const {
     return this->body.can_evaluate_to_boolean();
 }
 
+void Prog::validate_no_free_break() const {}
+void Prog::validate_no_break_with_value() const {}
+
 } // namespace evaluator

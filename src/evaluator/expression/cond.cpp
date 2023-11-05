@@ -97,4 +97,16 @@ bool Cond::can_evaluate_to_boolean() const {
            this->otherwise->can_evaluate_to_boolean();
 }
 
+void Cond::validate_no_free_break() const {
+    this->condition->validate_no_free_break();
+    this->then->validate_no_free_break();
+    this->otherwise->validate_no_free_break();
+}
+
+void Cond::validate_no_break_with_value() const {
+    this->condition->validate_no_break_with_value();
+    this->then->validate_no_break_with_value();
+    this->otherwise->validate_no_break_with_value();
+}
+
 } // namespace evaluator

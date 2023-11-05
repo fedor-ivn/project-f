@@ -55,4 +55,17 @@ void Break::display(std::ostream& stream, size_t depth) const {
 bool Break::can_evaluate_to_function() const { return false; }
 bool Break::can_evaluate_to_boolean() const { return false; }
 
+void Break::validate_no_free_break() const {
+    throw EvaluationError("`break` outside `while` or `prog`", this->span);
+}
+
+void Break::validate_no_break_with_value() const {
+    // Detect if the value was explicitly specified
+    if (this->expression->span.end != this->span.end) {
+        throw EvaluationError(
+            "cannot break out of a `while` loop with a value", this->span
+        );
+    }
+}
+
 } // namespace evaluator

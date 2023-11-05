@@ -58,4 +58,16 @@ bool Body::can_evaluate_to_boolean() const {
            this->body[this->body.size() - 1]->can_evaluate_to_boolean();
 }
 
+void Body::validate_no_free_break() const {
+    for (auto const& expression : this->body) {
+        expression->validate_no_free_break();
+    }
+}
+
+void Body::validate_no_break_with_value() const {
+    for (auto const& expression : this->body) {
+        expression->validate_no_break_with_value();
+    }
+}
+
 } // namespace evaluator

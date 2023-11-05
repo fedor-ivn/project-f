@@ -31,6 +31,7 @@ While::parse(Span span, std::shared_ptr<List> arguments) {
     }
 
     auto body = Body::parse(cons->right);
+    body.validate_no_break_with_value();
 
     return std::make_unique<While>(
         While(span, std::move(condition), std::move(body))
@@ -59,5 +60,7 @@ void While::display(std::ostream& stream, size_t depth) const {
 
 bool While::can_evaluate_to_function() const { return false; }
 bool While::can_evaluate_to_boolean() const { return false; }
+void While::validate_no_free_break() const {}
+void While::validate_no_break_with_value() const {}
 
 } // namespace evaluator

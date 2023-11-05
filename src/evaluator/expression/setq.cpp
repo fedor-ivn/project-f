@@ -76,4 +76,12 @@ bool Setq::can_evaluate_to_boolean() const {
     return this->initializer->can_evaluate_to_boolean();
 }
 
+void Setq::validate_no_free_break() const {
+    this->initializer->validate_no_free_break();
+}
+
+void Setq::validate_no_break_with_value() const {
+    this->initializer->validate_no_break_with_value();
+}
+
 } // namespace evaluator

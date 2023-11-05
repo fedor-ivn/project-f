@@ -50,6 +50,7 @@ std::unique_ptr<Func> Func::parse(Span span, std::shared_ptr<List> arguments) {
     auto parameters = Parameters::parse(parameter_list);
 
     auto body = Body::parse(cons->right);
+    body.validate_no_free_break();
 
     return std::make_unique<Func>(
         Func(span, name, std::move(parameters), std::move(body))
@@ -81,5 +82,7 @@ void Func::display(std::ostream& stream, size_t depth) const {
 
 bool Func::can_evaluate_to_function() const { return true; }
 bool Func::can_evaluate_to_boolean() const { return false; }
+void Func::validate_no_free_break() const {}
+void Func::validate_no_break_with_value() const {}
 
 } // namespace evaluator

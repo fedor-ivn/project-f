@@ -13,7 +13,10 @@ Program Program::parse(std::vector<std::shared_ptr<Element>> ast) {
     for (auto& element : ast) {
         program.push_back(Expression::parse(element));
     }
-    return Program(Body(std::move(program)));
+
+    Body body(std::move(program));
+    body.validate_no_free_break();
+    return Program(std::move(body));
 }
 
 std::shared_ptr<Element> Program::evaluate() const {
