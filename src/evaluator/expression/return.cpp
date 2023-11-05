@@ -19,7 +19,7 @@ std::unique_ptr<Return> Return::parse(std::shared_ptr<List> arguments) {
         return std::make_unique<Return>(Return(std::make_unique<Quote>(null)));
     }
 
-    auto expression = Expression::from_element(cons->left);
+    auto expression = Expression::parse(cons->left);
 
     cons = cons->right->to_cons();
     if (cons) {

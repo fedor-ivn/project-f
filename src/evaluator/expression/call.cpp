@@ -15,7 +15,7 @@ Call::Call(
     : function(std::move(function)), arguments(std::move(arguments)) {}
 
 std::unique_ptr<Call> Call::parse(Cons const& form) {
-    auto function = Expression::from_element(form.left);
+    auto function = Expression::parse(form.left);
     if (!function->can_evaluate_to_function()) {
         throw EvaluationError(
             "function (or a special form) expected, but this expression will "
@@ -27,7 +27,7 @@ std::unique_ptr<Call> Call::parse(Cons const& form) {
     std::vector<std::unique_ptr<Expression>> arguments;
     auto cons = form.right->to_cons();
     while (cons) {
-        arguments.push_back(Expression::from_element(cons->left));
+        arguments.push_back(Expression::parse(cons->left));
         cons = cons->right->to_cons();
     }
 

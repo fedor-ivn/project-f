@@ -9,7 +9,7 @@ namespace evaluator {
 class Expression {
   public:
     static std::unique_ptr<Expression>
-    from_element(std::shared_ptr<ast::Element> element);
+    parse(std::shared_ptr<ast::Element> element);
 
     virtual ~Expression() = default;
 

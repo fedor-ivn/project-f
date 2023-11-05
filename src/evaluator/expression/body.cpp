@@ -19,7 +19,7 @@ Body Body::parse(std::shared_ptr<List> unparsed) {
 
     auto cons = unparsed->to_cons();
     while (cons) {
-        body.push_back(Expression::from_element(cons->left));
+        body.push_back(Expression::parse(cons->left));
         cons = cons->right->to_cons();
     }
     return Body(std::move(body));

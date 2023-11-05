@@ -4,8 +4,8 @@ namespace evaluator {
 
 using ast::Element;
 
-std::unique_ptr<Expression>
-Expression::from_element(std::shared_ptr<Element> element) {
+std::unique_ptr<Expression> Expression::parse(std::shared_ptr<Element> element
+) {
     if (auto cons = element->to_cons()) {
         auto symbol = cons->left->to_symbol();
         auto arguments = cons->right;

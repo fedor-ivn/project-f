@@ -18,7 +18,7 @@ std::unique_ptr<While> While::parse(std::shared_ptr<List> arguments) {
         throw EvaluationError("`while` is empty", form_span);
     }
 
-    auto condition = Expression::from_element(cons->left);
+    auto condition = Expression::parse(cons->left);
     if (!condition->can_evaluate_to_boolean()) {
         throw EvaluationError(
             "a boolean is expected, but this expression will never evaluate to "

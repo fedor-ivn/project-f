@@ -35,7 +35,7 @@ std::unique_ptr<Setq> Setq::parse(std::shared_ptr<List> arguments) {
         throw EvaluationError("`setq` without an initializer", form_span);
     }
 
-    auto expression = Expression::from_element(cons->left);
+    auto expression = Expression::parse(cons->left);
 
     cons = cons->right->to_cons();
     if (cons) {

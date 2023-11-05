@@ -28,7 +28,7 @@ std::unique_ptr<Cond> Cond::parse(std::shared_ptr<List> arguments) {
         );
     }
 
-    auto condition = Expression::from_element(cons->left);
+    auto condition = Expression::parse(cons->left);
     if (!condition->can_evaluate_to_boolean()) {
         throw EvaluationError(
             "a boolean is expected, but this expression will never evaluate to "
@@ -44,21 +44,20 @@ std::unique_ptr<Cond> Cond::parse(std::shared_ptr<List> arguments) {
     }
     cons = cons->right->to_cons();
 
-    auto then = Expression::from_element(cons->left);
+    auto then = Expression::parse(cons->left);
 
     cons = cons->right->to_cons();
 
     std::unique_ptr<Expression> otherwise;
     if (cons) {
-        otherwise = Expression::from_element(cons->left);
+        otherwise = Expression::parse(cons->left);
 
         if (cons->right->to_cons()) {
             throw EvaluationError("`cond` has extra arguments", cons->span);
         }
     } else {
-        otherwise = Expression::from_element(
-            std::make_shared<Null>(Null(arguments->span))
-        );
+        otherwise =
+            Expression::parse(std::make_shared<Null>(Null(arguments->span)));
     }
 
     auto cond =

@@ -11,7 +11,7 @@ Program::Program(Body body) : program(std::move(body)) {}
 Program Program::parse(std::vector<std::shared_ptr<Element>> ast) {
     std::vector<std::unique_ptr<Expression>> program;
     for (auto&& element : ast) {
-        program.push_back(Expression::from_element(std::move(element)));
+        program.push_back(Expression::parse(std::move(element)));
     }
     return Program(Body(std::move(program)));
 }
