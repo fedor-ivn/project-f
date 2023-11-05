@@ -8,6 +8,10 @@ namespace evaluator {
 
 class Expression {
   public:
+    ast::Span span;
+
+    Expression(ast::Span span);
+
     static std::unique_ptr<Expression>
     parse(std::shared_ptr<ast::Element> element);
 
@@ -21,10 +25,13 @@ class Expression {
 };
 
 class Parameters {
+    ast::Span span;
     std::vector<std::shared_ptr<ast::Symbol>> parameters;
 
   public:
-    Parameters(std::vector<std::shared_ptr<ast::Symbol>> parameters);
+    Parameters(
+        ast::Span span, std::vector<std::shared_ptr<ast::Symbol>> parameters
+    );
 
     static Parameters parse(std::shared_ptr<ast::List> parameter_list);
 
@@ -82,9 +89,10 @@ class Quote : public Expression {
     std::shared_ptr<ast::Element> element;
 
   public:
-    Quote(std::shared_ptr<ast::Element> element);
+    Quote(ast::Span span, std::shared_ptr<ast::Element> element);
 
-    static std::unique_ptr<Quote> parse(std::shared_ptr<ast::List> arguments);
+    static std::unique_ptr<Quote>
+    parse(ast::Span span, std::shared_ptr<ast::List> arguments);
 
     virtual std::shared_ptr<ast::Element> evaluate() const;
     virtual void display(std::ostream& stream, size_t depth) const;
@@ -99,11 +107,13 @@ class Setq : public Expression {
 
   public:
     Setq(
+        ast::Span span,
         std::shared_ptr<ast::Symbol> symbol,
         std::unique_ptr<Expression> expression
     );
 
-    static std::unique_ptr<Setq> parse(std::shared_ptr<ast::List> arguments);
+    static std::unique_ptr<Setq>
+    parse(ast::Span span, std::shared_ptr<ast::List> arguments);
 
     virtual std::shared_ptr<ast::Element> evaluate() const;
     virtual void display(std::ostream& stream, size_t depth) const;
@@ -119,12 +129,14 @@ class Cond : public Expression {
 
   public:
     Cond(
+        ast::Span span,
         std::unique_ptr<Expression> condition,
         std::unique_ptr<Expression> then,
         std::unique_ptr<Expression> otherwise
     );
 
-    static std::unique_ptr<Cond> parse(std::shared_ptr<ast::List> arguments);
+    static std::unique_ptr<Cond>
+    parse(ast::Span span, std::shared_ptr<ast::List> arguments);
 
     virtual std::shared_ptr<ast::Element> evaluate() const;
     virtual void display(std::ostream& stream, size_t depth) const;
@@ -137,9 +149,10 @@ class Return : public Expression {
     std::unique_ptr<Expression> expression;
 
   public:
-    Return(std::unique_ptr<Expression> expression);
+    Return(ast::Span span, std::unique_ptr<Expression> expression);
 
-    static std::unique_ptr<Return> parse(std::shared_ptr<ast::List> arguments);
+    static std::unique_ptr<Return>
+    parse(ast::Span span, std::shared_ptr<ast::List> arguments);
 
     virtual std::shared_ptr<ast::Element> evaluate() const;
     virtual void display(std::ostream& stream, size_t depth) const;
@@ -152,9 +165,10 @@ class Break : public Expression {
     std::unique_ptr<Expression> expression;
 
   public:
-    Break(std::unique_ptr<Expression> expression);
+    Break(ast::Span span, std::unique_ptr<Expression> expression);
 
-    static std::unique_ptr<Break> parse(std::shared_ptr<ast::List> arguments);
+    static std::unique_ptr<Break>
+    parse(ast::Span span, std::shared_ptr<ast::List> arguments);
 
     virtual std::shared_ptr<ast::Element> evaluate() const;
     virtual void display(std::ostream& stream, size_t depth) const;
@@ -169,11 +183,12 @@ class Call : public Expression {
 
   public:
     Call(
+        ast::Span span,
         std::unique_ptr<Expression> function,
         std::vector<std::unique_ptr<Expression>> arguments
     );
 
-    static std::unique_ptr<Call> parse(ast::Cons const& arguments);
+    static std::unique_ptr<Call> parse(std::shared_ptr<ast::Cons> arguments);
 
     virtual std::shared_ptr<ast::Element> evaluate() const;
     virtual void display(std::ostream& stream, size_t depth) const;
@@ -188,9 +203,15 @@ class Func : public Expression {
     Body body;
 
   public:
-    Func(std::shared_ptr<ast::Symbol> name, Parameters parameters, Body body);
+    Func(
+        ast::Span span,
+        std::shared_ptr<ast::Symbol> name,
+        Parameters parameters,
+        Body body
+    );
 
-    static std::unique_ptr<Func> parse(std::shared_ptr<ast::List> arguments);
+    static std::unique_ptr<Func>
+    parse(ast::Span span, std::shared_ptr<ast::List> arguments);
 
     virtual std::shared_ptr<ast::Element> evaluate() const;
     virtual void display(std::ostream& stream, size_t depth) const;
@@ -204,9 +225,10 @@ class Lambda : public Expression {
     Body body;
 
   public:
-    Lambda(Parameters parameters, Body body);
+    Lambda(ast::Span span, Parameters parameters, Body body);
 
-    static std::unique_ptr<Lambda> parse(std::shared_ptr<ast::List> arguments);
+    static std::unique_ptr<Lambda>
+    parse(ast::Span span, std::shared_ptr<ast::List> arguments);
 
     virtual std::shared_ptr<ast::Element> evaluate() const;
     virtual void display(std::ostream& stream, size_t depth) const;
@@ -220,9 +242,10 @@ class Prog : public Expression {
     Body body;
 
   public:
-    Prog(Parameters variables, Body body);
+    Prog(ast::Span span, Parameters variables, Body body);
 
-    static std::unique_ptr<Prog> parse(std::shared_ptr<ast::List> arguments);
+    static std::unique_ptr<Prog>
+    parse(ast::Span span, std::shared_ptr<ast::List> arguments);
 
     virtual std::shared_ptr<ast::Element> evaluate() const;
     virtual void display(std::ostream& stream, size_t depth) const;
@@ -236,9 +259,10 @@ class While : public Expression {
     Body body;
 
   public:
-    While(std::unique_ptr<Expression> condition, Body body);
+    While(ast::Span span, std::unique_ptr<Expression> condition, Body body);
 
-    static std::unique_ptr<While> parse(std::shared_ptr<ast::List> arguments);
+    static std::unique_ptr<While>
+    parse(ast::Span span, std::shared_ptr<ast::List> arguments);
 
     virtual std::shared_ptr<ast::Element> evaluate() const;
     virtual void display(std::ostream& stream, size_t depth) const;

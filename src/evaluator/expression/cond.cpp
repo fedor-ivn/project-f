@@ -7,24 +7,26 @@ namespace evaluator {
 using ast::Element;
 using ast::List;
 using ast::Null;
+using ast::Span;
 using utils::Depth;
 using utils::to_cons;
 
 Cond::Cond(
+    Span span,
     std::unique_ptr<Expression> condition,
     std::unique_ptr<Expression> then,
     std::unique_ptr<Expression> otherwise
 )
-    : Expression(), condition(std::move(condition)), then(std::move(then)),
+    : Expression(span), condition(std::move(condition)), then(std::move(then)),
       otherwise(std::move(otherwise)) {}
 
-std::unique_ptr<Cond> Cond::parse(std::shared_ptr<List> arguments) {
+std::unique_ptr<Cond> Cond::parse(Span span, std::shared_ptr<List> arguments) {
     auto cons = to_cons(arguments);
     if (!cons) {
         throw EvaluationError(
             "`cond` needs a condition, a `then` branch, and optionally an "
             "`else` branch",
-            arguments->span
+            span
         );
     }
 
@@ -33,15 +35,13 @@ std::unique_ptr<Cond> Cond::parse(std::shared_ptr<List> arguments) {
         throw EvaluationError(
             "a boolean is expected, but this expression will never evaluate to "
             "a boolean",
-            cons->left->span
+            condition->span
         );
     }
 
     cons = to_cons(cons->right);
     if (!cons) {
-        throw EvaluationError(
-            "`cond` needs at least a `then` branch", cons->span
-        );
+        throw EvaluationError("`cond` needs at least a `then` branch", span);
     }
     auto then = Expression::parse(cons->left);
 
@@ -59,7 +59,7 @@ std::unique_ptr<Cond> Cond::parse(std::shared_ptr<List> arguments) {
     }
 
     auto cond =
-        Cond(std::move(condition), std::move(then), std::move(otherwise));
+        Cond(span, std::move(condition), std::move(then), std::move(otherwise));
     return std::make_unique<Cond>(std::move(cond));
 }
 
@@ -81,6 +81,8 @@ void Cond::display(std::ostream& stream, size_t depth) const {
     stream << Depth(depth + 1) << "otherwise = ";
     this->otherwise->display(stream, depth + 1);
     stream << "\n";
+
+    stream << Depth(depth + 1) << "span = " << this->span << '\n';
 
     stream << Depth(depth) << '}';
 }

@@ -7,11 +7,14 @@
 namespace evaluator {
 
 using ast::List;
+using ast::Span;
 using utils::Depth;
 using utils::to_cons;
 
-Parameters::Parameters(std::vector<std::shared_ptr<ast::Symbol>> parameters)
-    : parameters(std::move(parameters)) {}
+Parameters::Parameters(
+    Span span, std::vector<std::shared_ptr<ast::Symbol>> parameters
+)
+    : span(span), parameters(std::move(parameters)) {}
 
 Parameters Parameters::parse(std::shared_ptr<List> parameter_list) {
     std::vector<std::shared_ptr<ast::Symbol>> parameters;
@@ -42,11 +45,11 @@ Parameters Parameters::parse(std::shared_ptr<List> parameter_list) {
         cons = to_cons(cons->right);
     }
 
-    return Parameters(std::move(parameters));
+    return Parameters(parameter_list->span, std::move(parameters));
 }
 
 void Parameters::display(std::ostream& stream, size_t depth) const {
-    stream << "Parameters [\n";
+    stream << "Parameters(" << this->span << ") [\n";
     for (auto const& parameter : this->parameters) {
         stream << Depth(depth + 1) << parameter->display_verbose(depth + 1)
                << ",\n";

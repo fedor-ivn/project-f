@@ -6,17 +6,20 @@ namespace evaluator {
 
 using ast::Element;
 using ast::List;
+using ast::Span;
 using utils::Depth;
 using utils::to_cons;
 
-Lambda::Lambda(Parameters parameters, Body body)
-    : Expression(), parameters(std::move(parameters)), body(std::move(body)) {}
+Lambda::Lambda(Span span, Parameters parameters, Body body)
+    : Expression(span), parameters(std::move(parameters)),
+      body(std::move(body)) {}
 
-std::unique_ptr<Lambda> Lambda::parse(std::shared_ptr<ast::List> arguments) {
+std::unique_ptr<Lambda>
+Lambda::parse(Span span, std::shared_ptr<ast::List> arguments) {
     auto cons = to_cons(arguments);
     if (!cons) {
         throw EvaluationError(
-            "`lambda` needs a parameter list and a body", arguments->span
+            "`lambda` needs a parameter list and a body", span
         );
     }
 
@@ -32,7 +35,7 @@ std::unique_ptr<Lambda> Lambda::parse(std::shared_ptr<ast::List> arguments) {
     auto body = Body::parse(cons->right);
 
     return std::make_unique<Lambda>(
-        Lambda(std::move(parameters), std::move(body))
+        Lambda(span, std::move(parameters), std::move(body))
     );
 }
 
@@ -50,6 +53,8 @@ void Lambda::display(std::ostream& stream, size_t depth) const {
     stream << Depth(depth + 1) << "body = ";
     this->body.display(stream, depth + 1);
     stream << '\n';
+
+    stream << Depth(depth + 1) << "span = " << this->span << '\n';
 
     stream << Depth(depth) << '}';
 }

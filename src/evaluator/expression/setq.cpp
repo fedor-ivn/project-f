@@ -6,20 +6,22 @@ namespace evaluator {
 
 using ast::Element;
 using ast::List;
+using ast::Span;
 using utils::Depth;
 using utils::to_cons;
 
 Setq::Setq(
-    std::shared_ptr<ast::Symbol> symbol, std::unique_ptr<Expression> expression
+    Span span,
+    std::shared_ptr<ast::Symbol> symbol,
+    std::unique_ptr<Expression> expression
 )
-    : Expression(), variable(symbol), initializer(std::move(expression)) {}
+    : Expression(span), variable(symbol), initializer(std::move(expression)) {}
 
-std::unique_ptr<Setq> Setq::parse(std::shared_ptr<List> arguments) {
-    auto form_span = arguments->span;
+std::unique_ptr<Setq> Setq::parse(Span span, std::shared_ptr<List> arguments) {
     auto cons = to_cons(arguments);
     if (!cons) {
         throw EvaluationError(
-            "`setq` without a variable name and an initializer", form_span
+            "`setq` without a variable name and an initializer", span
         );
     }
 
@@ -33,7 +35,7 @@ std::unique_ptr<Setq> Setq::parse(std::shared_ptr<List> arguments) {
 
     cons = to_cons(cons->right);
     if (!cons) {
-        throw EvaluationError("`setq` without an initializer", form_span);
+        throw EvaluationError("`setq` without an initializer", span);
     }
 
     auto expression = Expression::parse(cons->left);
@@ -43,7 +45,7 @@ std::unique_ptr<Setq> Setq::parse(std::shared_ptr<List> arguments) {
         throw EvaluationError("`setq` has extra arguments", cons->span);
     }
 
-    return std::make_unique<Setq>(Setq(symbol, std::move(expression)));
+    return std::make_unique<Setq>(Setq(span, symbol, std::move(expression)));
 }
 
 std::shared_ptr<Element> Setq::evaluate() const {
@@ -60,6 +62,8 @@ void Setq::display(std::ostream& stream, size_t depth) const {
     stream << Depth(depth + 1) << "initializer = ";
     this->initializer->display(stream, depth + 1);
     stream << '\n';
+
+    stream << Depth(depth + 1) << "span = " << this->span << '\n';
 
     stream << Depth(depth) << '}';
 }

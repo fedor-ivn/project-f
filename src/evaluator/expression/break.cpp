@@ -7,17 +7,23 @@ namespace evaluator {
 using ast::Element;
 using ast::List;
 using ast::Null;
+using ast::Span;
 using utils::Depth;
 using utils::to_cons;
 
-Break::Break(std::unique_ptr<Expression> expression)
-    : Expression(), expression(std::move(expression)) {}
+Break::Break(Span span, std::unique_ptr<Expression> expression)
+    : Expression(span), expression(std::move(expression)) {}
 
-std::unique_ptr<Break> Break::parse(std::shared_ptr<List> arguments) {
+std::unique_ptr<Break>
+Break::parse(Span span, std::shared_ptr<List> arguments) {
     auto cons = to_cons(arguments);
     if (!cons) {
-        auto null = Quote(std::make_shared<Null>(Null(arguments->span)));
-        return std::make_unique<Break>(Break(std::make_unique<Quote>(null)));
+        auto null = Quote(
+            arguments->span, std::make_shared<Null>(Null(arguments->span))
+        );
+        return std::make_unique<Break>(
+            Break(span, std::make_unique<Quote>(null))
+        );
     }
 
     auto expression = Expression::parse(cons->left);
@@ -27,7 +33,7 @@ std::unique_ptr<Break> Break::parse(std::shared_ptr<List> arguments) {
         throw EvaluationError("`break` has extra arguments", cons->span);
     }
 
-    return std::make_unique<Break>(Break(std::move(expression)));
+    return std::make_unique<Break>(Break(span, std::move(expression)));
 }
 
 std::shared_ptr<Element> Break::evaluate() const {
@@ -40,6 +46,8 @@ void Break::display(std::ostream& stream, size_t depth) const {
     stream << Depth(depth + 1) << "expression = ";
     this->expression->display(stream, depth + 1);
     stream << '\n';
+
+    stream << Depth(depth + 1) << "span = " << this->span << '\n';
 
     stream << Depth(depth) << '}';
 }

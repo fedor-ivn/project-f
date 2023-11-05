@@ -6,34 +6,37 @@ namespace evaluator {
 
 using ast::Cons;
 using ast::Element;
+using ast::Span;
 using utils::Depth;
 using utils::to_cons;
 
 Call::Call(
+    Span span,
     std::unique_ptr<Expression> function,
     std::vector<std::unique_ptr<Expression>> arguments
 )
-    : function(std::move(function)), arguments(std::move(arguments)) {}
+    : Expression(span), function(std::move(function)),
+      arguments(std::move(arguments)) {}
 
-std::unique_ptr<Call> Call::parse(Cons const& form) {
-    auto function = Expression::parse(form.left);
+std::unique_ptr<Call> Call::parse(std::shared_ptr<Cons> form) {
+    auto function = Expression::parse(form->left);
     if (!function->can_evaluate_to_function()) {
         throw EvaluationError(
             "function (or a special form) expected, but this expression will "
             "never evaluate to a function",
-            form.left->span
+            function->span
         );
     }
 
     std::vector<std::unique_ptr<Expression>> arguments;
-    auto cons = to_cons(form.right);
+    auto cons = to_cons(form->right);
     while (cons) {
         arguments.push_back(Expression::parse(cons->left));
         cons = to_cons(cons->right);
     }
 
     return std::make_unique<Call>(
-        Call(std::move(function), std::move(arguments))
+        Call(form->span, std::move(function), std::move(arguments))
     );
 }
 
@@ -55,6 +58,8 @@ void Call::display(std::ostream& stream, size_t depth) const {
         stream << ",\n";
     }
     stream << Depth(depth + 1) << "]\n";
+
+    stream << Depth(depth + 1) << "span = " << this->span << '\n';
 
     stream << Depth(depth) << '}';
 }

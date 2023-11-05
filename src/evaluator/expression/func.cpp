@@ -6,19 +6,24 @@ namespace evaluator {
 
 using ast::Element;
 using ast::List;
+using ast::Span;
 using utils::Depth;
 using utils::to_cons;
 
-Func::Func(std::shared_ptr<ast::Symbol> name, Parameters parameters, Body body)
-    : Expression(), name(name), parameters(std::move(parameters)),
+Func::Func(
+    Span span,
+    std::shared_ptr<ast::Symbol> name,
+    Parameters parameters,
+    Body body
+)
+    : Expression(span), name(name), parameters(std::move(parameters)),
       body(std::move(body)) {}
 
-std::unique_ptr<Func> Func::parse(std::shared_ptr<List> arguments) {
+std::unique_ptr<Func> Func::parse(Span span, std::shared_ptr<List> arguments) {
     auto cons = to_cons(arguments);
     if (!cons) {
         throw EvaluationError(
-            "`func` needs a function name, a parameter list and a body",
-            arguments->span
+            "`func` needs a function name, a parameter list and a body", span
         );
     }
 
@@ -32,9 +37,7 @@ std::unique_ptr<Func> Func::parse(std::shared_ptr<List> arguments) {
 
     cons = to_cons(cons->right);
     if (!cons) {
-        throw EvaluationError(
-            "`func` needs a parameter list and a body", cons->span
-        );
+        throw EvaluationError("`func` needs a parameter list and a body", span);
     }
 
     auto parameter_list = std::dynamic_pointer_cast<List>(cons->left);
@@ -49,7 +52,7 @@ std::unique_ptr<Func> Func::parse(std::shared_ptr<List> arguments) {
     auto body = Body::parse(cons->right);
 
     return std::make_unique<Func>(
-        Func(name, std::move(parameters), std::move(body))
+        Func(span, name, std::move(parameters), std::move(body))
     );
 }
 
@@ -70,6 +73,8 @@ void Func::display(std::ostream& stream, size_t depth) const {
     stream << Depth(depth + 1) << "body = ";
     this->body.display(stream, depth + 1);
     stream << '\n';
+
+    stream << Depth(depth + 1) << "span = " << this->span << '\n';
 
     stream << Depth(depth) << '}';
 }

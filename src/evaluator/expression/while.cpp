@@ -6,17 +6,19 @@ namespace evaluator {
 
 using ast::Element;
 using ast::List;
+using ast::Span;
 using utils::Depth;
 using utils::to_cons;
 
-While::While(std::unique_ptr<Expression> condition, Body body)
-    : Expression(), condition(std::move(condition)), body(std::move(body)) {}
+While::While(Span span, std::unique_ptr<Expression> condition, Body body)
+    : Expression(span), condition(std::move(condition)), body(std::move(body)) {
+}
 
-std::unique_ptr<While> While::parse(std::shared_ptr<List> arguments) {
-    auto form_span = arguments->span;
+std::unique_ptr<While>
+While::parse(Span span, std::shared_ptr<List> arguments) {
     auto cons = to_cons(arguments);
     if (!cons) {
-        throw EvaluationError("`while` is empty", form_span);
+        throw EvaluationError("`while` is empty", span);
     }
 
     auto condition = Expression::parse(cons->left);
@@ -30,7 +32,8 @@ std::unique_ptr<While> While::parse(std::shared_ptr<List> arguments) {
 
     auto body = Body::parse(cons->right);
 
-    return std::make_unique<While>(While(std::move(condition), std::move(body))
+    return std::make_unique<While>(
+        While(span, std::move(condition), std::move(body))
     );
 }
 
@@ -48,6 +51,8 @@ void While::display(std::ostream& stream, size_t depth) const {
     stream << Depth(depth + 1) << "body = ";
     this->body.display(stream, depth + 1);
     stream << '\n';
+
+    stream << Depth(depth + 1) << "span = " << this->span << '\n';
 
     stream << Depth(depth) << '}';
 }
