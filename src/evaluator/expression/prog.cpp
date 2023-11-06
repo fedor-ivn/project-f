@@ -56,14 +56,33 @@ void Prog::display(std::ostream& stream, size_t depth) const {
     stream << Depth(depth) << '}';
 }
 
-bool Prog::can_evaluate_to_function() const {
-    return this->body.can_evaluate_to_function();
+bool Prog::returns() const {
+    for (auto const& expression : this->body.body) {
+        if (expression->returns()) {
+            return true;
+        }
+    }
+
+    return false;
 }
 
-bool Prog::can_evaluate_to_boolean() const {
-    return this->body.can_evaluate_to_boolean();
+bool Prog::breaks() const { return false; }
+
+bool Prog::can_evaluate_to(ast::ElementKind kind) const {
+    for (auto const& expression : this->body.body) {
+        if (expression->can_break_with(kind)) {
+            return true;
+        }
+        if (expression->diverges()) {
+            return false;
+        }
+    }
+
+    return this->body.body.size() > 0 &&
+           this->body.body.back()->can_evaluate_to(kind);
 }
 
+bool Prog::can_break_with(ast::ElementKind) const { return false; }
 void Prog::validate_no_free_break() const {}
 void Prog::validate_no_break_with_value() const {}
 

@@ -45,10 +45,12 @@ void Quote::display(std::ostream& stream, size_t depth) const {
     stream << Depth(depth) << '}';
 }
 
-bool Quote::can_evaluate_to_function() const { return false; }
-bool Quote::can_evaluate_to_boolean() const {
-    return bool(std::dynamic_pointer_cast<Boolean>(this->element));
+bool Quote::returns() const { return false; }
+bool Quote::breaks() const { return false; }
+bool Quote::can_evaluate_to(ast::ElementKind kind) const {
+    return this->element->kind == kind;
 }
+bool Quote::can_break_with(ast::ElementKind) const { return false; }
 void Quote::validate_no_free_break() const {}
 void Quote::validate_no_break_with_value() const {}
 

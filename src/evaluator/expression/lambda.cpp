@@ -60,8 +60,12 @@ void Lambda::display(std::ostream& stream, size_t depth) const {
     stream << Depth(depth) << '}';
 }
 
-bool Lambda::can_evaluate_to_function() const { return true; }
-bool Lambda::can_evaluate_to_boolean() const { return false; }
+bool Lambda::returns() const { return false; }
+bool Lambda::breaks() const { return false; }
+bool Lambda::can_evaluate_to(ast::ElementKind kind) const {
+    return kind == ast::ElementKind::FUNCTION;
+}
+bool Lambda::can_break_with(ast::ElementKind) const { return false; }
 void Lambda::validate_no_free_break() const {}
 void Lambda::validate_no_break_with_value() const {}
 

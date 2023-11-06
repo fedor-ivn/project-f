@@ -52,8 +52,14 @@ void Break::display(std::ostream& stream, size_t depth) const {
     stream << Depth(depth) << '}';
 }
 
-bool Break::can_evaluate_to_function() const { return false; }
-bool Break::can_evaluate_to_boolean() const { return false; }
+bool Break::returns() const { return this->expression->returns(); }
+bool Break::breaks() const { return !this->returns(); }
+bool Break::can_evaluate_to(ast::ElementKind) const { return false; }
+
+bool Break::can_break_with(ast::ElementKind kind) const {
+    return this->expression->can_break_with(kind) ||
+           this->expression->can_evaluate_to(kind);
+}
 
 void Break::validate_no_free_break() const {
     throw EvaluationError("`break` outside `while` or `prog`", this->span);

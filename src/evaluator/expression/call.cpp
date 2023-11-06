@@ -20,7 +20,7 @@ Call::Call(
 
 std::unique_ptr<Call> Call::parse(std::shared_ptr<Cons> form) {
     auto function = Expression::parse(form->left);
-    if (!function->can_evaluate_to_function()) {
+    if (!function->can_evaluate_to(ast::ElementKind::FUNCTION)) {
         throw EvaluationError(
             "a function (or a special form) is expected, but this expression "
             "will never evaluate to a function",
@@ -64,8 +64,55 @@ void Call::display(std::ostream& stream, size_t depth) const {
     stream << Depth(depth) << '}';
 }
 
-bool Call::can_evaluate_to_function() const { return true; }
-bool Call::can_evaluate_to_boolean() const { return true; }
+bool Call::returns() const {
+    if (this->function->returns()) {
+        return true;
+    }
+
+    for (auto const& argument : this->arguments) {
+        if (argument->returns()) {
+            return true;
+        }
+    }
+
+    return false;
+}
+
+bool Call::breaks() const {
+    if (this->function->breaks()) {
+        return true;
+    }
+
+    for (auto const& argument : this->arguments) {
+        if (argument->breaks()) {
+            return true;
+        }
+    }
+
+    return false;
+}
+
+bool Call::can_evaluate_to(ast::ElementKind) const { return true; }
+
+bool Call::can_break_with(ast::ElementKind kind) const {
+    if (this->function->can_break_with(kind)) {
+        return true;
+    }
+    if (this->function->diverges()) {
+        return false;
+    }
+
+    for (auto const& argument : this->arguments) {
+        if (argument->can_break_with(kind)) {
+            return true;
+        }
+        if (argument->diverges()) {
+            return false;
+        }
+    }
+
+    return false;
+}
 
 void Call::validate_no_free_break() const {
     this->function->validate_no_free_break();

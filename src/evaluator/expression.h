@@ -1,6 +1,7 @@
 #pragma once
 
 #include "../ast/element.h"
+#include "../ast/kind.h"
 #include <memory>
 #include <vector>
 
@@ -20,8 +21,13 @@ class Expression {
     virtual std::shared_ptr<ast::Element> evaluate() const = 0;
     virtual void display(std::ostream& stream, size_t depth) const = 0;
 
-    virtual bool can_evaluate_to_function() const = 0;
-    virtual bool can_evaluate_to_boolean() const = 0;
+    // Returns in the sense "evaluating this expression will always end up
+    // calling `return`"
+    virtual bool returns() const = 0;
+    virtual bool breaks() const = 0;
+    virtual bool diverges() const;
+    virtual bool can_evaluate_to(ast::ElementKind kind) const = 0;
+    virtual bool can_break_with(ast::ElementKind kind) const = 0;
     virtual void validate_no_free_break() const = 0;
     virtual void validate_no_break_with_value() const = 0;
 };
@@ -40,12 +46,10 @@ class Parameters {
     void display(std::ostream& stream, size_t depth) const;
 };
 
-class Program;
-
 class Body {
+  public:
     std::vector<std::unique_ptr<Expression>> body;
 
-  public:
     Body(std::vector<std::unique_ptr<Expression>> body);
 
     static Body parse(std::shared_ptr<ast::List> unparsed);
@@ -54,12 +58,8 @@ class Body {
 
     void display(std::ostream& stream, size_t depth) const;
 
-    bool can_evaluate_to_function() const;
-    bool can_evaluate_to_boolean() const;
     void validate_no_free_break() const;
     void validate_no_break_with_value() const;
-
-    friend std::ostream& operator<<(std::ostream& stream, Program const& self);
 };
 
 class Program {
@@ -85,8 +85,10 @@ class Symbol : public Expression {
     virtual std::shared_ptr<ast::Element> evaluate() const;
     virtual void display(std::ostream& stream, size_t depth) const;
 
-    virtual bool can_evaluate_to_function() const;
-    virtual bool can_evaluate_to_boolean() const;
+    virtual bool returns() const;
+    virtual bool breaks() const;
+    virtual bool can_evaluate_to(ast::ElementKind kind) const;
+    virtual bool can_break_with(ast::ElementKind kind) const;
     virtual void validate_no_free_break() const;
     virtual void validate_no_break_with_value() const;
 };
@@ -103,8 +105,10 @@ class Quote : public Expression {
     virtual std::shared_ptr<ast::Element> evaluate() const;
     virtual void display(std::ostream& stream, size_t depth) const;
 
-    virtual bool can_evaluate_to_function() const;
-    virtual bool can_evaluate_to_boolean() const;
+    virtual bool returns() const;
+    virtual bool breaks() const;
+    virtual bool can_evaluate_to(ast::ElementKind kind) const;
+    virtual bool can_break_with(ast::ElementKind kind) const;
     virtual void validate_no_free_break() const;
     virtual void validate_no_break_with_value() const;
 };
@@ -126,8 +130,10 @@ class Setq : public Expression {
     virtual std::shared_ptr<ast::Element> evaluate() const;
     virtual void display(std::ostream& stream, size_t depth) const;
 
-    virtual bool can_evaluate_to_function() const;
-    virtual bool can_evaluate_to_boolean() const;
+    virtual bool returns() const;
+    virtual bool breaks() const;
+    virtual bool can_evaluate_to(ast::ElementKind kind) const;
+    virtual bool can_break_with(ast::ElementKind kind) const;
     virtual void validate_no_free_break() const;
     virtual void validate_no_break_with_value() const;
 };
@@ -151,8 +157,10 @@ class Cond : public Expression {
     virtual std::shared_ptr<ast::Element> evaluate() const;
     virtual void display(std::ostream& stream, size_t depth) const;
 
-    virtual bool can_evaluate_to_function() const;
-    virtual bool can_evaluate_to_boolean() const;
+    virtual bool returns() const;
+    virtual bool breaks() const;
+    virtual bool can_evaluate_to(ast::ElementKind kind) const;
+    virtual bool can_break_with(ast::ElementKind kind) const;
     virtual void validate_no_free_break() const;
     virtual void validate_no_break_with_value() const;
 };
@@ -169,8 +177,10 @@ class Return : public Expression {
     virtual std::shared_ptr<ast::Element> evaluate() const;
     virtual void display(std::ostream& stream, size_t depth) const;
 
-    virtual bool can_evaluate_to_function() const;
-    virtual bool can_evaluate_to_boolean() const;
+    virtual bool returns() const;
+    virtual bool breaks() const;
+    virtual bool can_evaluate_to(ast::ElementKind kind) const;
+    virtual bool can_break_with(ast::ElementKind kind) const;
     virtual void validate_no_free_break() const;
     virtual void validate_no_break_with_value() const;
 };
@@ -187,8 +197,10 @@ class Break : public Expression {
     virtual std::shared_ptr<ast::Element> evaluate() const;
     virtual void display(std::ostream& stream, size_t depth) const;
 
-    virtual bool can_evaluate_to_function() const;
-    virtual bool can_evaluate_to_boolean() const;
+    virtual bool returns() const;
+    virtual bool breaks() const;
+    virtual bool can_evaluate_to(ast::ElementKind kind) const;
+    virtual bool can_break_with(ast::ElementKind kind) const;
     virtual void validate_no_free_break() const;
     virtual void validate_no_break_with_value() const;
 };
@@ -209,8 +221,10 @@ class Call : public Expression {
     virtual std::shared_ptr<ast::Element> evaluate() const;
     virtual void display(std::ostream& stream, size_t depth) const;
 
-    virtual bool can_evaluate_to_function() const;
-    virtual bool can_evaluate_to_boolean() const;
+    virtual bool returns() const;
+    virtual bool breaks() const;
+    virtual bool can_evaluate_to(ast::ElementKind kind) const;
+    virtual bool can_break_with(ast::ElementKind kind) const;
     virtual void validate_no_free_break() const;
     virtual void validate_no_break_with_value() const;
 };
@@ -234,8 +248,10 @@ class Func : public Expression {
     virtual std::shared_ptr<ast::Element> evaluate() const;
     virtual void display(std::ostream& stream, size_t depth) const;
 
-    virtual bool can_evaluate_to_function() const;
-    virtual bool can_evaluate_to_boolean() const;
+    virtual bool returns() const;
+    virtual bool breaks() const;
+    virtual bool can_evaluate_to(ast::ElementKind kind) const;
+    virtual bool can_break_with(ast::ElementKind kind) const;
     virtual void validate_no_free_break() const;
     virtual void validate_no_break_with_value() const;
 };
@@ -253,8 +269,10 @@ class Lambda : public Expression {
     virtual std::shared_ptr<ast::Element> evaluate() const;
     virtual void display(std::ostream& stream, size_t depth) const;
 
-    virtual bool can_evaluate_to_function() const;
-    virtual bool can_evaluate_to_boolean() const;
+    virtual bool returns() const;
+    virtual bool breaks() const;
+    virtual bool can_evaluate_to(ast::ElementKind kind) const;
+    virtual bool can_break_with(ast::ElementKind kind) const;
     virtual void validate_no_free_break() const;
     virtual void validate_no_break_with_value() const;
 };
@@ -272,8 +290,10 @@ class Prog : public Expression {
     virtual std::shared_ptr<ast::Element> evaluate() const;
     virtual void display(std::ostream& stream, size_t depth) const;
 
-    virtual bool can_evaluate_to_function() const;
-    virtual bool can_evaluate_to_boolean() const;
+    virtual bool returns() const;
+    virtual bool breaks() const;
+    virtual bool can_evaluate_to(ast::ElementKind kind) const;
+    virtual bool can_break_with(ast::ElementKind kind) const;
     virtual void validate_no_free_break() const;
     virtual void validate_no_break_with_value() const;
 };
@@ -291,8 +311,10 @@ class While : public Expression {
     virtual std::shared_ptr<ast::Element> evaluate() const;
     virtual void display(std::ostream& stream, size_t depth) const;
 
-    virtual bool can_evaluate_to_function() const;
-    virtual bool can_evaluate_to_boolean() const;
+    virtual bool returns() const;
+    virtual bool breaks() const;
+    virtual bool can_evaluate_to(ast::ElementKind kind) const;
+    virtual bool can_break_with(ast::ElementKind kind) const;
     virtual void validate_no_free_break() const;
     virtual void validate_no_break_with_value() const;
 };
