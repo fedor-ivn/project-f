@@ -24,8 +24,8 @@ std::unique_ptr<Cond> Cond::parse(Span span, std::shared_ptr<List> arguments) {
     auto cons = to_cons(arguments);
     if (!cons) {
         throw EvaluationError(
-            "`cond` needs a condition, a `then` branch, and optionally an "
-            "`else` branch",
+            "`cond` misses a condition, a `then` branch, and maybe an `else` "
+            "branch",
             span
         );
     }
@@ -41,7 +41,9 @@ std::unique_ptr<Cond> Cond::parse(Span span, std::shared_ptr<List> arguments) {
 
     cons = to_cons(cons->right);
     if (!cons) {
-        throw EvaluationError("`cond` needs at least a `then` branch", span);
+        throw EvaluationError(
+            "`cond` misses a `then` branch and maybe an `else` branch", span
+        );
     }
     auto then = Expression::parse(cons->left);
 

@@ -21,7 +21,7 @@ std::unique_ptr<Setq> Setq::parse(Span span, std::shared_ptr<List> arguments) {
     auto cons = to_cons(arguments);
     if (!cons) {
         throw EvaluationError(
-            "`setq` without a variable name and an initializer", span
+            "`setq` misses a variable name and an initializer", span
         );
     }
 
@@ -35,7 +35,7 @@ std::unique_ptr<Setq> Setq::parse(Span span, std::shared_ptr<List> arguments) {
 
     cons = to_cons(cons->right);
     if (!cons) {
-        throw EvaluationError("`setq` without an initializer", span);
+        throw EvaluationError("`setq` misses an initializer", span);
     }
 
     auto expression = Expression::parse(cons->left);

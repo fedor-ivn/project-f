@@ -23,27 +23,29 @@ std::unique_ptr<Func> Func::parse(Span span, std::shared_ptr<List> arguments) {
     auto cons = to_cons(arguments);
     if (!cons) {
         throw EvaluationError(
-            "`func` needs a function name, a parameter list and a body", span
+            "`func` misses a function name, a parameter list and a body", span
         );
     }
 
     auto name = std::dynamic_pointer_cast<ast::Symbol>(cons->left);
     if (!name) {
         throw EvaluationError(
-            "`func` expected a function name as its first argument",
+            "`func` expects a function name as its first argument",
             cons->left->span
         );
     }
 
     cons = to_cons(cons->right);
     if (!cons) {
-        throw EvaluationError("`func` needs a parameter list and a body", span);
+        throw EvaluationError(
+            "`func` misses a parameter list and a body", span
+        );
     }
 
     auto parameter_list = std::dynamic_pointer_cast<List>(cons->left);
     if (!parameter_list) {
         throw EvaluationError(
-            "`func` expected a parameter list as its second argument",
+            "`func` expects a parameter list as its second argument",
             cons->left->span
         );
     }

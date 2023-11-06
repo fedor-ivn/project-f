@@ -19,7 +19,7 @@ std::unique_ptr<Quote>
 Quote::parse(Span span, std::shared_ptr<List> arguments) {
     auto cons = to_cons(arguments);
     if (!cons) {
-        throw EvaluationError("`quote` is empty", span);
+        throw EvaluationError("`quote` misses an element to quote", span);
     }
 
     auto element = cons->left;

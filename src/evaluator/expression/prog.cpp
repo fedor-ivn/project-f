@@ -17,13 +17,13 @@ Prog::Prog(Span span, Parameters variables, Body body)
 std::unique_ptr<Prog> Prog::parse(Span span, std::shared_ptr<List> arguments) {
     auto cons = to_cons(arguments);
     if (!cons) {
-        throw EvaluationError("`prog` needs a variable list and a body", span);
+        throw EvaluationError("`prog` misses a variable list and a body", span);
     }
 
     auto variable_list = std::dynamic_pointer_cast<List>(cons->left);
     if (!variable_list) {
         throw EvaluationError(
-            "`prog` expected a variable list as its first argument",
+            "`prog` expects a variable list as its first argument",
             cons->left->span
         );
     }

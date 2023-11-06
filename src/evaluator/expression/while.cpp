@@ -18,7 +18,7 @@ std::unique_ptr<While>
 While::parse(Span span, std::shared_ptr<List> arguments) {
     auto cons = to_cons(arguments);
     if (!cons) {
-        throw EvaluationError("`while` is empty", span);
+        throw EvaluationError("`while` misses a condition and a body", span);
     }
 
     auto condition = Expression::parse(cons->left);

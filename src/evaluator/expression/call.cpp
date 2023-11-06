@@ -22,8 +22,8 @@ std::unique_ptr<Call> Call::parse(std::shared_ptr<Cons> form) {
     auto function = Expression::parse(form->left);
     if (!function->can_evaluate_to_function()) {
         throw EvaluationError(
-            "function (or a special form) expected, but this expression will "
-            "never evaluate to a function",
+            "a function (or a special form) is expected, but this expression "
+            "will never evaluate to a function",
             function->span
         );
     }
