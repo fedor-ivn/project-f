@@ -55,7 +55,7 @@ bool Body::can_evaluate_to_function() const {
 
 bool Body::can_evaluate_to_boolean() const {
     return this->body.size() > 0 &&
-           this->body[this->body.size() - 1]->can_evaluate_to_boolean();
+           this->body.back()->can_evaluate_to_boolean();
 }
 
 void Body::validate_no_free_break() const {
