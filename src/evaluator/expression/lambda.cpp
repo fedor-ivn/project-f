@@ -19,14 +19,14 @@ Lambda::parse(Span span, std::shared_ptr<ast::List> arguments) {
     auto cons = to_cons(arguments);
     if (!cons) {
         throw EvaluationError(
-            "`lambda` needs a parameter list and a body", span
+            "`lambda` misses a parameter list and a body", span
         );
     }
 
     auto parameter_list = std::dynamic_pointer_cast<ast::List>(cons->left);
     if (!parameter_list) {
         throw EvaluationError(
-            "`lambda` expected a parameter list as its first argument",
+            "`lambda` expects a parameter list as its first argument",
             cons->left->span
         );
     }
@@ -47,7 +47,7 @@ std::shared_ptr<ast::Element> Lambda::evaluate() const {
 void Lambda::display(std::ostream& stream, size_t depth) const {
     stream << "Lambda {\n";
 
-    stream << Depth(depth + 1) << "arguments = ";
+    stream << Depth(depth + 1) << "parameters = ";
     this->parameters.display(stream, depth + 1);
     stream << '\n';
 

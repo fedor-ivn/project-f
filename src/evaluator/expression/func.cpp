@@ -69,7 +69,7 @@ void Func::display(std::ostream& stream, size_t depth) const {
     stream << Depth(depth + 1)
            << "name = " << this->name->display_verbose(depth + 1) << '\n';
 
-    stream << Depth(depth + 1) << "arguments = ";
+    stream << Depth(depth + 1) << "parameters = ";
     this->parameters.display(stream, depth + 1);
     stream << '\n';
 
