@@ -14,4 +14,8 @@ std::ostream& operator<<(std::ostream& stream, Depth const& self) {
     return stream;
 }
 
+std::shared_ptr<ast::Cons> to_cons(std::shared_ptr<ast::List> list) {
+    return std::dynamic_pointer_cast<ast::Cons>(list);
+}
+
 } // namespace utils

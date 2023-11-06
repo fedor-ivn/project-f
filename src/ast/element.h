@@ -22,13 +22,6 @@ class Element {
     Element(Span span);
     virtual ~Element() = default;
 
-    bool is_null() const;
-    std::optional<int64_t> to_integer() const;
-    std::optional<double> to_real() const;
-    std::optional<bool> to_boolean() const;
-    std::optional<std::string_view> to_symbol() const;
-    std::optional<Cons> to_cons() const;
-
     DisplayVerbose display_verbose(size_t depth = 0);
     DisplayPretty display_pretty();
 

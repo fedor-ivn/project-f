@@ -10,7 +10,6 @@
 #include "ast/span.h"
 #include "evaluator/error.h"
 #include "evaluator/evaluator.h"
-#include "evaluator/program.h"
 #include "reader/error.h"
 #include "reader/parser.h"
 #include "reader/scanner.h"
@@ -193,7 +192,7 @@ void process(
             return;
         }
 
-        auto program = Program::from_elements(ast);
+        auto program = Program::parse(ast);
         if (mode == Mode::SemanticAnalysis) {
             std::cout << program << std::endl;
             return;
