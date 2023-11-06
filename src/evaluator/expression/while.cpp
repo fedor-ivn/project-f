@@ -29,6 +29,7 @@ While::parse(Span span, std::shared_ptr<List> arguments) {
             cons->left->span
         );
     }
+    condition->validate_no_break_with_value();
 
     auto body = Body::parse(cons->right);
     body.validate_no_break_with_value();
