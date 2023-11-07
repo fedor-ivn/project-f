@@ -65,7 +65,7 @@ std::unique_ptr<Cond> Cond::parse(Span span, std::shared_ptr<List> arguments) {
     return std::make_unique<Cond>(std::move(cond));
 }
 
-std::shared_ptr<Element> Cond::evaluate() const {
+std::shared_ptr<Element> Cond::evaluate(std::shared_ptr<Scope>) const {
     throw std::runtime_error("Not implemented");
 }
 

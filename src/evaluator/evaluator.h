@@ -6,6 +6,8 @@
 namespace evaluator {
 
 class Evaluator {
+  std::shared_ptr<Scope> global;
+
   public:
     Evaluator();
 
