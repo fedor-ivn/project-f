@@ -124,7 +124,7 @@ class Setq : public Expression {
     static std::unique_ptr<Setq>
     parse(ast::Span span, std::shared_ptr<ast::List> arguments);
 
-    virtual std::shared_ptr<ast::Element> evaluate(std::shared_ptr<Scope> parent) const;
+    virtual std::shared_ptr<ast::Element> evaluate(std::shared_ptr<Scope> scope) const;
     virtual void display(std::ostream& stream, size_t depth) const;
 
     virtual bool can_evaluate_to_function() const;

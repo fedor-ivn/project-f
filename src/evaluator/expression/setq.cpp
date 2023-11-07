@@ -48,8 +48,10 @@ std::unique_ptr<Setq> Setq::parse(Span span, std::shared_ptr<List> arguments) {
     return std::make_unique<Setq>(Setq(span, symbol, std::move(expression)));
 }
 
-std::shared_ptr<Element> Setq::evaluate(std::shared_ptr<Scope> parent) const {
-    throw std::runtime_error("Not implemented");
+std::shared_ptr<Element> Setq::evaluate(std::shared_ptr<Scope> scope) const {
+    auto element = this->initializer->evaluate(scope);
+    scope->define(*this->variable, element);
+    return element;
 }
 
 void Setq::display(std::ostream& stream, size_t depth) const {
