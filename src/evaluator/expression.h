@@ -1,6 +1,7 @@
 #pragma once
 
 #include "../ast/element.h"
+#include "scope.h"
 #include <memory>
 #include <vector>
 
@@ -17,7 +18,7 @@ class Expression {
 
     virtual ~Expression() = default;
 
-    virtual std::shared_ptr<ast::Element> evaluate() const = 0;
+    virtual std::shared_ptr<ast::Element> evaluate(std::shared_ptr<Scope> parent) const = 0;
     virtual void display(std::ostream& stream, size_t depth) const = 0;
 
     virtual bool can_evaluate_to_function() const = 0;
@@ -50,7 +51,7 @@ class Body {
 
     static Body parse(std::shared_ptr<ast::List> unparsed);
 
-    std::shared_ptr<ast::Element> evaluate() const;
+    std::shared_ptr<ast::Element> evaluate(std::shared_ptr<Scope> parent) const;
 
     void display(std::ostream& stream, size_t depth) const;
 
@@ -70,7 +71,7 @@ class Program {
 
     static Program parse(std::vector<std::shared_ptr<ast::Element>> elements);
 
-    std::shared_ptr<ast::Element> evaluate() const;
+    std::shared_ptr<ast::Element> evaluate(std::shared_ptr<Scope> parent) const;
 
     void display(std::ostream& stream, size_t depth) const;
     friend std::ostream& operator<<(std::ostream& stream, Program const& self);
@@ -82,7 +83,7 @@ class Symbol : public Expression {
   public:
     Symbol(std::shared_ptr<ast::Symbol> symbol);
 
-    virtual std::shared_ptr<ast::Element> evaluate() const;
+    virtual std::shared_ptr<ast::Element> evaluate(std::shared_ptr<Scope> parent) const;
     virtual void display(std::ostream& stream, size_t depth) const;
 
     virtual bool can_evaluate_to_function() const;
@@ -100,7 +101,7 @@ class Quote : public Expression {
     static std::unique_ptr<Quote>
     parse(ast::Span span, std::shared_ptr<ast::List> arguments);
 
-    virtual std::shared_ptr<ast::Element> evaluate() const;
+    virtual std::shared_ptr<ast::Element> evaluate(std::shared_ptr<Scope> parent) const;
     virtual void display(std::ostream& stream, size_t depth) const;
 
     virtual bool can_evaluate_to_function() const;
@@ -123,7 +124,7 @@ class Setq : public Expression {
     static std::unique_ptr<Setq>
     parse(ast::Span span, std::shared_ptr<ast::List> arguments);
 
-    virtual std::shared_ptr<ast::Element> evaluate() const;
+    virtual std::shared_ptr<ast::Element> evaluate(std::shared_ptr<Scope> parent) const;
     virtual void display(std::ostream& stream, size_t depth) const;
 
     virtual bool can_evaluate_to_function() const;
@@ -148,7 +149,7 @@ class Cond : public Expression {
     static std::unique_ptr<Cond>
     parse(ast::Span span, std::shared_ptr<ast::List> arguments);
 
-    virtual std::shared_ptr<ast::Element> evaluate() const;
+    virtual std::shared_ptr<ast::Element> evaluate(std::shared_ptr<Scope> parent) const;
     virtual void display(std::ostream& stream, size_t depth) const;
 
     virtual bool can_evaluate_to_function() const;
@@ -166,7 +167,7 @@ class Return : public Expression {
     static std::unique_ptr<Return>
     parse(ast::Span span, std::shared_ptr<ast::List> arguments);
 
-    virtual std::shared_ptr<ast::Element> evaluate() const;
+    virtual std::shared_ptr<ast::Element> evaluate(std::shared_ptr<Scope> parent) const;
     virtual void display(std::ostream& stream, size_t depth) const;
 
     virtual bool can_evaluate_to_function() const;
@@ -184,7 +185,7 @@ class Break : public Expression {
     static std::unique_ptr<Break>
     parse(ast::Span span, std::shared_ptr<ast::List> arguments);
 
-    virtual std::shared_ptr<ast::Element> evaluate() const;
+    virtual std::shared_ptr<ast::Element> evaluate(std::shared_ptr<Scope> parent) const;
     virtual void display(std::ostream& stream, size_t depth) const;
 
     virtual bool can_evaluate_to_function() const;
@@ -206,7 +207,7 @@ class Call : public Expression {
 
     static std::unique_ptr<Call> parse(std::shared_ptr<ast::Cons> arguments);
 
-    virtual std::shared_ptr<ast::Element> evaluate() const;
+    virtual std::shared_ptr<ast::Element> evaluate(std::shared_ptr<Scope> parent) const;
     virtual void display(std::ostream& stream, size_t depth) const;
 
     virtual bool can_evaluate_to_function() const;
@@ -231,7 +232,7 @@ class Func : public Expression {
     static std::unique_ptr<Func>
     parse(ast::Span span, std::shared_ptr<ast::List> arguments);
 
-    virtual std::shared_ptr<ast::Element> evaluate() const;
+    virtual std::shared_ptr<ast::Element> evaluate(std::shared_ptr<Scope> parent) const;
     virtual void display(std::ostream& stream, size_t depth) const;
 
     virtual bool can_evaluate_to_function() const;
@@ -250,7 +251,7 @@ class Lambda : public Expression {
     static std::unique_ptr<Lambda>
     parse(ast::Span span, std::shared_ptr<ast::List> arguments);
 
-    virtual std::shared_ptr<ast::Element> evaluate() const;
+    virtual std::shared_ptr<ast::Element> evaluate(std::shared_ptr<Scope> parent) const;
     virtual void display(std::ostream& stream, size_t depth) const;
 
     virtual bool can_evaluate_to_function() const;
@@ -269,7 +270,7 @@ class Prog : public Expression {
     static std::unique_ptr<Prog>
     parse(ast::Span span, std::shared_ptr<ast::List> arguments);
 
-    virtual std::shared_ptr<ast::Element> evaluate() const;
+    virtual std::shared_ptr<ast::Element> evaluate(std::shared_ptr<Scope> parent) const;
     virtual void display(std::ostream& stream, size_t depth) const;
 
     virtual bool can_evaluate_to_function() const;
@@ -288,7 +289,7 @@ class While : public Expression {
     static std::unique_ptr<While>
     parse(ast::Span span, std::shared_ptr<ast::List> arguments);
 
-    virtual std::shared_ptr<ast::Element> evaluate() const;
+    virtual std::shared_ptr<ast::Element> evaluate(std::shared_ptr<Scope> parent) const;
     virtual void display(std::ostream& stream, size_t depth) const;
 
     virtual bool can_evaluate_to_function() const;

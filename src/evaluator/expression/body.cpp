@@ -26,12 +26,12 @@ Body Body::parse(std::shared_ptr<List> unparsed) {
     return Body(std::move(body));
 }
 
-std::shared_ptr<Element> Body::evaluate() const {
+std::shared_ptr<Element> Body::evaluate(std::shared_ptr<Scope> parent) const {
     std::shared_ptr<Element> last_evaluated =
         std::make_shared<Null>(Null(Span(Position(0, 0), Position(0, 0))));
 
     for (auto& expression : this->body) {
-        last_evaluated = expression->evaluate();
+        last_evaluated = expression->evaluate(parent);
     }
     return last_evaluated;
 }

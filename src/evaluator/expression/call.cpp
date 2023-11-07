@@ -40,7 +40,7 @@ std::unique_ptr<Call> Call::parse(std::shared_ptr<Cons> form) {
     );
 }
 
-std::shared_ptr<Element> Call::evaluate() const {
+std::shared_ptr<Element> Call::evaluate(std::shared_ptr<Scope> parent) const {
     throw std::runtime_error("Not implemented");
 }
 

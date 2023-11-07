@@ -26,6 +26,7 @@ add_library(internals
     src/evaluator/expression/while.cpp
     src/evaluator/error.cpp
     src/evaluator/evaluator.cpp
+    src/evaluator/scope.cpp
     src/reader/scanner.cpp
     src/reader/token.cpp
     src/reader/parser.cpp

@@ -59,7 +59,7 @@ std::unique_ptr<Func> Func::parse(Span span, std::shared_ptr<List> arguments) {
     );
 }
 
-std::shared_ptr<Element> Func::evaluate() const {
+std::shared_ptr<Element> Func::evaluate(std::shared_ptr<Scope> parent) const {
     throw std::runtime_error("Not implemented");
 }
 

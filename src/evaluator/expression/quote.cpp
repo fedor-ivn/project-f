@@ -32,7 +32,7 @@ Quote::parse(Span span, std::shared_ptr<List> arguments) {
     return std::make_unique<Quote>(Quote(span, element));
 }
 
-std::shared_ptr<Element> Quote::evaluate() const { return this->element; }
+std::shared_ptr<Element> Quote::evaluate(std::shared_ptr<Scope> parent) const { return this->element; }
 
 void Quote::display(std::ostream& stream, size_t depth) const {
     stream << "Quote {\n";

@@ -48,7 +48,7 @@ std::unique_ptr<Setq> Setq::parse(Span span, std::shared_ptr<List> arguments) {
     return std::make_unique<Setq>(Setq(span, symbol, std::move(expression)));
 }
 
-std::shared_ptr<Element> Setq::evaluate() const {
+std::shared_ptr<Element> Setq::evaluate(std::shared_ptr<Scope> parent) const {
     throw std::runtime_error("Not implemented");
 }
 

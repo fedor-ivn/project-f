@@ -36,7 +36,7 @@ std::unique_ptr<Prog> Prog::parse(Span span, std::shared_ptr<List> arguments) {
     );
 }
 
-std::shared_ptr<Element> Prog::evaluate() const {
+std::shared_ptr<Element> Prog::evaluate(std::shared_ptr<Scope> parent) const {
     throw std::runtime_error("Not implemented");
 }
 

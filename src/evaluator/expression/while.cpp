@@ -39,7 +39,7 @@ While::parse(Span span, std::shared_ptr<List> arguments) {
     );
 }
 
-std::shared_ptr<Element> While::evaluate() const {
+std::shared_ptr<Element> While::evaluate(std::shared_ptr<Scope> parent) const {
     throw std::runtime_error("Not implemented");
 }
 

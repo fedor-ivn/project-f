@@ -36,7 +36,7 @@ Return::parse(Span span, std::shared_ptr<List> arguments) {
     return std::make_unique<Return>(Return(span, std::move(expression)));
 }
 
-std::shared_ptr<Element> Return::evaluate() const {
+std::shared_ptr<Element> Return::evaluate(std::shared_ptr<Scope> parent) const {
     throw std::runtime_error("Not implemented");
 }
 

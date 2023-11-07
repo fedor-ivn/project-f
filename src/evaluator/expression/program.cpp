@@ -1,5 +1,6 @@
 #include "../../utils.h"
 #include "../expression.h"
+#include <memory>
 
 namespace evaluator {
 
@@ -19,8 +20,8 @@ Program Program::parse(std::vector<std::shared_ptr<Element>> ast) {
     return Program(std::move(body));
 }
 
-std::shared_ptr<Element> Program::evaluate() const {
-    return this->program.evaluate();
+std::shared_ptr<Element> Program::evaluate(std::shared_ptr<Scope> parent) const {
+    return this->program.evaluate(parent);
 }
 
 std::ostream& operator<<(std::ostream& stream, Program const& self) {
