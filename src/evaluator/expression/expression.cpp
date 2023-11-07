@@ -63,4 +63,6 @@ std::unique_ptr<Expression> Expression::parse(std::shared_ptr<Element> element
     return std::make_unique<Quote>(Quote(element->span, element));
 }
 
+bool Expression::diverges() const { return this->returns() || this->breaks(); }
+
 } // namespace evaluator

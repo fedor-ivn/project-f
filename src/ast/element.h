@@ -6,6 +6,7 @@
 #include <optional>
 #include <string>
 
+#include "kind.h"
 #include "span.h"
 
 namespace ast {
@@ -18,8 +19,9 @@ class Cons;
 class Element {
   public:
     Span span;
+    ElementKind kind;
 
-    Element(Span span);
+    Element(ElementKind kind, Span span);
     virtual ~Element() = default;
 
     DisplayVerbose display_verbose(size_t depth = 0);
@@ -86,7 +88,7 @@ class List : public Element {
 
 class Null : public List {
   public:
-    using List::List;
+    Null(Span span);
 
   private:
     virtual void _display_verbose(std::ostream& stream, size_t depth) const;

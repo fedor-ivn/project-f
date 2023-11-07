@@ -31,7 +31,7 @@ std::unique_ptr<Cond> Cond::parse(Span span, std::shared_ptr<List> arguments) {
     }
 
     auto condition = Expression::parse(cons->left);
-    if (!condition->can_evaluate_to_boolean()) {
+    if (!condition->can_evaluate_to(ast::ElementKind::BOOLEAN)) {
         throw EvaluationError(
             "a boolean is expected, but this expression will never evaluate to "
             "a boolean",
@@ -89,14 +89,35 @@ void Cond::display(std::ostream& stream, size_t depth) const {
     stream << Depth(depth) << '}';
 }
 
-bool Cond::can_evaluate_to_function() const {
-    return this->then->can_evaluate_to_function() ||
-           this->otherwise->can_evaluate_to_function();
+bool Cond::returns() const {
+    return this->condition->returns() ||
+           (this->then->returns() && this->otherwise->returns());
 }
 
-bool Cond::can_evaluate_to_boolean() const {
-    return this->then->can_evaluate_to_boolean() ||
-           this->otherwise->can_evaluate_to_boolean();
+bool Cond::breaks() const {
+    return this->condition->breaks() ||
+           (this->then->breaks() && this->otherwise->breaks());
+}
+
+bool Cond::can_evaluate_to(ast::ElementKind kind) const {
+    if (this->condition->diverges()) {
+        return false;
+    }
+
+    return this->then->can_evaluate_to(kind) ||
+           this->otherwise->can_evaluate_to(kind);
+}
+
+bool Cond::can_break_with(ast::ElementKind kind) const {
+    if (this->condition->can_break_with(kind)) {
+        return true;
+    }
+    if (this->condition->diverges()) {
+        return false;
+    }
+
+    return this->then->can_break_with(kind) ||
+           this->otherwise->can_break_with(kind);
 }
 
 void Cond::validate_no_free_break() const {

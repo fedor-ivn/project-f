@@ -9,14 +9,15 @@ namespace ast {
 using utils::Depth;
 using utils::to_cons;
 
-Element::Element(Span span) : span(span) {}
+Element::Element(ElementKind kind, Span span) : span(span), kind(kind) {}
 
 DisplayVerbose Element::display_verbose(size_t depth) {
     return DisplayVerbose(this, depth);
 }
 DisplayPretty Element::display_pretty() { return DisplayPretty(this); }
 
-Integer::Integer(int64_t value, Span span) : Element(span), value(value) {}
+Integer::Integer(int64_t value, Span span)
+    : Element(ElementKind::INTEGER, span), value(value) {}
 
 void Integer::_display_verbose(std::ostream& stream, size_t) const {
     stream << "Integer(" << this->value << ", " << this->span << ")";
@@ -26,7 +27,8 @@ void Integer::_display_pretty(std::ostream& stream) const {
     stream << this->value;
 }
 
-Real::Real(double value, Span span) : Element(span), value(value) {}
+Real::Real(double value, Span span)
+    : Element(ElementKind::REAL, span), value(value) {}
 
 void Real::_display_verbose(std::ostream& stream, size_t) const {
     stream << "Real(" << this->value << ", " << this->span << ")";
@@ -54,7 +56,8 @@ void Real::_display_pretty(std::ostream& stream) const {
     }
 }
 
-Boolean::Boolean(bool value, Span span) : Element(span), value(value) {}
+Boolean::Boolean(bool value, Span span)
+    : Element(ElementKind::BOOLEAN, span), value(value) {}
 
 void Boolean::_display_verbose(std::ostream& stream, size_t) const {
     auto value = this->value ? "true" : "false";
@@ -66,7 +69,8 @@ void Boolean::_display_pretty(std::ostream& stream) const {
     stream << value;
 }
 
-Symbol::Symbol(std::string value, Span span) : Element(span), value(value) {}
+Symbol::Symbol(std::string value, Span span)
+    : Element(ElementKind::SYMBOL, span), value(value) {}
 
 void Symbol::_display_verbose(std::ostream& stream, size_t) const {
     stream << "Symbol(" << this->value << ", " << this->span << ")";
@@ -75,6 +79,8 @@ void Symbol::_display_verbose(std::ostream& stream, size_t) const {
 void Symbol::_display_pretty(std::ostream& stream) const {
     stream << this->value;
 }
+
+Null::Null(Span span) : List(ElementKind::NULL_, span) {}
 
 void Null::_display_verbose(std::ostream& stream, size_t) const {
     stream << "Null(" << this->span << ")";
@@ -85,7 +91,7 @@ void Null::_display_pretty(std::ostream& stream) const { stream << "null"; }
 Cons::Cons(
     std::shared_ptr<Element> left, std::shared_ptr<List> right, Span span
 )
-    : List(span), left(left), right(right) {}
+    : List(ElementKind::CONS, span), left(left), right(right) {}
 
 void Cons::_display_verbose(std::ostream& stream, size_t depth) const {
     stream << "Cons(\n";
