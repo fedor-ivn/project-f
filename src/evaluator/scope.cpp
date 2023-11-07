@@ -22,7 +22,7 @@ std::shared_ptr<ast::Element> Scope::lookup(ast::Symbol const& symbol) {
         return this->parent->lookup(symbol);
     }
     throw EvaluationError(
-        "Undefined variable: " + symbol.value, symbol.span
+        "variable `" + symbol.value + "` is not defined", symbol.span
     );
 }
 
