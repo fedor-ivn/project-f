@@ -15,8 +15,10 @@ void Symbol::display(std::ostream& stream, size_t depth) const {
     stream << this->symbol->display_verbose(depth);
 }
 
-bool Symbol::can_evaluate_to_function() const { return true; }
-bool Symbol::can_evaluate_to_boolean() const { return true; }
+bool Symbol::returns() const { return false; }
+bool Symbol::breaks() const { return false; }
+bool Symbol::can_evaluate_to(ast::ElementKind) const { return true; }
+bool Symbol::can_break_with(ast::ElementKind) const { return false; }
 void Symbol::validate_no_free_break() const {}
 void Symbol::validate_no_break_with_value() const {}
 

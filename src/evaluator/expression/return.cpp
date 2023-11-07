@@ -52,8 +52,13 @@ void Return::display(std::ostream& stream, size_t depth) const {
     stream << Depth(depth) << '}';
 }
 
-bool Return::can_evaluate_to_function() const { return false; }
-bool Return::can_evaluate_to_boolean() const { return false; }
+bool Return::returns() const { return !this->breaks(); }
+bool Return::breaks() const { return this->expression->breaks(); }
+bool Return::can_evaluate_to(ast::ElementKind) const { return false; }
+
+bool Return::can_break_with(ast::ElementKind kind) const {
+    return this->expression->can_break_with(kind);
+}
 
 void Return::validate_no_free_break() const {
     this->expression->validate_no_free_break();

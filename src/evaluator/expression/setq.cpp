@@ -70,12 +70,15 @@ void Setq::display(std::ostream& stream, size_t depth) const {
     stream << Depth(depth) << '}';
 }
 
-bool Setq::can_evaluate_to_function() const {
-    return this->initializer->can_evaluate_to_function();
+bool Setq::returns() const { return this->initializer->returns(); }
+bool Setq::breaks() const { return this->initializer->breaks(); }
+
+bool Setq::can_evaluate_to(ast::ElementKind kind) const {
+    return this->initializer->can_evaluate_to(kind);
 }
 
-bool Setq::can_evaluate_to_boolean() const {
-    return this->initializer->can_evaluate_to_boolean();
+bool Setq::can_break_with(ast::ElementKind kind) const {
+    return this->initializer->can_break_with(kind);
 }
 
 void Setq::validate_no_free_break() const {

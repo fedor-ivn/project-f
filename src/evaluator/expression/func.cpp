@@ -82,8 +82,12 @@ void Func::display(std::ostream& stream, size_t depth) const {
     stream << Depth(depth) << '}';
 }
 
-bool Func::can_evaluate_to_function() const { return true; }
-bool Func::can_evaluate_to_boolean() const { return false; }
+bool Func::returns() const { return false; }
+bool Func::breaks() const { return false; }
+bool Func::can_evaluate_to(ast::ElementKind kind) const {
+    return kind == ast::ElementKind::FUNCTION;
+}
+bool Func::can_break_with(ast::ElementKind) const { return false; }
 void Func::validate_no_free_break() const {}
 void Func::validate_no_break_with_value() const {}
 

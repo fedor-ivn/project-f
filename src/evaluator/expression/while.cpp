@@ -22,7 +22,7 @@ While::parse(Span span, std::shared_ptr<List> arguments) {
     }
 
     auto condition = Expression::parse(cons->left);
-    if (!condition->can_evaluate_to_boolean()) {
+    if (!condition->can_evaluate_to(ast::ElementKind::BOOLEAN)) {
         throw EvaluationError(
             "a boolean is expected, but this expression will never evaluate to "
             "a boolean",
@@ -59,8 +59,12 @@ void While::display(std::ostream& stream, size_t depth) const {
     stream << Depth(depth) << '}';
 }
 
-bool While::can_evaluate_to_function() const { return false; }
-bool While::can_evaluate_to_boolean() const { return false; }
+bool While::returns() const { return this->condition->returns(); }
+bool While::breaks() const { return false; }
+bool While::can_evaluate_to(ast::ElementKind kind) const {
+    return kind == ast::ElementKind::NULL_;
+}
+bool While::can_break_with(ast::ElementKind) const { return false; }
 void While::validate_no_free_break() const {}
 void While::validate_no_break_with_value() const {}
 

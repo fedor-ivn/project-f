@@ -48,16 +48,6 @@ void Body::display(std::ostream& stream, size_t depth) const {
     stream << Depth(depth) << ']';
 }
 
-bool Body::can_evaluate_to_function() const {
-    return this->body.size() > 0 &&
-           this->body.back()->can_evaluate_to_function();
-}
-
-bool Body::can_evaluate_to_boolean() const {
-    return this->body.size() > 0 &&
-           this->body.back()->can_evaluate_to_boolean();
-}
-
 void Body::validate_no_free_break() const {
     for (auto const& expression : this->body) {
         expression->validate_no_free_break();
