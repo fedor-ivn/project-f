@@ -65,8 +65,37 @@ std::unique_ptr<Cond> Cond::parse(Span span, std::shared_ptr<List> arguments) {
     return std::make_unique<Cond>(std::move(cond));
 }
 
-std::shared_ptr<Element> Cond::evaluate(std::shared_ptr<Scope>) const {
-    throw std::runtime_error("Not implemented");
+std::shared_ptr<Element> Cond::evaluate(std::shared_ptr<Scope> scope) const {
+    auto evaluated_condition = condition->evaluate(scope);
+
+    if (!evaluated_condition) {
+        throw EvaluationError("condition cannot be evaluated", condition->span);
+    }
+
+    auto boolean_condition = std::dynamic_pointer_cast<ast::Boolean>(evaluated_condition);
+
+    if (!boolean_condition) {
+        throw EvaluationError("condition cannot be casted to boolean", evaluated_condition->span);
+    }
+
+    if (boolean_condition->value) {
+        auto evaluated_then = then->evaluate(scope);
+
+        if (!evaluated_then) {
+            throw EvaluationError("`then` case cannot be evaluated", then->span);
+        }
+
+        return evaluated_then;
+    }
+    else {
+        auto evaluated_otherwise = otherwise->evaluate(scope);
+
+        if (!evaluated_otherwise) {
+            throw EvaluationError("`otherwise` case cannot be evaluated", otherwise->span);
+        }
+
+        return evaluated_otherwise;
+    }
 }
 
 void Cond::display(std::ostream& stream, size_t depth) const {
