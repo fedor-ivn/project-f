@@ -75,7 +75,7 @@ std::shared_ptr<Element> Cond::evaluate(std::shared_ptr<Scope> scope) const {
     auto boolean_condition = std::dynamic_pointer_cast<ast::Boolean>(evaluated_condition);
 
     if (!boolean_condition) {
-        throw EvaluationError("condition cannot be casted to boolean", evaluated_condition->span);
+        throw EvaluationError("condition did not evaluate to a boolean", evaluated_condition->span);
     }
 
     if (boolean_condition->value) {
