@@ -98,7 +98,7 @@ bool test_semantic_file(std::filesystem::path path) {
     auto boolean = std::dynamic_pointer_cast<ast::Boolean>(output);
 
     if (!boolean) {
-        throw std::runtime_error("test should have a boolean result");
+        return false;
     }
 
     return boolean->value;
