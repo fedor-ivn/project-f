@@ -37,17 +37,21 @@ std::unique_ptr<Prog> Prog::parse(Span span, std::shared_ptr<List> arguments) {
     );
 }
 
-std::shared_ptr<Element> Prog::evaluate(std::shared_ptr<Scope> scope) const {
+std::shared_ptr<Element> Prog::evaluate(std::shared_ptr<Scope> parent_scope
+) const {
+    std::shared_ptr<Scope> local_scope =
+        std::make_shared<Scope>(Scope(parent_scope));
+
     for (auto parameter : this->variables.parameters) {
         auto v = parameter;
-        scope->define(
+        local_scope->define(
             *parameter, std::make_shared<ast::Null>(Null(this->span))
         );
     }
 
     std::shared_ptr<ast::Element> result;
     for (auto const& expression : this->body.body) {
-        result = expression->evaluate(scope);
+        result = expression->evaluate(local_scope);
 
         if (expression->breaks()) {
             return result;
