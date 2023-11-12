@@ -72,26 +72,32 @@ std::shared_ptr<Element> Cond::evaluate(std::shared_ptr<Scope> scope) const {
         throw EvaluationError("condition cannot be evaluated", condition->span);
     }
 
-    auto boolean_condition = std::dynamic_pointer_cast<ast::Boolean>(evaluated_condition);
+    auto boolean_condition =
+        std::dynamic_pointer_cast<ast::Boolean>(evaluated_condition);
 
     if (!boolean_condition) {
-        throw EvaluationError("condition did not evaluate to a boolean", evaluated_condition->span);
+        throw EvaluationError(
+            "condition did not evaluate to a boolean", evaluated_condition->span
+        );
     }
 
     if (boolean_condition->value) {
         auto evaluated_then = then->evaluate(scope);
 
         if (!evaluated_then) {
-            throw EvaluationError("`then` case cannot be evaluated", then->span);
+            throw EvaluationError(
+                "`then` case cannot be evaluated", then->span
+            );
         }
 
         return evaluated_then;
-    }
-    else {
+    } else {
         auto evaluated_otherwise = otherwise->evaluate(scope);
 
         if (!evaluated_otherwise) {
-            throw EvaluationError("`otherwise` case cannot be evaluated", otherwise->span);
+            throw EvaluationError(
+                "`otherwise` case cannot be evaluated", otherwise->span
+            );
         }
 
         return evaluated_otherwise;
