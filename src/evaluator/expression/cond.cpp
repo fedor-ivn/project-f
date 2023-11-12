@@ -68,10 +68,6 @@ std::unique_ptr<Cond> Cond::parse(Span span, std::shared_ptr<List> arguments) {
 std::shared_ptr<Element> Cond::evaluate(std::shared_ptr<Scope> scope) const {
     auto evaluated_condition = condition->evaluate(scope);
 
-    if (!evaluated_condition) {
-        throw EvaluationError("condition cannot be evaluated", condition->span);
-    }
-
     auto boolean_condition =
         std::dynamic_pointer_cast<ast::Boolean>(evaluated_condition);
 
