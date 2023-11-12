@@ -39,8 +39,32 @@ While::parse(Span span, std::shared_ptr<List> arguments) {
     );
 }
 
-std::shared_ptr<Element> While::evaluate(std::shared_ptr<Scope>) const {
-    throw std::runtime_error("Not implemented");
+std::shared_ptr<Element> While::evaluate(std::shared_ptr<Scope> scope) const {
+    std::shared_ptr<Element> result;
+
+    while (true) {
+        auto condition = this->condition->evaluate(scope);
+        auto boolean_condition =
+            std::dynamic_pointer_cast<ast::Boolean>(condition);
+
+        if (!boolean_condition) {
+            throw EvaluationError("a boolean is expected", condition->span);
+        }
+
+        if (!boolean_condition->value) {
+            break;
+        }
+
+        for (auto const& expression : this->body.body) {
+            result = expression->evaluate(scope);
+
+            if (expression->breaks()) {
+                return result;
+            }
+        }
+    }
+
+    return result;
 }
 
 void While::display(std::ostream& stream, size_t depth) const {
