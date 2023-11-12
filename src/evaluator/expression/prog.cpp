@@ -6,6 +6,7 @@ namespace evaluator {
 
 using ast::Element;
 using ast::List;
+using ast::Null;
 using ast::Span;
 using utils::Depth;
 using utils::to_cons;
@@ -36,8 +37,24 @@ std::unique_ptr<Prog> Prog::parse(Span span, std::shared_ptr<List> arguments) {
     );
 }
 
-std::shared_ptr<Element> Prog::evaluate(std::shared_ptr<Scope>) const {
-    throw std::runtime_error("Not implemented");
+std::shared_ptr<Element> Prog::evaluate(std::shared_ptr<Scope> scope) const {
+    for (auto parameter : this->variables.parameters) {
+        auto v = parameter;
+        scope->define(
+            *parameter, std::make_shared<ast::Null>(Null(this->span))
+        );
+    }
+
+    std::shared_ptr<ast::Element> result;
+    for (auto const& expression : this->body.body) {
+        result = expression->evaluate(scope);
+
+        if (expression->breaks()) {
+            return result;
+        }
+    }
+
+    return result;
 }
 
 void Prog::display(std::ostream& stream, size_t depth) const {
