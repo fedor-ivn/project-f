@@ -114,7 +114,7 @@ std::vector<std::filesystem::path> get_paths(Mode mode) {
 
     std::vector<std::filesystem::path> paths;
 
-    for (std::string_view subdirectory : subdirectories) {
+    for (auto subdirectory : subdirectories) {
         for (auto const& entry : std::filesystem::directory_iterator(
                  "tests/" + std::string(subdirectory)
              )) {
