@@ -12,11 +12,9 @@
 
 using evaluator::Evaluator;
 using evaluator::Program;
-using reader::Parser;
 using reader::Reader;
-using reader::Scanner;
 
-enum class Mode { HELP, SYNTAX, SEMANTIC };
+enum class Mode { SYNTAX, SEMANTIC };
 
 enum class ArgumentErrorCause { UnknownArgument, ExtraArgument };
 
@@ -34,6 +32,10 @@ class ArgumentError : public std::exception {
 
         if (error.cause == ArgumentErrorCause::UnknownArgument) {
             stream << "unknown argument: '" << error.argument << "'";
+        }
+
+        else if (error.cause == ArgumentErrorCause::ExtraArgument) {
+            stream << "extra argument: '" << error.argument << "'";
         }
 
         return stream;
@@ -103,10 +105,6 @@ bool test_semantic_file(std::filesystem::path path) {
 }
 
 std::vector<std::filesystem::path> get_paths(Mode mode) {
-    if (mode == Mode::HELP) {
-        throw std::runtime_error("get_paths got wrong mode - help");
-    }
-
     std::string postfix = mode == Mode::SEMANTIC ? "semantic" : "syntax";
 
     std::vector<std::filesystem::path> paths;
@@ -162,24 +160,39 @@ int test_all_files_syntax() {
 }
 
 class Arguments {
-    constexpr static const std::string_view HELP = "--help";
-    constexpr static const std::string_view SYNTAX = "--syntax";
-    constexpr static const std::string_view SEMANTIC = "--semantic";
-
     Mode mode;
     std::optional<std::string_view> file = std::nullopt;
 
   public:
+    constexpr static const std::string_view HELP = "--help";
+    constexpr static const std::string_view SYNTAX = "--syntax";
+    constexpr static const std::string_view SEMANTIC = "--semantic";
+
     std::optional<std::string_view> get_file() { return this->file; }
 
     void parse(int argc, char const** argv) {
+        if (argc == 1) {
+            this->mode = Mode::SEMANTIC;
+        }
+
+        if (argc > 1) {
+            if (argv[1] == HELP) {
+                if (argc > 2) {
+                    throw ArgumentError(
+                        ArgumentErrorCause::ExtraArgument, argv[2]
+                    );
+                } else {
+                    print_help(argv[0]);
+                    return;
+                }
+            }
+        }
+
         for (int argument_index = 1; argument_index < argc; argument_index++) {
             std::string_view argument = argv[argument_index];
 
             if (argument_index == 1) {
-                if (argument == HELP) {
-                    this->mode = Mode::HELP;
-                } else if (argument == SYNTAX) {
+                if (argument == SYNTAX) {
                     this->mode = Mode::SYNTAX;
                 } else if (argument == SEMANTIC) {
                     this->mode = Mode::SEMANTIC;
@@ -219,12 +232,6 @@ int main(int argc, char const** argv) {
         arguments.parse(argc, argv);
     } catch (ArgumentError const& error) {
         std::cerr << error << std::endl;
-    }
-
-    char const* program_name = argc > 0 ? argv[0] : "test-runner";
-
-    if (arguments.get_mode() == Mode::HELP) {
-        Arguments::print_help(program_name);
     }
 
     if (auto path_str = arguments.get_file()) {
