@@ -43,7 +43,6 @@ std::shared_ptr<Element> Prog::evaluate(std::shared_ptr<Scope> parent_scope
         std::make_shared<Scope>(Scope(parent_scope));
 
     for (auto parameter : this->variables.parameters) {
-        auto v = parameter;
         local_scope->define(
             *parameter, std::make_shared<ast::Null>(Null(this->span))
         );
