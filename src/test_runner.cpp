@@ -105,7 +105,7 @@ bool test_semantic_file(std::filesystem::path path) {
 }
 
 std::vector<std::filesystem::path> get_paths(Mode mode) {
-    std::string postfix = mode == Mode::SEMANTIC ? "semantic" : "syntax";
+    std::string subdirectory = mode == Mode::SEMANTIC ? "semantic" : "syntax";
 
     std::vector<std::filesystem::path> paths;
 
