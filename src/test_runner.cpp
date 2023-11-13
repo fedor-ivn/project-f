@@ -186,14 +186,8 @@ class Arguments {
 
         if (argc > 1) {
             if (argv[1] == HELP) {
-                if (argc > 2) {
-                    throw ArgumentError(
-                        ArgumentErrorCause::ExtraArgument, argv[2]
-                    );
-                } else {
-                    print_help(argv[0]);
-                    return;
-                }
+                print_help(argv[0]);
+                return;
             }
         }
 
