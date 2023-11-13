@@ -80,21 +80,9 @@ std::shared_ptr<Element> Cond::evaluate(std::shared_ptr<Scope> scope) const {
     if (boolean_condition->value) {
         auto evaluated_then = then->evaluate(scope);
 
-        if (!evaluated_then) {
-            throw EvaluationError(
-                "`then` case cannot be evaluated", then->span
-            );
-        }
-
         return evaluated_then;
     } else {
         auto evaluated_otherwise = otherwise->evaluate(scope);
-
-        if (!evaluated_otherwise) {
-            throw EvaluationError(
-                "`otherwise` case cannot be evaluated", otherwise->span
-            );
-        }
 
         return evaluated_otherwise;
     }
