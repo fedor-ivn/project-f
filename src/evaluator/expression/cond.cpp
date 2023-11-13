@@ -78,14 +78,9 @@ std::shared_ptr<Element> Cond::evaluate(std::shared_ptr<Scope> scope) const {
     }
 
     if (boolean_condition->value) {
-        auto evaluated_then = then->evaluate(scope);
-
-        return evaluated_then;
-    } else {
-        auto evaluated_otherwise = otherwise->evaluate(scope);
-
-        return evaluated_otherwise;
+        return then->evaluate(scope);
     }
+    return otherwise->evaluate(scope);
 }
 
 void Cond::display(std::ostream& stream, size_t depth) const {
