@@ -39,12 +39,12 @@ std::unique_ptr<Prog> Prog::parse(Span span, std::shared_ptr<List> arguments) {
 
 std::shared_ptr<Element> Prog::evaluate(std::shared_ptr<Scope> parent_scope
 ) const {
-    std::shared_ptr<Scope> local_scope =
+    auto local_scope =
         std::make_shared<Scope>(Scope(parent_scope));
 
     for (auto parameter : this->variables.parameters) {
         local_scope->define(
-            *parameter, std::make_shared<ast::Null>(Null(this->span))
+            *parameter, std::make_shared<ast::Null>(Null(parameter->span))
         );
     }
 
