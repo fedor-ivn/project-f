@@ -36,8 +36,16 @@ Break::parse(Span span, std::shared_ptr<List> arguments) {
     return std::make_unique<Break>(Break(span, std::move(expression)));
 }
 
-std::shared_ptr<Element> Break::evaluate(std::shared_ptr<Scope>) const {
-    throw std::runtime_error("Not implemented");
+class BreakControlFlow {
+  public:
+    std::shared_ptr<Element> element;
+
+    BreakControlFlow(std::shared_ptr<Element> element) : element(element){};
+};
+
+std::shared_ptr<Element> Break::evaluate(std::shared_ptr<Scope> scope) const {
+    auto element = this->expression->evaluate(scope);
+    throw BreakControlFlow(element);
 }
 
 void Break::display(std::ostream& stream, size_t depth) const {
