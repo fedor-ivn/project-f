@@ -85,11 +85,9 @@ bool test_semantic_file(std::filesystem::path path) {
     buffer << file.rdbuf();
     std::string source(buffer.str());
 
-    Scanner scanner(source, ast::Position());
-    Parser parser(scanner);
+    Reader reader(source);
 
-    auto ast = parser.parse();
-    auto program = Program::parse(ast);
+    auto program = Program::parse(reader.read());
 
     Evaluator evaluator;
 
