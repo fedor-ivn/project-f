@@ -259,16 +259,16 @@ int main(int argc, char const** argv) {
 
         if (code) {
             std::cout << "Passed!" << std::endl;
+            return 0;
         } else {
             std::cout << "Failed!" << std::endl;
+            return 1;
         }
     } else {
         if (arguments.get_mode() == Mode::SYNTAX) {
-            test_all_files_syntax();
+            return test_all_files_syntax();
         } else if (arguments.get_mode() == Mode::SEMANTIC) {
-            test_all_files_semantic();
+            return test_all_files_semantic();
         }
     }
-
-    return 0;
 }
