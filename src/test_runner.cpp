@@ -168,10 +168,11 @@ int test_all_files_syntax() {
 }
 
 class Arguments {
-    Mode mode;
     std::optional<std::string_view> file = std::nullopt;
 
   public:
+    Mode mode;
+
     constexpr static const std::string_view HELP = "--help";
     constexpr static const std::string_view SYNTAX = "--syntax";
     constexpr static const std::string_view SEMANTIC = "--semantic";
@@ -221,8 +222,6 @@ class Arguments {
         }
     }
 
-    Mode get_mode() { return this->mode; }
-
     static void print_help(char const* program_name) {
         std::cerr << "F language test runner\n\n";
         std::cerr << "Usage: " << program_name << " [...options]\n\n";
@@ -251,7 +250,7 @@ int main(int argc, char const** argv) {
 
         bool code;
 
-        if (arguments.get_mode() == Mode::SYNTAX) {
+        if (arguments.mode == Mode::SYNTAX) {
             code = test_syntax_file(path);
         } else {
             code = test_semantic_file(path);
@@ -265,9 +264,9 @@ int main(int argc, char const** argv) {
             return 1;
         }
     } else {
-        if (arguments.get_mode() == Mode::SYNTAX) {
+        if (arguments.mode == Mode::SYNTAX) {
             return test_all_files_syntax();
-        } else if (arguments.get_mode() == Mode::SEMANTIC) {
+        } else if (arguments.mode == Mode::SEMANTIC) {
             return test_all_files_semantic();
         }
     }
