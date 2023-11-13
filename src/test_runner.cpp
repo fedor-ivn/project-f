@@ -105,14 +105,24 @@ bool test_semantic_file(std::filesystem::path path) {
 }
 
 std::vector<std::filesystem::path> get_paths(Mode mode) {
-    std::string subdirectory = mode == Mode::SEMANTIC ? "semantic" : "syntax";
+    std::vector<std::string_view> subdirectories;
+
+    if (mode == Mode::SEMANTIC) {
+        subdirectories.push_back("semantic");
+        subdirectories.push_back("functions");
+    } else {
+        subdirectories.push_back("syntax");
+    }
 
     std::vector<std::filesystem::path> paths;
 
-    for (auto const& entry :
-         std::filesystem::directory_iterator("tests/" + postfix)) {
-        if (entry.path().extension() == ".lispf") {
-            paths.push_back(entry.path());
+    for (std::string_view subdirectory : subdirectories) {
+        for (auto const& entry : std::filesystem::directory_iterator(
+                 "tests/" + std::string(subdirectory)
+             )) {
+            if (entry.path().extension() == ".lispf") {
+                paths.push_back(entry.path());
+            }
         }
     }
 
