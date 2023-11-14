@@ -172,6 +172,7 @@ class Arguments {
 
   public:
     Mode mode;
+    bool help = false;
 
     constexpr static const std::string_view HELP = "--help";
     constexpr static const std::string_view SYNTAX = "--syntax";
@@ -186,7 +187,7 @@ class Arguments {
 
         if (argc > 1) {
             if (argv[1] == HELP) {
-                print_help(argv[0]);
+                this->help = true;
                 return;
             }
         }
@@ -233,6 +234,13 @@ int main(int argc, char const** argv) {
         arguments.parse(argc, argv);
     } catch (ArgumentError const& error) {
         std::cerr << error << std::endl;
+    }
+
+    char const* program_name = argc > 0 ? argv[0] : "test-runner";
+
+    if (arguments.help) {
+        Arguments::print_help(program_name);
+        return 0;
     }
 
     if (auto path_str = arguments.get_file()) {
