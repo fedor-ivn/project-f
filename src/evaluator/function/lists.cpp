@@ -6,6 +6,63 @@ namespace evaluator {
 using ast::Cons;
 using ast::Element;
 using ast::List;
+using ast::Null;
+
+std::shared_ptr<Element> HeadFunction::call(CallFrame frame) const {
+    if (frame.arguments.size() != 1) {
+        throw EvaluationError(
+            "`head` expects 1 argument, received " +
+                std::to_string(frame.arguments.size()),
+            frame.call_site
+        );
+    }
+    auto list = frame.arguments[0];
+
+    if (auto cons = std::dynamic_pointer_cast<Cons>(list)) {
+        return cons->left;
+    }
+
+    if (auto null = std::dynamic_pointer_cast<Null>(list)) {
+        return null;
+    }
+
+    throw EvaluationError(
+        "`cons` expects the first argument to be a list", frame.call_site
+    );
+}
+
+std::string_view HeadFunction::name() const { return "head"; }
+void HeadFunction::display_parameters(std::ostream& stream) const {
+    stream << "list";
+}
+
+std::shared_ptr<Element> TailFunction::call(CallFrame frame) const {
+    if (frame.arguments.size() != 1) {
+        throw EvaluationError(
+            "`tail` expects 1 argument, received " +
+                std::to_string(frame.arguments.size()),
+            frame.call_site
+        );
+    }
+    auto list = frame.arguments[0];
+
+    if (auto cons = std::dynamic_pointer_cast<Cons>(list)) {
+        return cons->right;
+    }
+
+    if (auto null = std::dynamic_pointer_cast<Null>(list)) {
+        return null;
+    }
+
+    throw EvaluationError(
+        "`tail` expects the first argument to be a list", frame.call_site
+    );
+}
+
+std::string_view TailFunction::name() const { return "tail"; }
+void TailFunction::display_parameters(std::ostream& stream) const {
+    stream << "list";
+}
 
 std::shared_ptr<Element> ConsFunction::call(CallFrame frame) const {
     if (frame.arguments.size() != 2) {
