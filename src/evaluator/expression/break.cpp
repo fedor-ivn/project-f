@@ -1,4 +1,5 @@
 #include "../../utils.h"
+#include "../control_flow.h"
 #include "../error.h"
 #include "../expression.h"
 
@@ -35,13 +36,6 @@ Break::parse(Span span, std::shared_ptr<List> arguments) {
 
     return std::make_unique<Break>(Break(span, std::move(expression)));
 }
-
-class BreakControlFlow {
-  public:
-    std::shared_ptr<Element> element;
-
-    BreakControlFlow(std::shared_ptr<Element> element) : element(element){};
-};
 
 std::shared_ptr<Element> Break::evaluate(std::shared_ptr<Scope> scope) const {
     auto element = this->expression->evaluate(scope);
