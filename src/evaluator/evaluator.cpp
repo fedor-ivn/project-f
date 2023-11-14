@@ -19,6 +19,10 @@ Evaluator::Evaluator() : global(std::make_shared<Scope>(Scope(nullptr))) {
     this->global->define(
         ast::Symbol("cons", nowhere), std::make_shared<ConsFunction>()
     );
+
+    this->global->define(
+        ast::Symbol("eval", nowhere), std::make_shared<EvalFunction>()
+    );
 }
 
 std::shared_ptr<Element> Evaluator::evaluate(Program program) {
