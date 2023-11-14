@@ -48,6 +48,10 @@ std::shared_ptr<Element> Prog::evaluate(std::shared_ptr<Scope> parent_scope
         );
     }
 
+    if (this->body.body.size() == 0) {
+        return std::make_shared<Null>(Null(this->span));
+    }
+
     std::shared_ptr<ast::Element> result;
     for (auto const& expression : this->body.body) {
         try {
