@@ -28,6 +28,7 @@ add_library(internals
     src/evaluator/control_flow.cpp
     src/evaluator/evaluator.cpp
     src/evaluator/function.cpp
+    src/evaluator/function/lists.cpp
     src/evaluator/scope.cpp
     src/reader/scanner.cpp
     src/reader/token.cpp
