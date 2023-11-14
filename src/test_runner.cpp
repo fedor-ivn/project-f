@@ -250,26 +250,34 @@ int main(int argc, char const** argv) {
             throw std::runtime_error("provided file does not exist");
         }
 
-        bool code;
-
-        if (arguments.mode == Mode::SYNTAX) {
-            code = test_syntax_file(path);
-        } else {
-            code = test_semantic_file(path);
-        }
-
-        if (code) {
-            std::cout << "Passed!" << std::endl;
-            return 0;
-        } else {
-            std::cout << "Failed!" << std::endl;
+        if (!test_syntax_file(path)) {
+            std::cout << "Syntax test on " + path.string() + " is failed!\n";
             return 1;
         }
-    } else {
+        std::cout << "Syntax test on " + path.string() + " is passed!\n";
+
         if (arguments.mode == Mode::SYNTAX) {
-            return test_all_files_syntax();
-        } else if (arguments.mode == Mode::SEMANTIC) {
-            return test_all_files_semantic();
+            return 0;
+        }
+
+        if (!test_semantic_file(path)) {
+            std::cout << "Semantic test on " + path.string() + " is failed!\n";
+            return 1;
+        }
+        std::cout << "Semantic test on " + path.string() + " is passed!\n";
+    } else {
+        std::cout << "Syntax tests: \n";
+        if (test_all_files_syntax()) {
+            return 1;
+        }
+
+        if (arguments.mode == Mode::SEMANTIC) {
+            std::cout << "\nSemantic tests: \n";
+            if (test_all_files_semantic()) {
+                return 1;
+            }
         }
     }
+
+    return 0;
 }
