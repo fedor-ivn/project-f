@@ -1,0 +1,8 @@
+; test `break` inside `prog`
+(setq breakProgResult
+      (prog ()
+        (break true)
+        (divide 2 0)))
+
+(return breakProgResult)
+(divide 3 0)
