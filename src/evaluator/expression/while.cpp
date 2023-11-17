@@ -42,26 +42,25 @@ While::parse(Span span, std::shared_ptr<List> arguments) {
 }
 
 std::shared_ptr<Element> While::evaluate(std::shared_ptr<Scope> scope) const {
-    while (true) {
-        auto condition = this->condition->evaluate(scope);
-        auto boolean_condition =
-            std::dynamic_pointer_cast<ast::Boolean>(condition);
+    try {
+        while (true) {
+            auto condition = this->condition->evaluate(scope);
+            auto boolean_condition =
+                std::dynamic_pointer_cast<ast::Boolean>(condition);
 
-        if (!boolean_condition) {
-            throw EvaluationError("a boolean is expected", condition->span);
-        }
+            if (!boolean_condition) {
+                throw EvaluationError("a boolean is expected", condition->span);
+            }
 
-        if (!boolean_condition->value) {
-            break;
-        }
+            if (!boolean_condition->value) {
+                break;
+            }
 
-        for (auto const& expression : this->body.body) {
-            try {
+            for (auto const& expression : this->body.body) {
                 expression->evaluate(scope);
-            } catch (BreakControlFlow) {
-                return std::make_shared<Null>(Null(this->span));
             }
         }
+    } catch (BreakControlFlow) {
     }
 
     return std::make_shared<Null>(Null(this->span));
