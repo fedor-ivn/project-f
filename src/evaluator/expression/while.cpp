@@ -42,8 +42,6 @@ While::parse(Span span, std::shared_ptr<List> arguments) {
 }
 
 std::shared_ptr<Element> While::evaluate(std::shared_ptr<Scope> scope) const {
-    std::shared_ptr<Element> result;
-
     while (true) {
         auto condition = this->condition->evaluate(scope);
         auto boolean_condition =
@@ -59,7 +57,7 @@ std::shared_ptr<Element> While::evaluate(std::shared_ptr<Scope> scope) const {
 
         for (auto const& expression : this->body.body) {
             try {
-                result = expression->evaluate(scope);
+                expression->evaluate(scope);
             } catch (BreakControlFlow) {
                 return std::make_shared<Null>(Null(this->span));
             }
