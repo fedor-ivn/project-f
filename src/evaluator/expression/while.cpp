@@ -6,6 +6,7 @@ namespace evaluator {
 
 using ast::Element;
 using ast::List;
+using ast::Null;
 using ast::Span;
 using utils::Depth;
 using utils::to_cons;
@@ -59,12 +60,12 @@ std::shared_ptr<Element> While::evaluate(std::shared_ptr<Scope> scope) const {
             result = expression->evaluate(scope);
 
             if (expression->breaks()) {
-                return result;
+                return std::make_shared<Null>(Null(this->span));
             }
         }
     }
 
-    return result;
+    return std::make_shared<Null>(Null(this->span));
 }
 
 void While::display(std::ostream& stream, size_t depth) const {
