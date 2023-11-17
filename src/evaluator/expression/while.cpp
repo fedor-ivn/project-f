@@ -1,4 +1,5 @@
 #include "../../utils.h"
+#include "../control_flow.h"
 #include "../error.h"
 #include "../expression.h"
 
@@ -57,9 +58,9 @@ std::shared_ptr<Element> While::evaluate(std::shared_ptr<Scope> scope) const {
         }
 
         for (auto const& expression : this->body.body) {
-            result = expression->evaluate(scope);
-
-            if (expression->breaks()) {
+            try {
+                result = expression->evaluate(scope);
+            } catch (BreakControlFlow) {
                 return std::make_shared<Null>(Null(this->span));
             }
         }
