@@ -14,6 +14,7 @@ using evaluator::EvaluationError;
 using evaluator::Evaluator;
 using evaluator::Program;
 using reader::Reader;
+using reader::SyntaxError;
 
 enum class Mode { SYNTAX, SEMANTIC };
 
@@ -71,7 +72,7 @@ bool test_correct_file_syntax(std::filesystem::path path) {
     Reader reader((std::string_view(source)));
     try {
         auto elements = reader.read();
-    } catch (reader::SyntaxError const& e) {
+    } catch (SyntaxError const& e) {
         std::cout << e << std::endl;
         return false;
     }
@@ -98,7 +99,7 @@ bool test_semantic_file(std::filesystem::path path) {
         Reader reader(source);
         program = Program::parse(reader.read());
     } catch (EvaluationError const& e) {
-        std::cout << std::endl << e << std::endl;
+        std::cout << e << std::endl;
         return false;
     }
 
@@ -109,8 +110,11 @@ bool test_semantic_file(std::filesystem::path path) {
     auto boolean = std::dynamic_pointer_cast<ast::Boolean>(output);
 
     if (!boolean) {
-        std::cout << "This expression is evaluated to false.\n";
         return false;
+    }
+
+    if (!boolean->value) {
+        std::cout << "this expression is evaluated to false\n";
     }
 
     return boolean->value;
@@ -151,7 +155,6 @@ int test_files_semantic(std::vector<std::filesystem::path> paths) {
         if (passed) {
             std::cout << "passed" << std::endl;
         } else {
-            std::cout << "failed" << std::endl;
             code = 1;
         }
     }
@@ -169,7 +172,6 @@ int test_files_syntax(std::vector<std::filesystem::path> paths) {
         if (passed) {
             std::cout << "passed" << std::endl;
         } else {
-            std::cout << "failed" << std::endl;
             code = 1;
         }
     }
@@ -261,33 +263,15 @@ int main(int argc, char const** argv) {
     int code = 0;
 
     if (arguments.files.size()) {
-        for (auto path : arguments.files) {
-            std::cout << "----------------\nTest file: " << path.string()
-                      << std::endl
-                      << std::endl;
+        std::cout << "Syntax tests:\n";
+        code = test_files_syntax(arguments.files);
 
-            if (!std::filesystem::exists(path)) {
-                throw std::runtime_error("provided file does not exist");
-            }
-
-            if (!test_syntax_file(path)) {
-                std::cout << "Syntax test on " + path.string() + " failed!\n";
-                code = 1;
-                continue;
-            }
-            std::cout << "Syntax test on " + path.string() + " passed!\n";
-
-            if (arguments.mode == Mode::SYNTAX) {
-                continue;
-            }
-
-            if (!test_semantic_file(path)) {
-                std::cout << "Semantic test on " + path.string() + " failed!\n";
-                code = 1;
-                continue;
-            }
-            std::cout << "\nSemantic test on " + path.string() + " passed!\n";
+        if (code) {
+            return code;
         }
+
+        std::cout << "\nSemantic tests:\n";
+        code = test_files_semantic(arguments.files);
     } else {
         std::cout << "Syntax tests: \n";
         if (test_files_syntax(get_paths(Mode::SYNTAX))) {
