@@ -36,6 +36,9 @@ Evaluator::Evaluator() : global(std::make_shared<Scope>(Scope(nullptr))) {
     this->global->define(
         ast::Symbol("lesseq", nowhere), std::make_shared<LesseqFunction>()
     );
+    this->global->define(
+        ast::Symbol("greater", nowhere), std::make_shared<GreaterFunction>()
+    );
 }
 
 std::shared_ptr<Element> Evaluator::evaluate(Program program) {
