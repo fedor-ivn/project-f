@@ -167,4 +167,14 @@ class XorFunction : public BuiltInFunction {
     virtual void display_parameters(std::ostream& stream) const;
 };
 
+class NotFunction : public BuiltInFunction {
+  public:
+    using BuiltInFunction::BuiltInFunction;
+    virtual std::shared_ptr<Element> call(CallFrame frame) const;
+
+  protected:
+    virtual std::string_view name() const;
+    virtual void display_parameters(std::ostream& stream) const;
+};
+
 } // namespace evaluator

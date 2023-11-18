@@ -52,6 +52,9 @@ Evaluator::Evaluator() : global(std::make_shared<Scope>(Scope(nullptr))) {
     this->global->define(
         ast::Symbol("xor", nowhere), std::make_shared<XorFunction>()
     );
+    this->global->define(
+        ast::Symbol("not", nowhere), std::make_shared<NotFunction>()
+    );
 }
 
 std::shared_ptr<Element> Evaluator::evaluate(Program program) {

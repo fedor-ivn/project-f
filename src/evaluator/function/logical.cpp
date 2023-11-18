@@ -119,4 +119,34 @@ void XorFunction::display_parameters(std::ostream& stream) const {
     stream << "a b";
 }
 
+std::shared_ptr<Element> NotFunction::call(CallFrame frame) const {
+    if (frame.arguments.size() != 1) {
+        throw EvaluationError(
+            "`not` expects 1 argument, received " +
+                std::to_string(frame.arguments.size()),
+            frame.call_site
+        );
+    }
+
+    auto element = frame.arguments[0];
+
+    bool result;
+
+    if (auto element_bool = std::dynamic_pointer_cast<ast::Boolean>(element)) {
+        result = !(element_bool->value);
+    } else {
+        throw EvaluationError(
+            "`not` expects argument to be boolean", frame.call_site
+        );
+    }
+
+    return std::make_shared<ast::Boolean>(result, this->span);
+}
+
+std::string_view NotFunction::name() const { return "not"; }
+
+void NotFunction::display_parameters(std::ostream& stream) const {
+    stream << "a";
+}
+
 } // namespace evaluator
