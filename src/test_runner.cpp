@@ -3,11 +3,14 @@
 #include <iostream>
 #include <string>
 
+#include "ast/element.h"
+#include "evaluator/error.h"
 #include "evaluator/evaluator.h"
 #include "evaluator/expression.h"
 #include "reader/error.h"
 #include "reader/reader.h"
 
+using evaluator::EvaluationError;
 using evaluator::Evaluator;
 using evaluator::Program;
 using reader::Reader;
@@ -48,6 +51,9 @@ bool test_fail_file_syntax(std::filesystem::path path) {
         try {
             Reader reader((std::string_view(line)));
             auto elements = reader.read();
+
+            std::cout << "This file is supposed to be syntactically incorrect, "
+                         "but it is actucally not.";
             return false;
         } catch (reader::SyntaxError const&) {
         }
@@ -65,7 +71,8 @@ bool test_correct_file_syntax(std::filesystem::path path) {
     Reader reader((std::string_view(source)));
     try {
         auto elements = reader.read();
-    } catch (reader::SyntaxError const&) {
+    } catch (reader::SyntaxError const& e) {
+        std::cout << e << std::endl;
         return false;
     }
 
@@ -85,9 +92,15 @@ bool test_semantic_file(std::filesystem::path path) {
     buffer << file.rdbuf();
     std::string source(buffer.str());
 
-    Reader reader(source);
-
-    auto program = Program::parse(reader.read());
+    std::vector<std::shared_ptr<ast::Element>> empty_program;
+    Program program = Program::parse(empty_program);
+    try {
+        Reader reader(source);
+        program = Program::parse(reader.read());
+    } catch (EvaluationError const& e) {
+        std::cout << std::endl << e << std::endl;
+        return false;
+    }
 
     Evaluator evaluator;
 
