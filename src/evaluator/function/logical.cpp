@@ -129,7 +129,7 @@ std::shared_ptr<Element> NotFunction::call(CallFrame frame) const {
     bool result;
 
     auto element_bool = std::dynamic_pointer_cast<ast::Boolean>(element);
-    result = !(element_bool->value);
+    result = !element_bool->value;
 
     return std::make_shared<ast::Boolean>(result, this->span);
 }
