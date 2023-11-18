@@ -140,9 +140,7 @@ std::vector<std::filesystem::path> get_paths(Mode mode) {
     return paths;
 }
 
-int test_all_files_semantic() {
-    std::vector<std::filesystem::path> paths = get_paths(Mode::SEMANTIC);
-
+int test_files_semantic(std::vector<std::filesystem::path> paths) {
     int code = 0;
 
     for (auto&& path : paths) {
@@ -160,9 +158,7 @@ int test_all_files_semantic() {
     return code;
 }
 
-int test_all_files_syntax() {
-    std::vector<std::filesystem::path> paths = get_paths(Mode::SYNTAX);
-
+int test_files_syntax(std::vector<std::filesystem::path> paths) {
     int code = 0;
 
     for (auto&& path : paths) {
@@ -280,13 +276,13 @@ int main(int argc, char const** argv) {
         std::cout << "Semantic test on " + path.string() + " is passed!\n";
     } else {
         std::cout << "Syntax tests: \n";
-        if (test_all_files_syntax()) {
+        if (test_files_syntax(get_paths(Mode::SYNTAX))) {
             return 1;
         }
 
         if (arguments.mode == Mode::SEMANTIC) {
             std::cout << "\nSemantic tests: \n";
-            if (test_all_files_semantic()) {
+            if (test_files_semantic(get_paths(Mode::SEMANTIC))) {
                 return 1;
             }
         }
