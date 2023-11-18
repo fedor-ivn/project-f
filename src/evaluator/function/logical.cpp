@@ -81,4 +81,42 @@ void OrFunction::display_parameters(std::ostream& stream) const {
     stream << "a b";
 }
 
+std::shared_ptr<Element> XorFunction::call(CallFrame frame) const {
+    if (frame.arguments.size() != 2) {
+        throw EvaluationError(
+            "`xor` expects 2 arguments, received " +
+                std::to_string(frame.arguments.size()),
+            frame.call_site
+        );
+    }
+
+    auto a_element = frame.arguments[0];
+    auto b_element = frame.arguments[1];
+
+    if (a_element->kind != b_element->kind) {
+        throw EvaluationError(
+            "`xor` expects arguments to be booleans", frame.call_site
+        );
+    }
+
+    bool result;
+
+    if (auto a_bool = std::dynamic_pointer_cast<ast::Boolean>(a_element)) {
+        auto b_bool = std::dynamic_pointer_cast<ast::Boolean>(b_element);
+        result = a_bool->value != b_bool->value;
+    } else {
+        throw EvaluationError(
+            "`xor` expects arguments to be booleans", frame.call_site
+        );
+    }
+
+    return std::make_shared<ast::Boolean>(result, this->span);
+}
+
+std::string_view XorFunction::name() const { return "xor"; }
+
+void XorFunction::display_parameters(std::ostream& stream) const {
+    stream << "a b";
+}
+
 } // namespace evaluator
