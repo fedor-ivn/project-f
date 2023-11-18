@@ -54,7 +54,7 @@ bool test_fail_file_syntax(std::filesystem::path path) {
             auto elements = reader.read();
 
             std::cout << "This file is supposed to be syntactically incorrect, "
-                         "but it is actucally not.";
+                         "but it parsed without errors";
             return false;
         } catch (reader::SyntaxError const&) {
         }
