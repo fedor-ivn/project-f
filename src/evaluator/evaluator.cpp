@@ -27,6 +27,9 @@ Evaluator::Evaluator() : global(std::make_shared<Scope>(Scope(nullptr))) {
     this->global->define(
         ast::Symbol("equal", nowhere), std::make_shared<EqualFunction>()
     );
+    this->global->define(
+        ast::Symbol("nonequal", nowhere), std::make_shared<NonequalFunction>()
+    );
 }
 
 std::shared_ptr<Element> Evaluator::evaluate(Program program) {
