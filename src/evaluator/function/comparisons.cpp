@@ -144,4 +144,51 @@ void LessFunction::display_parameters(std::ostream& stream) const {
     stream << "a b";
 }
 
+std::shared_ptr<Element> LesseqFunction::call(CallFrame frame) const {
+    if (frame.arguments.size() != 2) {
+        throw EvaluationError(
+            "`lesseq` expects 2 arguments, received " +
+                std::to_string(frame.arguments.size()),
+            frame.call_site
+        );
+    }
+
+    auto a_element = frame.arguments[0];
+    auto b_element = frame.arguments[1];
+
+    if (a_element->kind != b_element->kind) {
+        throw EvaluationError(
+            "`lesseq` expects that arguments have the same type",
+            frame.call_site
+        );
+    }
+
+    bool result;
+
+    if (auto a_real = std::dynamic_pointer_cast<ast::Real>(a_element)) {
+        auto b_real = std::dynamic_pointer_cast<ast::Real>(b_element);
+        result = a_real->value <= b_real->value;
+    } else if (auto a_int = std::dynamic_pointer_cast<ast::Integer>(a_element)) {
+        auto b_int = std::dynamic_pointer_cast<ast::Integer>(b_element);
+        result = a_int->value <= b_int->value;
+    } else if (auto a_bool = std::dynamic_pointer_cast<ast::Boolean>(a_element)) {
+        auto b_bool = std::dynamic_pointer_cast<ast::Boolean>(b_element);
+        result = a_bool->value <= b_bool->value;
+    } else {
+        throw EvaluationError(
+            "`lesseq` expects arguments to be both either integers, reals, "
+            "or booleans",
+            frame.call_site
+        );
+    }
+
+    return std::make_shared<ast::Boolean>(result, this->span);
+}
+
+std::string_view LesseqFunction::name() const { return "lesseq"; }
+
+void LesseqFunction::display_parameters(std::ostream& stream) const {
+    stream << "a b";
+}
+
 } // namespace evaluator
