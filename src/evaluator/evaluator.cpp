@@ -46,6 +46,9 @@ Evaluator::Evaluator() : global(std::make_shared<Scope>(Scope(nullptr))) {
     this->global->define(
         ast::Symbol("and", nowhere), std::make_shared<AndFunction>()
     );
+    this->global->define(
+        ast::Symbol("or", nowhere), std::make_shared<OrFunction>()
+    );
 }
 
 std::shared_ptr<Element> Evaluator::evaluate(Program program) {
