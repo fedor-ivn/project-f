@@ -120,15 +120,16 @@ std::shared_ptr<Element> NotFunction::call(CallFrame frame) const {
 
     auto element = frame.arguments[0];
 
-    bool result;
-
-    if (auto element_bool = std::dynamic_pointer_cast<ast::Boolean>(element)) {
-        result = !(element_bool->value);
-    } else {
+    if (element->kind != ElementKind::BOOLEAN) {
         throw EvaluationError(
             "`not` expects argument to be boolean", frame.call_site
         );
     }
+
+    bool result;
+
+    auto element_bool = std::dynamic_pointer_cast<ast::Boolean>(element);
+    result = !(element_bool->value);
 
     return std::make_shared<ast::Boolean>(result, this->span);
 }
