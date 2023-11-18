@@ -1,6 +1,7 @@
 #include "../../utils.h"
 #include "../error.h"
 #include "../expression.h"
+#include "../function.h"
 
 namespace evaluator {
 
@@ -40,8 +41,20 @@ std::unique_ptr<Call> Call::parse(std::shared_ptr<Cons> form) {
     );
 }
 
-std::shared_ptr<Element> Call::evaluate(std::shared_ptr<Scope>) const {
-    throw std::runtime_error("Not implemented");
+std::shared_ptr<Element> Call::evaluate(std::shared_ptr<Scope> scope) const {
+    auto function =
+        std::dynamic_pointer_cast<Function>(this->function->evaluate(scope));
+    if (!function) {
+        throw EvaluationError("Cannot call a non-function", this->span);
+    }
+
+    std::vector<std::shared_ptr<Element>> arguments;
+    for (auto& argument : this->arguments) {
+        arguments.push_back(argument->evaluate(scope));
+    }
+
+    CallFrame frame(std::move(arguments), this->span, scope);
+    return function->call(std::move(frame));
 }
 
 void Call::display(std::ostream& stream, size_t depth) const {
