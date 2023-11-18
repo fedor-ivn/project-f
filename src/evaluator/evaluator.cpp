@@ -23,6 +23,10 @@ Evaluator::Evaluator() : global(std::make_shared<Scope>(Scope(nullptr))) {
     this->global->define(
         ast::Symbol("eval", nowhere), std::make_shared<EvalFunction>()
     );
+
+    this->global->define(
+        ast::Symbol("equal", nowhere), std::make_shared<EqualFunction>()
+    );
 }
 
 std::shared_ptr<Element> Evaluator::evaluate(Program program) {

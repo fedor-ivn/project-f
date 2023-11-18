@@ -30,6 +30,7 @@ add_library(internals
     src/evaluator/function.cpp
     src/evaluator/function/lists.cpp
     src/evaluator/function/evaluation.cpp
+    src/evaluator/function/comparisons.cpp
     src/evaluator/scope.cpp
     src/reader/scanner.cpp
     src/reader/token.cpp
