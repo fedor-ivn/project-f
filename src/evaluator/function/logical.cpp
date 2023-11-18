@@ -17,7 +17,7 @@ std::shared_ptr<Element> AndFunction::call(CallFrame frame) const {
     auto a_element = frame.arguments[0];
     auto b_element = frame.arguments[1];
 
-    if (a_element->kind != b_element->kind) {
+    if (a_element->kind != ElementKind::BOOLEAN || b_element->kind != ElementKind::BOOLEAN) {
         throw EvaluationError(
             "`and` expects arguments to be booleans", frame.call_site
         );
