@@ -26,11 +26,9 @@ std::shared_ptr<Element> AndFunction::call(CallFrame frame) const {
         );
     }
 
-    bool result;
-
     auto a_bool = std::dynamic_pointer_cast<ast::Boolean>(a_element);
     auto b_bool = std::dynamic_pointer_cast<ast::Boolean>(b_element);
-    result = a_bool->value && b_bool->value;
+    auto result = a_bool->value && b_bool->value;
 
     return std::make_shared<ast::Boolean>(result, this->span);
 }
@@ -60,11 +58,9 @@ std::shared_ptr<Element> OrFunction::call(CallFrame frame) const {
         );
     }
 
-    bool result;
-
     auto a_bool = std::dynamic_pointer_cast<ast::Boolean>(a_element);
     auto b_bool = std::dynamic_pointer_cast<ast::Boolean>(b_element);
-    result = a_bool->value || b_bool->value;
+    auto result = a_bool->value || b_bool->value;
 
     return std::make_shared<ast::Boolean>(result, this->span);
 }
@@ -94,11 +90,9 @@ std::shared_ptr<Element> XorFunction::call(CallFrame frame) const {
         );
     }
 
-    bool result;
-
     auto a_bool = std::dynamic_pointer_cast<ast::Boolean>(a_element);
     auto b_bool = std::dynamic_pointer_cast<ast::Boolean>(b_element);
-    result = a_bool->value != b_bool->value;
+    auto result = a_bool->value != b_bool->value;
 
     return std::make_shared<ast::Boolean>(result, this->span);
 }
@@ -126,10 +120,8 @@ std::shared_ptr<Element> NotFunction::call(CallFrame frame) const {
         );
     }
 
-    bool result;
-
     auto element_bool = std::dynamic_pointer_cast<ast::Boolean>(element);
-    result = !element_bool->value;
+    auto result = !element_bool->value;
 
     return std::make_shared<ast::Boolean>(result, this->span);
 }
