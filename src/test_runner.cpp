@@ -27,10 +27,10 @@ enum class ArgumentErrorCause {
 
 class ArgumentError : public std::exception {
     ArgumentErrorCause cause;
-    std::string_view argument;
+    std::string argument;
 
   public:
-    ArgumentError(ArgumentErrorCause cause, std::string_view argument)
+    ArgumentError(ArgumentErrorCause cause, std::string argument)
         : cause(cause), argument(argument) {}
 
     friend std::ostream&
@@ -165,6 +165,12 @@ int test_files_semantic(std::vector<std::filesystem::path> paths) {
     int code = 0;
 
     for (auto&& path : paths) {
+        if (!std::filesystem::exists(path)) {
+            throw ArgumentError(
+                ArgumentErrorCause::FileDoesNotExist, path.string()
+            );
+        }
+
         std::cout << path << ": ";
 
         bool passed = test_semantic_file(path);
@@ -208,7 +214,7 @@ class Arguments {
 
     void parse(int argc, char const** argv) {
         if (argc > 1) {
-            std::string_view argument(argv[1]);
+            std::string argument(argv[1]);
 
             if (argument.starts_with('-')) {
                 if (argument == HELP) {
@@ -231,7 +237,7 @@ class Arguments {
         }
 
         for (int argument_index = 2; argument_index < argc; argument_index++) {
-            std::string_view argument = argv[argument_index];
+            std::string argument = argv[argument_index];
 
             if (argument == SYNTAX || argument == SEMANTIC) {
                 if (explicit_flag) {
@@ -246,14 +252,6 @@ class Arguments {
             }
 
             files.push_back(argument);
-        }
-
-        for (auto path : files) {
-            if (!std::filesystem::exists(path)) {
-                throw ArgumentError(
-                    ArgumentErrorCause::FileDoesNotExist, path.string()
-                );
-            }
         }
     }
 
@@ -286,21 +284,26 @@ int main(int argc, char const** argv) {
 
     int code = 0;
 
-    if (arguments.files.size()) {
-        std::cout << "Tests:\n";
-        code = test_files_semantic(arguments.files);
-    } else {
-        std::cout << "Syntax tests: \n";
-        if (test_files_syntax(get_paths(Mode::SYNTAX))) {
-            code = 1;
-        }
-
-        if (arguments.mode == Mode::SEMANTIC) {
-            std::cout << "\nSemantic tests: \n";
-            if (test_files_semantic(get_paths(Mode::SEMANTIC))) {
+    try {
+        if (arguments.files.size()) {
+            std::cout << "Tests:\n";
+            code = test_files_semantic(arguments.files);
+        } else {
+            std::cout << "Syntax tests: \n";
+            if (test_files_syntax(get_paths(Mode::SYNTAX))) {
                 code = 1;
             }
+
+            if (arguments.mode == Mode::SEMANTIC) {
+                std::cout << "\nSemantic tests: \n";
+                if (test_files_semantic(get_paths(Mode::SEMANTIC))) {
+                    code = 1;
+                }
+            }
         }
+    } catch (ArgumentError const& error) {
+        std::cerr << error << std::endl;
+        return 1;
     }
 
     return code;
