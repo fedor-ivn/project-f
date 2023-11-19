@@ -1,4 +1,5 @@
 #include "../../utils.h"
+#include "../control_flow.h"
 #include "../error.h"
 #include "../expression.h"
 
@@ -6,6 +7,7 @@ namespace evaluator {
 
 using ast::Element;
 using ast::List;
+using ast::Null;
 using ast::Span;
 using utils::Depth;
 using utils::to_cons;
@@ -36,9 +38,27 @@ std::unique_ptr<Prog> Prog::parse(Span span, std::shared_ptr<List> arguments) {
     );
 }
 
-std::shared_ptr<Element> Prog::evaluate(std::shared_ptr<Scope>) const {
-    throw std::runtime_error("Not implemented");
-}
+std::shared_ptr<Element> Prog::evaluate(std::shared_ptr<Scope> parent_scope
+) const {
+    auto local_scope = std::make_shared<Scope>(Scope(parent_scope));
+
+    for (auto parameter : this->variables.parameters) {
+        local_scope->define(
+            *parameter, std::make_shared<ast::Null>(Null(parameter->span))
+        );
+    }
+
+    std::shared_ptr<ast::Element> result = std::make_shared<Null>(this->span);
+    for (auto const& expression : this->body.body) {
+        try {
+            result = expression->evaluate(local_scope);
+        } catch (BreakControlFlow e) {
+            return e.element;
+        }
+    }
+
+    return result;
+};
 
 void Prog::display(std::ostream& stream, size_t depth) const {
     stream << "Prog {\n";
