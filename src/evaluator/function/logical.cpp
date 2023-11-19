@@ -122,7 +122,7 @@ std::shared_ptr<Element> NotFunction::call(CallFrame frame) const {
 
     if (element->kind != ElementKind::BOOLEAN) {
         throw EvaluationError(
-            "`not` expects argument to be boolean", frame.call_site
+            "`not` expects its argument to be a boolean", frame.call_site
         );
     }
 
