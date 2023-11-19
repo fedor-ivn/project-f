@@ -22,7 +22,6 @@ enum class ArgumentErrorCause {
     ExtraArgument,
     WrongFlagPosition,
     UnknownFlag,
-    FileDoesNotExist
 };
 
 class ArgumentError : public std::exception {
@@ -49,16 +48,18 @@ class ArgumentError : public std::exception {
             stream << "unknown flag: '" << error.argument << "'";
         }
 
-        else if (error.cause == ArgumentErrorCause::FileDoesNotExist) {
-            stream << "this file does not exist: '" << error.argument << "'";
-        }
-
         return stream;
     }
 };
 
 bool test_fail_file_syntax(std::filesystem::path path) {
     std::ifstream file(path);
+
+    if (!file.is_open()) {
+        std::cout << "this file does not exist" << std::endl;
+        return false;
+    }
+
     std::string line;
 
     while (std::getline(file, line)) {
@@ -78,6 +79,12 @@ bool test_fail_file_syntax(std::filesystem::path path) {
 
 bool test_correct_file_syntax(std::filesystem::path path) {
     std::ifstream file(path);
+
+    if (!file.is_open()) {
+        std::cout << "this file does not exist" << std::endl;
+        return false;
+    }
+
     std::stringstream buffer;
     buffer << file.rdbuf();
     std::string source(buffer.str());
@@ -102,6 +109,12 @@ bool test_syntax_file(std::filesystem::path path) {
 
 bool test_semantic_file(std::filesystem::path path) {
     std::ifstream file(path);
+
+    if (!file.is_open()) {
+        std::cout << "this file does not exist" << std::endl;
+        return false;
+    }
+
     std::stringstream buffer;
     buffer << file.rdbuf();
     std::string source(buffer.str());
@@ -165,12 +178,6 @@ int test_files_semantic(std::vector<std::filesystem::path> paths) {
     int code = 0;
 
     for (auto&& path : paths) {
-        if (!std::filesystem::exists(path)) {
-            throw ArgumentError(
-                ArgumentErrorCause::FileDoesNotExist, path.string()
-            );
-        }
-
         std::cout << path << ": ";
 
         bool passed = test_semantic_file(path);
