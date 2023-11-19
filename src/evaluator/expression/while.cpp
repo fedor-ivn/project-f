@@ -1,4 +1,5 @@
 #include "../../utils.h"
+#include "../control_flow.h"
 #include "../error.h"
 #include "../expression.h"
 
@@ -6,6 +7,7 @@ namespace evaluator {
 
 using ast::Element;
 using ast::List;
+using ast::Null;
 using ast::Span;
 using utils::Depth;
 using utils::to_cons;
@@ -39,8 +41,29 @@ While::parse(Span span, std::shared_ptr<List> arguments) {
     );
 }
 
-std::shared_ptr<Element> While::evaluate(std::shared_ptr<Scope>) const {
-    throw std::runtime_error("Not implemented");
+std::shared_ptr<Element> While::evaluate(std::shared_ptr<Scope> scope) const {
+    try {
+        while (true) {
+            auto condition = this->condition->evaluate(scope);
+            auto boolean_condition =
+                std::dynamic_pointer_cast<ast::Boolean>(condition);
+
+            if (!boolean_condition) {
+                throw EvaluationError("a boolean is expected", condition->span);
+            }
+
+            if (!boolean_condition->value) {
+                break;
+            }
+
+            for (auto const& expression : this->body.body) {
+                expression->evaluate(scope);
+            }
+        }
+    } catch (BreakControlFlow) {
+    }
+
+    return std::make_shared<Null>(Null(this->span));
 }
 
 void While::display(std::ostream& stream, size_t depth) const {
