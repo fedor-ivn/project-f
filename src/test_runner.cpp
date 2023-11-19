@@ -18,7 +18,12 @@ using reader::SyntaxError;
 
 enum class Mode { SYNTAX, SEMANTIC };
 
-enum class ArgumentErrorCause { ExtraArgument, WrongFlagPosition };
+enum class ArgumentErrorCause {
+    ExtraArgument,
+    WrongFlagPosition,
+    UnknownFlag,
+    FileDoesNotExist
+};
 
 class ArgumentError : public std::exception {
     ArgumentErrorCause cause;
@@ -38,6 +43,14 @@ class ArgumentError : public std::exception {
 
         else if (error.cause == ArgumentErrorCause::WrongFlagPosition) {
             stream << "wrong flag position: '" << error.argument << "'";
+        }
+
+        else if (error.cause == ArgumentErrorCause::UnknownFlag) {
+            stream << "unknown flag: '" << error.argument << "'";
+        }
+
+        else if (error.cause == ArgumentErrorCause::FileDoesNotExist) {
+            stream << "this file does not exist: '" << error.argument << "'";
         }
 
         return stream;
@@ -98,6 +111,9 @@ bool test_semantic_file(std::filesystem::path path) {
     try {
         Reader reader(source);
         program = Program::parse(reader.read());
+    } catch (SyntaxError const& e) {
+        std::cout << e << std::endl;
+        return false;
     } catch (EvaluationError const& e) {
         std::cout << e << std::endl;
         return false;
@@ -182,7 +198,7 @@ int test_files_syntax(std::vector<std::filesystem::path> paths) {
 class Arguments {
   public:
     std::vector<std::filesystem::path> files;
-    Mode mode;
+    Mode mode = Mode::SEMANTIC;
     bool help = false;
     bool explicit_flag = false;
 
@@ -191,44 +207,52 @@ class Arguments {
     constexpr static const std::string_view SEMANTIC = "--semantic";
 
     void parse(int argc, char const** argv) {
-        if (argc == 1) {
-            this->mode = Mode::SEMANTIC;
-        }
-
         if (argc > 1) {
-            if (argv[1] == HELP) {
-                this->help = true;
-                return;
-            }
-        }
+            std::string_view argument(argv[1]);
 
-        for (int argument_index = 1; argument_index < argc; argument_index++) {
-            std::string_view argument = argv[argument_index];
-
-            if (argument_index == 1) {
-                if (argument == SYNTAX) {
+            if (argument.starts_with('-')) {
+                if (argument == HELP) {
+                    this->help = true;
+                    return;
+                } else if (argument == SYNTAX) {
                     mode = Mode::SYNTAX;
                     explicit_flag = true;
                 } else if (argument == SEMANTIC) {
                     mode = Mode::SEMANTIC;
                     explicit_flag = true;
                 } else {
-                    files.push_back(argument);
+                    throw ArgumentError(
+                        ArgumentErrorCause::UnknownFlag, argument
+                    );
                 }
             } else {
-                if (argument == SYNTAX || argument == SEMANTIC) {
-                    if (explicit_flag) {
-                        throw ArgumentError(
-                            ArgumentErrorCause::ExtraArgument, argument
-                        );
-                    } else {
-                        throw ArgumentError(
-                            ArgumentErrorCause::WrongFlagPosition, argument
-                        );
-                    }
-                }
-
                 files.push_back(argument);
+            }
+        }
+
+        for (int argument_index = 2; argument_index < argc; argument_index++) {
+            std::string_view argument = argv[argument_index];
+
+            if (argument == SYNTAX || argument == SEMANTIC) {
+                if (explicit_flag) {
+                    throw ArgumentError(
+                        ArgumentErrorCause::ExtraArgument, argument
+                    );
+                } else {
+                    throw ArgumentError(
+                        ArgumentErrorCause::WrongFlagPosition, argument
+                    );
+                }
+            }
+
+            files.push_back(argument);
+        }
+
+        for (auto path : files) {
+            if (!std::filesystem::exists(path)) {
+                throw ArgumentError(
+                    ArgumentErrorCause::FileDoesNotExist, path.string()
+                );
             }
         }
     }
@@ -263,14 +287,7 @@ int main(int argc, char const** argv) {
     int code = 0;
 
     if (arguments.files.size()) {
-        std::cout << "Syntax tests:\n";
-        code = test_files_syntax(arguments.files);
-
-        if (code) {
-            return code;
-        }
-
-        std::cout << "\nSemantic tests:\n";
+        std::cout << "Tests:\n";
         code = test_files_semantic(arguments.files);
     } else {
         std::cout << "Syntax tests: \n";
