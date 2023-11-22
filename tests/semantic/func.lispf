@@ -1,0 +1,3 @@
+(func foo (x y z)
+    (plus x (times y z)))
+(equal (foo 1 2 3) 7)

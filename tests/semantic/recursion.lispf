@@ -1,0 +1,6 @@
+; test recursion
+(func factorial (n)
+    (cond (lesseq n 1)
+        1
+        (times n (factorial (minus n 1)))))
+(equal (factorial 5) 120)

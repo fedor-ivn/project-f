@@ -1,0 +1,10 @@
+; test using function objects
+(cond (nonequal ((func id (x) x) 10) 10)
+    (return false))
+(setq eggs id)
+(cond (nonequal (eggs 11) 11)
+    (return false))
+(func x (y) (y 12))
+(cond (nonequal (x eggs) 12)
+    (return false))
+true

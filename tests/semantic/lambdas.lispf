@@ -1,0 +1,13 @@
+; test lambdas
+(setq square (lambda (x) (times x x)))
+(cond (nonequal (square 5) 25)
+    (return false))
+(cond (nonequal (x square) 144)
+    (return false))
+
+(cond ((lambda (x) (not x)) true)
+    (return false))
+(cond (not (isfunc x))
+    (return false))
+
+true

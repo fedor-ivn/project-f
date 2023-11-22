@@ -1,0 +1,2 @@
+; test the return value of `func`
+(isfunc (func x ()))
