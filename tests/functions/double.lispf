@@ -1,0 +1,12 @@
+(setq inf (divide 1.0 0.0))
+(setq negInf (divide -1.0 0.0))
+(setq nan (divide 0.0 0.0))
+
+(func isNan (x) (nonequal x x))
+
+(and (equal +0.0 -0.0)
+     (isNan nan)
+     (isNan (minus inf inf))
+     (isNan (plus nan 4.0))
+     (equal (plus negInf 1.0) negInf)
+     (equal (minus 2.0 inf) negInf))
