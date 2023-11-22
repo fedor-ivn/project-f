@@ -1,0 +1,2 @@
+; test the return value of `prog`
+(equal (prog () 1 2 3) 3)

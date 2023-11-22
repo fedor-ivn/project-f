@@ -1,0 +1,7 @@
+; captured variables remain alive even after the scope ends
+(setq increment
+      (prog (counter)
+          (setq counter 0)
+          (lambda () (setq counter (plus counter 1)))))
+
+(and (equal (increment) 1) (equal (increment) 2))

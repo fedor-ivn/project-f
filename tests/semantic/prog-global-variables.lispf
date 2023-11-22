@@ -1,0 +1,4 @@
+; test prog accesses global variables
+(setq a 1)
+(prog () (setq a 2))
+(equal a 2)
