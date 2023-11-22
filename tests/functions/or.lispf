@@ -1,0 +1,4 @@
+(and (or true true)
+     (or true false)
+     (or false true)
+     (not (or false false)))

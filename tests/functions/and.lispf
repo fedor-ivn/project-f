@@ -1,0 +1,4 @@
+(cond (not (and true true)) (return false))
+(cond (and true false) (return false))
+(cond (and false true) (return false))
+(not (and false false))

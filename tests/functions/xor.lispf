@@ -1,0 +1,4 @@
+(and (not (xor true true))
+     (xor true false)
+     (xor false true)
+     (not (xor false false)))
