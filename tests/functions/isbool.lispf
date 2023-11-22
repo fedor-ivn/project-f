@@ -1,0 +1,3 @@
+(and (isbool true)
+     (isbool false)
+     (not (isbool 0)))

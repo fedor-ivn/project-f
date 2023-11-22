@@ -1,0 +1,3 @@
+(and (isnull null)
+     (isnull '())
+     (not (isnull '(null))))

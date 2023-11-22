@@ -1,0 +1,3 @@
+(and (isreal 4.0)
+     (isreal (divide 0.0 0.0))
+     (not (isreal 4)))

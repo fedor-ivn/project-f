@@ -1,0 +1,6 @@
+(setq foo 1)
+(setq bar 'bar)
+(and (isatom 'foo)
+     (isatom bar)
+     (not (isatom foo))
+     (not (isatom ''foo)))
