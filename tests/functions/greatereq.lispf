@@ -1,3 +1,3 @@
 (and (greatereq 4 3)
      (not (greatereq false true))
-     (greater -1.0 -2.0))
+     (greatereq -1.0 -1.0))

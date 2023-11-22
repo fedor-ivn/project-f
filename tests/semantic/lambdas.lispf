@@ -1,4 +1,6 @@
 ; test lambdas
+(func x (y) (y 12))
+
 (setq square (lambda (x) (times x x)))
 (cond (nonequal (square 5) 25)
     (return false))

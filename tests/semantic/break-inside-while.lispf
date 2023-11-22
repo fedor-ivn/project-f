@@ -3,7 +3,4 @@
 (while (not (isnull l))
     (cond (equal (head l) 3) (break))
     (setq l (tail l)))
-(setq breakWhileResult (equal (head l) 3))
-
-(return breakWhileResult)
-(divide 3 0)
+(equal (head l) 3)
