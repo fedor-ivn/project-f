@@ -40,7 +40,7 @@ Lambda::parse(Span span, std::shared_ptr<ast::List> arguments) {
     );
 }
 
-std::shared_ptr<ast::Element> Lambda::evaluate(std::shared_ptr<Scope>) const {
+ElementGuard Lambda::evaluate(EvaluationContext) const {
     throw std::runtime_error("Not implemented");
 }
 

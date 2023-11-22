@@ -41,19 +41,23 @@ std::unique_ptr<Call> Call::parse(std::shared_ptr<Cons> form) {
     );
 }
 
-std::shared_ptr<Element> Call::evaluate(std::shared_ptr<Scope> scope) const {
-    auto function =
-        std::dynamic_pointer_cast<Function>(this->function->evaluate(scope));
+ElementGuard Call::evaluate(EvaluationContext context) const {
+    auto function_guard = this->function->evaluate(context);
+    auto function = std::dynamic_pointer_cast<Function>(*function_guard);
     if (!function) {
         throw EvaluationError("Cannot call a non-function", this->span);
     }
 
+    std::vector<ElementGuard> argument_guards;
     std::vector<std::shared_ptr<Element>> arguments;
     for (auto& argument : this->arguments) {
-        arguments.push_back(argument->evaluate(scope));
+        auto guard = argument->evaluate(context);
+        guard.deactivate();
+        arguments.push_back(*guard);
+        argument_guards.push_back(std::move(guard));
     }
 
-    CallFrame frame(std::move(arguments), this->span, scope);
+    CallFrame frame(std::move(arguments), this->span, context);
     return function->call(std::move(frame));
 }
 

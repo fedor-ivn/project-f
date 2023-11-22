@@ -2,13 +2,13 @@
 
 namespace evaluator {
 
-using ast::Element;
-
 Symbol::Symbol(std::shared_ptr<ast::Symbol> symbol)
     : Expression(symbol->span), symbol(symbol) {}
 
-std::shared_ptr<Element> Symbol::evaluate(std::shared_ptr<Scope> scope) const {
-    return scope->lookup(*this->symbol);
+ElementGuard Symbol::evaluate(EvaluationContext context) const {
+    return context.garbage_collector->temporary(
+        context.scope->lookup(*this->symbol)
+    );
 }
 
 void Symbol::display(std::ostream& stream, size_t depth) const {

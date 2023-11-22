@@ -6,6 +6,11 @@ using ast::Cons;
 using ast::Element;
 using ast::Span;
 
+EvaluationContext::EvaluationContext(
+    GarbageCollector* gc, std::shared_ptr<Scope> scope
+)
+    : garbage_collector(gc), scope(scope) {}
+
 Expression::Expression(Span span) : span(span) {}
 
 std::unique_ptr<Expression> Expression::parse(std::shared_ptr<Element> element

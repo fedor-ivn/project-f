@@ -7,7 +7,7 @@ namespace evaluator {
 using ast::Element;
 using ast::ElementKind;
 
-std::shared_ptr<Element> EqualFunction::call(CallFrame frame) const {
+ElementGuard EqualFunction::call(CallFrame frame) const {
     if (frame.arguments.size() != 2) {
         throw EvaluationError(
             "`equal` expects 2 arguments, received " +
@@ -45,7 +45,9 @@ std::shared_ptr<Element> EqualFunction::call(CallFrame frame) const {
         );
     }
 
-    return std::make_shared<ast::Boolean>(result, this->span);
+    return frame.context.garbage_collector->temporary(
+        std::make_shared<ast::Boolean>(result, this->span)
+    );
 }
 
 std::string_view EqualFunction::name() const { return "equal"; }
@@ -54,7 +56,7 @@ void EqualFunction::display_parameters(std::ostream& stream) const {
     stream << "a b";
 }
 
-std::shared_ptr<Element> NonequalFunction::call(CallFrame frame) const {
+ElementGuard NonequalFunction::call(CallFrame frame) const {
     if (frame.arguments.size() != 2) {
         throw EvaluationError(
             "`nonequal` expects 2 arguments, received " +
@@ -92,7 +94,9 @@ std::shared_ptr<Element> NonequalFunction::call(CallFrame frame) const {
         );
     }
 
-    return std::make_shared<ast::Boolean>(result, this->span);
+    return frame.context.garbage_collector->temporary(
+        std::make_shared<ast::Boolean>(result, this->span)
+    );
 }
 
 std::string_view NonequalFunction::name() const { return "nonequal"; }
@@ -101,7 +105,7 @@ void NonequalFunction::display_parameters(std::ostream& stream) const {
     stream << "a b";
 }
 
-std::shared_ptr<Element> LessFunction::call(CallFrame frame) const {
+ElementGuard LessFunction::call(CallFrame frame) const {
     if (frame.arguments.size() != 2) {
         throw EvaluationError(
             "`less` expects 2 arguments, received " +
@@ -139,7 +143,9 @@ std::shared_ptr<Element> LessFunction::call(CallFrame frame) const {
         );
     }
 
-    return std::make_shared<ast::Boolean>(result, this->span);
+    return frame.context.garbage_collector->temporary(
+        std::make_shared<ast::Boolean>(result, this->span)
+    );
 }
 
 std::string_view LessFunction::name() const { return "less"; }
@@ -148,7 +154,7 @@ void LessFunction::display_parameters(std::ostream& stream) const {
     stream << "a b";
 }
 
-std::shared_ptr<Element> LesseqFunction::call(CallFrame frame) const {
+ElementGuard LesseqFunction::call(CallFrame frame) const {
     if (frame.arguments.size() != 2) {
         throw EvaluationError(
             "`lesseq` expects 2 arguments, received " +
@@ -186,7 +192,9 @@ std::shared_ptr<Element> LesseqFunction::call(CallFrame frame) const {
         );
     }
 
-    return std::make_shared<ast::Boolean>(result, this->span);
+    return frame.context.garbage_collector->temporary(
+        std::make_shared<ast::Boolean>(result, this->span)
+    );
 }
 
 std::string_view LesseqFunction::name() const { return "lesseq"; }
@@ -195,7 +203,7 @@ void LesseqFunction::display_parameters(std::ostream& stream) const {
     stream << "a b";
 }
 
-std::shared_ptr<Element> GreaterFunction::call(CallFrame frame) const {
+ElementGuard GreaterFunction::call(CallFrame frame) const {
     if (frame.arguments.size() != 2) {
         throw EvaluationError(
             "`greater` expects 2 arguments, received " +
@@ -233,7 +241,9 @@ std::shared_ptr<Element> GreaterFunction::call(CallFrame frame) const {
         );
     }
 
-    return std::make_shared<ast::Boolean>(result, this->span);
+    return frame.context.garbage_collector->temporary(
+        std::make_shared<ast::Boolean>(result, this->span)
+    );
 }
 
 std::string_view GreaterFunction::name() const { return "greater"; }
@@ -242,7 +252,7 @@ void GreaterFunction::display_parameters(std::ostream& stream) const {
     stream << "a b";
 }
 
-std::shared_ptr<Element> GreatereqFunction::call(CallFrame frame) const {
+ElementGuard GreatereqFunction::call(CallFrame frame) const {
     if (frame.arguments.size() != 2) {
         throw EvaluationError(
             "`greatereq` expects 2 arguments, received " +
@@ -280,7 +290,9 @@ std::shared_ptr<Element> GreatereqFunction::call(CallFrame frame) const {
         );
     }
 
-    return std::make_shared<ast::Boolean>(result, this->span);
+    return frame.context.garbage_collector->temporary(
+        std::make_shared<ast::Boolean>(result, this->span)
+    );
 }
 
 std::string_view GreatereqFunction::name() const { return "greatereq"; }

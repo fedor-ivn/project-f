@@ -41,12 +41,12 @@ While::parse(Span span, std::shared_ptr<List> arguments) {
     );
 }
 
-std::shared_ptr<Element> While::evaluate(std::shared_ptr<Scope> scope) const {
+ElementGuard While::evaluate(EvaluationContext context) const {
     try {
         while (true) {
-            auto condition = this->condition->evaluate(scope);
+            auto condition = this->condition->evaluate(context);
             auto boolean_condition =
-                std::dynamic_pointer_cast<ast::Boolean>(condition);
+                std::dynamic_pointer_cast<ast::Boolean>(*condition);
 
             if (!boolean_condition) {
                 throw EvaluationError("a boolean is expected", condition->span);
@@ -56,14 +56,14 @@ std::shared_ptr<Element> While::evaluate(std::shared_ptr<Scope> scope) const {
                 break;
             }
 
-            for (auto const& expression : this->body.body) {
-                expression->evaluate(scope);
-            }
+            this->body.evaluate(context);
         }
-    } catch (BreakControlFlow) {
+    } catch (BreakControlFlow&) {
     }
 
-    return std::make_shared<Null>(Null(this->span));
+    return context.garbage_collector->temporary(
+        std::make_shared<Null>(Null(this->span))
+    );
 }
 
 void While::display(std::ostream& stream, size_t depth) const {

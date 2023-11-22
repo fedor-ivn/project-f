@@ -65,11 +65,10 @@ std::unique_ptr<Cond> Cond::parse(Span span, std::shared_ptr<List> arguments) {
     return std::make_unique<Cond>(std::move(cond));
 }
 
-std::shared_ptr<Element> Cond::evaluate(std::shared_ptr<Scope> scope) const {
-    auto evaluated_condition = condition->evaluate(scope);
-
+ElementGuard Cond::evaluate(EvaluationContext context) const {
+    auto evaluated_condition = condition->evaluate(context);
     auto boolean_condition =
-        std::dynamic_pointer_cast<ast::Boolean>(evaluated_condition);
+        std::dynamic_pointer_cast<ast::Boolean>(*evaluated_condition);
 
     if (!boolean_condition) {
         throw EvaluationError(
@@ -78,9 +77,9 @@ std::shared_ptr<Element> Cond::evaluate(std::shared_ptr<Scope> scope) const {
     }
 
     if (boolean_condition->value) {
-        return then->evaluate(scope);
+        return then->evaluate(context);
     }
-    return otherwise->evaluate(scope);
+    return otherwise->evaluate(context);
 }
 
 void Cond::display(std::ostream& stream, size_t depth) const {

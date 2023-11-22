@@ -8,7 +8,7 @@ using ast::Element;
 using ast::List;
 using ast::Null;
 
-std::shared_ptr<Element> HeadFunction::call(CallFrame frame) const {
+ElementGuard HeadFunction::call(CallFrame frame) const {
     if (frame.arguments.size() != 1) {
         throw EvaluationError(
             "`head` expects 1 argument, received " +
@@ -19,11 +19,11 @@ std::shared_ptr<Element> HeadFunction::call(CallFrame frame) const {
     auto list = frame.arguments[0];
 
     if (auto cons = std::dynamic_pointer_cast<Cons>(list)) {
-        return cons->left;
+        return frame.context.garbage_collector->temporary(cons->left);
     }
 
     if (auto null = std::dynamic_pointer_cast<Null>(list)) {
-        return null;
+        return frame.context.garbage_collector->temporary(null);
     }
 
     throw EvaluationError(
@@ -36,7 +36,7 @@ void HeadFunction::display_parameters(std::ostream& stream) const {
     stream << "list";
 }
 
-std::shared_ptr<Element> TailFunction::call(CallFrame frame) const {
+ElementGuard TailFunction::call(CallFrame frame) const {
     if (frame.arguments.size() != 1) {
         throw EvaluationError(
             "`tail` expects 1 argument, received " +
@@ -47,11 +47,11 @@ std::shared_ptr<Element> TailFunction::call(CallFrame frame) const {
     auto list = frame.arguments[0];
 
     if (auto cons = std::dynamic_pointer_cast<Cons>(list)) {
-        return cons->right;
+        return frame.context.garbage_collector->temporary(cons->right);
     }
 
     if (auto null = std::dynamic_pointer_cast<Null>(list)) {
-        return null;
+        return frame.context.garbage_collector->temporary(null);
     }
 
     throw EvaluationError(
@@ -64,7 +64,7 @@ void TailFunction::display_parameters(std::ostream& stream) const {
     stream << "list";
 }
 
-std::shared_ptr<Element> ConsFunction::call(CallFrame frame) const {
+ElementGuard ConsFunction::call(CallFrame frame) const {
     if (frame.arguments.size() != 2) {
         throw EvaluationError(
             "`cons` expects 2 arguments, received " +
@@ -81,7 +81,9 @@ std::shared_ptr<Element> ConsFunction::call(CallFrame frame) const {
         );
     }
 
-    return std::make_unique<Cons>(left, right, frame.call_site);
+    return frame.context.garbage_collector->temporary(
+        std::make_unique<Cons>(left, right, frame.call_site)
+    );
 }
 
 std::string_view ConsFunction::name() const { return "cons"; }
