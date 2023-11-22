@@ -77,4 +77,104 @@ class EvalFunction : public BuiltInFunction {
     virtual void display_parameters(std::ostream& stream) const;
 };
 
+class EqualFunction : public BuiltInFunction {
+  public:
+    using BuiltInFunction::BuiltInFunction;
+    virtual std::shared_ptr<Element> call(CallFrame frame) const;
+
+  protected:
+    virtual std::string_view name() const;
+    virtual void display_parameters(std::ostream& stream) const;
+};
+
+class NonequalFunction : public BuiltInFunction {
+  public:
+    using BuiltInFunction::BuiltInFunction;
+    virtual std::shared_ptr<Element> call(CallFrame frame) const;
+
+  protected:
+    virtual std::string_view name() const;
+    virtual void display_parameters(std::ostream& stream) const;
+};
+
+class LessFunction : public BuiltInFunction {
+  public:
+    using BuiltInFunction::BuiltInFunction;
+    virtual std::shared_ptr<Element> call(CallFrame frame) const;
+
+  protected:
+    virtual std::string_view name() const;
+    virtual void display_parameters(std::ostream& stream) const;
+};
+
+class LesseqFunction : public BuiltInFunction {
+  public:
+    using BuiltInFunction::BuiltInFunction;
+    virtual std::shared_ptr<Element> call(CallFrame frame) const;
+
+  protected:
+    virtual std::string_view name() const;
+    virtual void display_parameters(std::ostream& stream) const;
+};
+
+class GreaterFunction : public BuiltInFunction {
+  public:
+    using BuiltInFunction::BuiltInFunction;
+    virtual std::shared_ptr<Element> call(CallFrame frame) const;
+
+  protected:
+    virtual std::string_view name() const;
+    virtual void display_parameters(std::ostream& stream) const;
+};
+
+class GreatereqFunction : public BuiltInFunction {
+  public:
+    using BuiltInFunction::BuiltInFunction;
+    virtual std::shared_ptr<Element> call(CallFrame frame) const;
+
+  protected:
+    virtual std::string_view name() const;
+    virtual void display_parameters(std::ostream& stream) const;
+};
+
+class AndFunction : public BuiltInFunction {
+  public:
+    using BuiltInFunction::BuiltInFunction;
+    virtual std::shared_ptr<Element> call(CallFrame frame) const;
+
+  protected:
+    virtual std::string_view name() const;
+    virtual void display_parameters(std::ostream& stream) const;
+};
+
+class OrFunction : public BuiltInFunction {
+  public:
+    using BuiltInFunction::BuiltInFunction;
+    virtual std::shared_ptr<Element> call(CallFrame frame) const;
+
+  protected:
+    virtual std::string_view name() const;
+    virtual void display_parameters(std::ostream& stream) const;
+};
+
+class XorFunction : public BuiltInFunction {
+  public:
+    using BuiltInFunction::BuiltInFunction;
+    virtual std::shared_ptr<Element> call(CallFrame frame) const;
+
+  protected:
+    virtual std::string_view name() const;
+    virtual void display_parameters(std::ostream& stream) const;
+};
+
+class NotFunction : public BuiltInFunction {
+  public:
+    using BuiltInFunction::BuiltInFunction;
+    virtual std::shared_ptr<Element> call(CallFrame frame) const;
+
+  protected:
+    virtual std::string_view name() const;
+    virtual void display_parameters(std::ostream& stream) const;
+};
+
 } // namespace evaluator

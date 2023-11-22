@@ -23,6 +23,38 @@ Evaluator::Evaluator() : global(std::make_shared<Scope>(Scope(nullptr))) {
     this->global->define(
         ast::Symbol("eval", nowhere), std::make_shared<EvalFunction>()
     );
+
+    this->global->define(
+        ast::Symbol("equal", nowhere), std::make_shared<EqualFunction>()
+    );
+    this->global->define(
+        ast::Symbol("nonequal", nowhere), std::make_shared<NonequalFunction>()
+    );
+    this->global->define(
+        ast::Symbol("less", nowhere), std::make_shared<LessFunction>()
+    );
+    this->global->define(
+        ast::Symbol("lesseq", nowhere), std::make_shared<LesseqFunction>()
+    );
+    this->global->define(
+        ast::Symbol("greater", nowhere), std::make_shared<GreaterFunction>()
+    );
+    this->global->define(
+        ast::Symbol("greatereq", nowhere), std::make_shared<GreatereqFunction>()
+    );
+
+    this->global->define(
+        ast::Symbol("and", nowhere), std::make_shared<AndFunction>()
+    );
+    this->global->define(
+        ast::Symbol("or", nowhere), std::make_shared<OrFunction>()
+    );
+    this->global->define(
+        ast::Symbol("xor", nowhere), std::make_shared<XorFunction>()
+    );
+    this->global->define(
+        ast::Symbol("not", nowhere), std::make_shared<NotFunction>()
+    );
 }
 
 std::shared_ptr<Element> Evaluator::evaluate(Program program) {
