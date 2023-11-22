@@ -121,16 +121,9 @@ bool test_semantic_file(std::filesystem::path path) {
 
     std::vector<std::shared_ptr<ast::Element>> empty_program;
     Program program = Program::parse(empty_program);
-    try {
-        Reader reader(source);
-        program = Program::parse(reader.read());
-    } catch (SyntaxError const& e) {
-        std::cout << e << std::endl;
-        return false;
-    } catch (EvaluationError const& e) {
-        std::cout << e << std::endl;
-        return false;
-    }
+
+    Reader reader(source);
+    program = Program::parse(reader.read());
 
     Evaluator evaluator;
 
@@ -180,7 +173,17 @@ int test_files_semantic(std::vector<std::filesystem::path> paths) {
     for (auto&& path : paths) {
         std::cout << path << ": ";
 
-        bool passed = test_semantic_file(path);
+        bool passed;
+        try {
+            passed = test_semantic_file(path);
+        } catch (SyntaxError const& e) {
+            std::cout << e << std::endl;
+            code = 1;
+        } catch (EvaluationError const& e) {
+            std::cout << e << std::endl;
+            code = 1;
+        }
+
         if (passed) {
             std::cout << "passed" << std::endl;
         } else {
