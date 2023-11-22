@@ -1,0 +1,4 @@
+(and (equal (head '(1 2 3 4)) 1)
+     (equal (head (cons 4 (cons 3 null))) 4)
+     (isnull (head '()))
+     (isnull (head null)))

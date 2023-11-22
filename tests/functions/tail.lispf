@@ -1,0 +1,10 @@
+(func equalList (a b)
+    (cond (isnull a) (return (isnull b)))
+    (cond (isnull b) (return false))
+    (cond (nonequal (head a) (head b)) (return false))
+    (equalList (tail a) (tail b)))
+
+(and (equalList (tail '(1 2 3 4)) '(2 3 4))
+     (equalList (tail (cons 4 (cons 3 null))) '(3))
+     (isnull (tail '()))
+     (isnull (tail null)))
