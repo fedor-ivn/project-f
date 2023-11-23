@@ -4,6 +4,7 @@
     (cond (nonequal (head a) (head b)) (return false))
     (equalList (tail a) (tail b)))
 
-(and (equalList (cons 1 '(2 3)) '(1 2 3))
-     (equalList (cons 1 null) '(1))
+(cond (not (equalList (cons 1 '(2 3)) '(1 2 3)))
+    (return false))
+(and (equalList (cons 1 null) '(1))
      (equalList (cons null null) '(null)))

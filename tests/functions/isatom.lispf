@@ -1,6 +1,9 @@
 (setq foo 1)
 (setq bar 'bar)
-(and (isatom 'foo)
-     (isatom bar)
-     (not (isatom foo))
+
+(cond (not (isatom 'foo))
+    (return false))
+(cond (not (isatom bar))
+    (return false))
+(and (not (isatom foo))
      (not (isatom ''foo)))

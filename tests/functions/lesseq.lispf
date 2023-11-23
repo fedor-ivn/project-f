@@ -1,3 +1,4 @@
-(and (lesseq 4 4)
-     (not (lesseq true false))
+(cond (not (lesseq 4 4))
+    (return false))
+(and (not (lesseq true false))
      (lesseq -1.0 -1.0))

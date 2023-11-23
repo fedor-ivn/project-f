@@ -1,3 +1,4 @@
-(and (greater 4 3)
-     (not (greater false true))
+(cond (not (greater 4 3))
+    (return false))
+(and (not (greater false true))
      (greater -1.0 -2.0))

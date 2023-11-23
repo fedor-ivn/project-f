@@ -4,4 +4,4 @@
 (cond true (setq a true) (return false))
 (cond false (return false) (setq b true))
 (setq c (cond false 42))
-(and a b (isnull c))
+(and (and a b) (isnull c))

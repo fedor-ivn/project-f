@@ -1,3 +1,4 @@
-(and (nonequal true false)
-     (nonequal 4 3)
+(cond (not (nonequal true false))
+    (return false))
+(and (nonequal 4 3)
      (not (nonequal 2 2)))

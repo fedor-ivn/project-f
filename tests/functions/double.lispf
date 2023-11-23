@@ -4,9 +4,13 @@
 
 (func isNan (x) (nonequal x x))
 
-(and (equal +0.0 -0.0)
-     (isNan nan)
-     (isNan (minus inf inf))
-     (isNan (plus nan 4.0))
-     (equal (plus negInf 1.0) negInf)
+(cond (not (equal +0.0 -0.0))
+    (return false))
+(cond (not (isNan nan))
+    (return false))
+(cond (not (isNan (minus inf inf)))
+    (return false))
+(cond (not (isNan (plus nan 4.0)))
+    (return false))
+(and (equal (plus negInf 1.0) negInf)
      (equal (minus 2.0 inf) negInf))

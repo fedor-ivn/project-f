@@ -1,3 +1,4 @@
-(and (isbool true)
-     (isbool false)
+(cond (not (isbool true))
+    (return false))
+(and (isbool false)
      (not (isbool 0)))

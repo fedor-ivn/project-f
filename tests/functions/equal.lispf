@@ -1,3 +1,4 @@
-(and (equal true true)
-     (equal 4 4)
+(cond (not (equal true true))
+    (return false))
+(and (equal 4 4)
      (not (equal 4 5)))
