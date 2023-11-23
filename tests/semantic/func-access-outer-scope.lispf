@@ -1,0 +1,9 @@
+; test that functions have access to the outer scope
+(setq a 1)
+(func increment (n)
+    (plus n 1))
+(func baz ()
+    (setq a 4)
+    (increment a))
+
+(and (equal (baz) 5) (equal a 4))

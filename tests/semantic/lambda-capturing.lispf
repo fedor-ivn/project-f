@@ -1,0 +1,7 @@
+(setq counter 0)
+(setq increment (lambda () (setq counter (plus counter 1))))
+
+(cond (not (equal (increment) 1))
+    (return false))
+(and (equal (increment) 2)
+     (equal counter 2))

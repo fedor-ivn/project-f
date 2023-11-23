@@ -1,0 +1,6 @@
+(cond (not (not (xor true true)))
+    (return false))
+(cond (not (xor true false))
+    (return false))
+(and (xor false true)
+     (not (xor false false)))

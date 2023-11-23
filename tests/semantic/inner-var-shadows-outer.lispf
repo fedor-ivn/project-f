@@ -1,0 +1,4 @@
+; test that the inner `a` shadows the outer one
+(setq a 1)
+(func bar (a) (plus a 1))
+(and (equal (bar 10) 11) (equal a 1))

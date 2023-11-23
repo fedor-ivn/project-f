@@ -1,0 +1,5 @@
+; test `return` inside `func`
+(func foo ()
+    (return 42)
+    (divide 1 0))
+(equal (foo) 42)

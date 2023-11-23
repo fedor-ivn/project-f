@@ -1,0 +1,7 @@
+(cond (not (equal (head '(1 2 3 4)) 1))
+    (return false))
+(cond (not (equal (head (cons 4 (cons 3 null))) 4))
+    (return false))
+
+(and (isnull (head '()))
+     (isnull (head null)))

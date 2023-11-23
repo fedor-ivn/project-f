@@ -1,0 +1,4 @@
+(cond (not (isnull null))
+    (return false))
+(and (isnull '())
+     (not (isnull '(null))))

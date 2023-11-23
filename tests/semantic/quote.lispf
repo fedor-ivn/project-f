@@ -2,9 +2,13 @@
 (setq b 'foo)
 (setq c ''foo); `c` contains the list `(quote foo)`
 
-(and (isatom a)
-     (isatom'a)
-     (isatom b)
-     (islist c)
-     (isatom (head c))
+(cond (not (isatom a))
+    (return false))
+(cond (not (isatom'a))
+    (return false))
+(cond (not (isatom b))
+    (return false))
+(cond (not (islist c))
+    (return false))
+(and (isatom (head c))
      (isatom (head (tail c))))

@@ -1,0 +1,7 @@
+; test `while`
+(setq n 1)
+(setq result 0)
+(while (nonequal n 10)
+    (setq result (plus result n))
+    (setq n (plus n 1)))
+(equal result 45)
