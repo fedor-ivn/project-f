@@ -173,7 +173,7 @@ int test_files_semantic(std::vector<std::filesystem::path> paths) {
     for (auto&& path : paths) {
         std::cout << path << ": ";
 
-        bool passed;
+        bool passed = false;
         try {
             passed = test_semantic_file(path);
         } catch (SyntaxError const& e) {
