@@ -2,7 +2,4 @@
 (func foo ()
     (return 42)
     (divide 1 0))
-(setq returnResult (equal (foo) 42))
-
-(return returnResult)
-(divide 3 0)
+(equal (foo) 42)

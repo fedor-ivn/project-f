@@ -4,7 +4,4 @@
 (while (nonequal n 10)
     (setq result (plus result n))
     (setq n (plus n 1)))
-(setq whileResult (equal result 45))
-
-(return whileResult)
-(divide 3 0)
+(equal result 45)
