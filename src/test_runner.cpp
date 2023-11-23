@@ -179,9 +179,11 @@ int test_files_semantic(std::vector<std::filesystem::path> paths) {
         } catch (SyntaxError const& e) {
             std::cout << e << std::endl;
             code = 1;
+            continue;
         } catch (EvaluationError const& e) {
             std::cout << e << std::endl;
             code = 1;
+            continue;
         }
 
         if (passed) {
