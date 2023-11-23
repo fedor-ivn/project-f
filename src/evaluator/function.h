@@ -29,6 +29,14 @@ class Function : public ast::Element {
     void _display_pretty(std::ostream& stream) const;
 };
 
+class UserDefinedFunction : public Function {
+  public:
+    UserDefinedFunction();
+
+  private:
+    virtual void _display_verbose(std::ostream& stream, size_t depth) const;
+};
+
 class BuiltInFunction : public Function {
   public:
     BuiltInFunction();
