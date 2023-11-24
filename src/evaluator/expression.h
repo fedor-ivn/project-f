@@ -242,14 +242,14 @@ class Call : public Expression {
 class Func : public Expression {
     std::shared_ptr<ast::Symbol> name;
     Parameters parameters;
-    Body body;
+    std::shared_ptr<Body> body;
 
   public:
     Func(
         ast::Span span,
         std::shared_ptr<ast::Symbol> name,
         Parameters parameters,
-        Body body
+        std::shared_ptr<Body> body
     );
 
     static std::unique_ptr<Func>

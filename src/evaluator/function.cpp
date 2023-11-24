@@ -37,10 +37,4 @@ void BuiltInFunction::_display_verbose(std::ostream& stream, size_t) const {
     stream << "BuiltInFunction(" << this->name() << ", " << this->span << ")";
 }
 
-UserDefinedFunction::UserDefinedFunction()
-    : Function(Span(Position(0, 0), Position(0, 0))) {}
-
-void UserDefinedFunction::_display_verbose(std::ostream& stream, size_t) const {
-    stream << "BuiltInFunction(" << this->name() << ", " << this->span << ")";
-}
 } // namespace evaluator

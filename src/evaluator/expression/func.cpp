@@ -1,6 +1,7 @@
 #include "../../utils.h"
 #include "../error.h"
 #include "../expression.h"
+#include "../function.h"
 
 namespace evaluator {
 
@@ -14,7 +15,7 @@ Func::Func(
     Span span,
     std::shared_ptr<ast::Symbol> name,
     Parameters parameters,
-    Body body
+    std::shared_ptr<Body> body
 )
     : Expression(span), name(name), parameters(std::move(parameters)),
       body(std::move(body)) {}
@@ -54,13 +55,22 @@ std::unique_ptr<Func> Func::parse(Span span, std::shared_ptr<List> arguments) {
     auto body = Body::parse(cons->right);
     body.validate_no_free_break();
 
-    return std::make_unique<Func>(
-        Func(span, name, std::move(parameters), std::move(body))
-    );
+    return std::make_unique<Func>(Func(
+        span,
+        name,
+        std::move(parameters),
+        std::make_shared<Body>(std::move(body))
+    ));
 }
 
-std::shared_ptr<Element> Func::evaluate(std::shared_ptr<Scope>) const {
-    throw std::runtime_error("Not implemented");
+std::shared_ptr<Element> Func::evaluate(std::shared_ptr<Scope> scope) const {
+    auto function = std::make_shared<UserDefinedFunction>(
+        this->span, this->name->value, this->parameters, this->body, scope
+    );
+
+    scope->define(*this->name, function);
+
+    return function;
 }
 
 void Func::display(std::ostream& stream, size_t depth) const {
@@ -74,7 +84,7 @@ void Func::display(std::ostream& stream, size_t depth) const {
     stream << '\n';
 
     stream << Depth(depth + 1) << "body = ";
-    this->body.display(stream, depth + 1);
+    this->body->display(stream, depth + 1);
     stream << '\n';
 
     stream << Depth(depth + 1) << "span = " << this->span << '\n';
