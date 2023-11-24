@@ -5,6 +5,15 @@
 
 namespace evaluator {
 
+FuncFunction::FuncFunction(
+    ast::Span span,
+    std::string name,
+    Parameters parameters,
+    std::shared_ptr<Body> body,
+    std::shared_ptr<Scope> scope
+)
+    : UserDefinedFunction(span, parameters, body, scope), _name(name) {}
+
 std::string_view FuncFunction::name() const { return this->_name; }
 
 void FuncFunction::_display_verbose(std::ostream& stream, size_t) const {

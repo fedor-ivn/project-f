@@ -61,8 +61,7 @@ class FuncFunction : public UserDefinedFunction {
         Parameters parameters,
         std::shared_ptr<Body> body,
         std::shared_ptr<Scope> scope
-    )
-        : UserDefinedFunction(span, parameters, body, scope), _name(name) {}
+    );
 
   private:
     virtual void _display_verbose(std::ostream& stream, size_t depth) const;
