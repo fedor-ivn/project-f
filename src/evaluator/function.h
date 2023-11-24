@@ -33,7 +33,6 @@ class UserDefinedFunction : public Function {
   public:
     UserDefinedFunction(
         ast::Span span,
-        std::string name,
         Parameters parameters,
         std::shared_ptr<Body> body,
         std::shared_ptr<Scope> scope
@@ -44,6 +43,7 @@ class UserDefinedFunction : public Function {
   protected:
     virtual std::string_view name() const;
     virtual void display_parameters(std::ostream& stream) const;
+    virtual void _display_verbose(std::ostream& stream, size_t depth) const;
 
   private:
     std::string _name;
@@ -51,8 +51,24 @@ class UserDefinedFunction : public Function {
     std::shared_ptr<Body> body;
 
     std::shared_ptr<Scope> scope;
+};
 
+class FuncFunction : public UserDefinedFunction {
+  public:
+    FuncFunction(
+        ast::Span span,
+        std::string name,
+        Parameters parameters,
+        std::shared_ptr<Body> body,
+        std::shared_ptr<Scope> scope
+    )
+        : UserDefinedFunction(span, parameters, body, scope), _name(name) {}
+
+  private:
     virtual void _display_verbose(std::ostream& stream, size_t depth) const;
+    virtual std::string_view name() const;
+
+    std::string _name;
 };
 
 class BuiltInFunction : public Function {

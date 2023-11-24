@@ -64,7 +64,7 @@ std::unique_ptr<Func> Func::parse(Span span, std::shared_ptr<List> arguments) {
 }
 
 std::shared_ptr<Element> Func::evaluate(std::shared_ptr<Scope> scope) const {
-    auto function = std::make_shared<UserDefinedFunction>(
+    auto function = std::make_shared<FuncFunction>(
         this->span, this->name->value, this->parameters, this->body, scope
     );
 
