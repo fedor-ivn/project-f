@@ -48,9 +48,9 @@ std::unique_ptr<Setq> Setq::parse(Span span, std::shared_ptr<List> arguments) {
     return std::make_unique<Setq>(Setq(span, symbol, std::move(expression)));
 }
 
-std::shared_ptr<Element> Setq::evaluate(std::shared_ptr<Scope> scope) const {
-    auto element = this->initializer->evaluate(scope);
-    scope->set_or_define(*this->variable, element);
+ElementGuard Setq::evaluate(EvaluationContext context) const {
+    auto element = this->initializer->evaluate(context);
+    context.scope->set_or_define(*this->variable, *element);
     return element;
 }
 

@@ -130,7 +130,7 @@ bool test_semantic_file(std::filesystem::path path) {
 
     auto output = evaluator.evaluate(std::move(program));
 
-    auto boolean = std::dynamic_pointer_cast<ast::Boolean>(output);
+    auto boolean = std::dynamic_pointer_cast<ast::Boolean>(*output);
 
     if (!boolean) {
         return false;

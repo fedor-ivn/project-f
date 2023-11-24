@@ -10,10 +10,9 @@ using ast::Span;
 CallFrame::CallFrame(
     std::vector<std::shared_ptr<Element>> arguments,
     Span call_site,
-    std::shared_ptr<Scope> caller_scope
+    EvaluationContext context
 )
-    : arguments(std::move(arguments)), call_site(call_site),
-      caller_scope(caller_scope) {}
+    : arguments(std::move(arguments)), call_site(call_site), context(context) {}
 
 Function::Function(ast::Span span) : Element(ElementKind::FUNCTION, span) {}
 

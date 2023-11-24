@@ -1,6 +1,8 @@
-#include "../ast/element.h"
-#include "scope.h"
 #include <vector>
+
+#include "../ast/element.h"
+#include "expression.h"
+#include "scope.h"
 
 namespace evaluator {
 
@@ -8,12 +10,12 @@ class CallFrame {
   public:
     std::vector<std::shared_ptr<ast::Element>> arguments;
     ast::Span call_site;
-    std::shared_ptr<Scope> caller_scope;
+    EvaluationContext context;
 
     CallFrame(
         std::vector<std::shared_ptr<ast::Element>> arguments,
         ast::Span call_site,
-        std::shared_ptr<Scope> caller_scope
+        EvaluationContext context
     );
 };
 
@@ -21,7 +23,7 @@ class Function : public ast::Element {
   public:
     Function(ast::Span span);
 
-    virtual std::shared_ptr<ast::Element> call(CallFrame frame) const = 0;
+    virtual ElementGuard call(CallFrame frame) const = 0;
 
   protected:
     virtual std::string_view name() const = 0;
@@ -40,7 +42,7 @@ class BuiltInFunction : public Function {
 class HeadFunction : public BuiltInFunction {
   public:
     using BuiltInFunction::BuiltInFunction;
-    virtual std::shared_ptr<Element> call(CallFrame frame) const;
+    virtual ElementGuard call(CallFrame frame) const;
 
   protected:
     virtual std::string_view name() const;
@@ -50,7 +52,7 @@ class HeadFunction : public BuiltInFunction {
 class TailFunction : public BuiltInFunction {
   public:
     using BuiltInFunction::BuiltInFunction;
-    virtual std::shared_ptr<Element> call(CallFrame frame) const;
+    virtual ElementGuard call(CallFrame frame) const;
 
   protected:
     virtual std::string_view name() const;
@@ -60,7 +62,7 @@ class TailFunction : public BuiltInFunction {
 class ConsFunction : public BuiltInFunction {
   public:
     using BuiltInFunction::BuiltInFunction;
-    virtual std::shared_ptr<Element> call(CallFrame frame) const;
+    virtual ElementGuard call(CallFrame frame) const;
 
   protected:
     virtual std::string_view name() const;
@@ -70,7 +72,7 @@ class ConsFunction : public BuiltInFunction {
 class EvalFunction : public BuiltInFunction {
   public:
     using BuiltInFunction::BuiltInFunction;
-    virtual std::shared_ptr<Element> call(CallFrame frame) const;
+    virtual ElementGuard call(CallFrame frame) const;
 
   protected:
     virtual std::string_view name() const;
@@ -80,7 +82,7 @@ class EvalFunction : public BuiltInFunction {
 class EqualFunction : public BuiltInFunction {
   public:
     using BuiltInFunction::BuiltInFunction;
-    virtual std::shared_ptr<Element> call(CallFrame frame) const;
+    virtual ElementGuard call(CallFrame frame) const;
 
   protected:
     virtual std::string_view name() const;
@@ -90,7 +92,7 @@ class EqualFunction : public BuiltInFunction {
 class NonequalFunction : public BuiltInFunction {
   public:
     using BuiltInFunction::BuiltInFunction;
-    virtual std::shared_ptr<Element> call(CallFrame frame) const;
+    virtual ElementGuard call(CallFrame frame) const;
 
   protected:
     virtual std::string_view name() const;
@@ -100,7 +102,7 @@ class NonequalFunction : public BuiltInFunction {
 class LessFunction : public BuiltInFunction {
   public:
     using BuiltInFunction::BuiltInFunction;
-    virtual std::shared_ptr<Element> call(CallFrame frame) const;
+    virtual ElementGuard call(CallFrame frame) const;
 
   protected:
     virtual std::string_view name() const;
@@ -110,7 +112,7 @@ class LessFunction : public BuiltInFunction {
 class LesseqFunction : public BuiltInFunction {
   public:
     using BuiltInFunction::BuiltInFunction;
-    virtual std::shared_ptr<Element> call(CallFrame frame) const;
+    virtual ElementGuard call(CallFrame frame) const;
 
   protected:
     virtual std::string_view name() const;
@@ -120,7 +122,7 @@ class LesseqFunction : public BuiltInFunction {
 class GreaterFunction : public BuiltInFunction {
   public:
     using BuiltInFunction::BuiltInFunction;
-    virtual std::shared_ptr<Element> call(CallFrame frame) const;
+    virtual ElementGuard call(CallFrame frame) const;
 
   protected:
     virtual std::string_view name() const;
@@ -130,7 +132,7 @@ class GreaterFunction : public BuiltInFunction {
 class GreatereqFunction : public BuiltInFunction {
   public:
     using BuiltInFunction::BuiltInFunction;
-    virtual std::shared_ptr<Element> call(CallFrame frame) const;
+    virtual ElementGuard call(CallFrame frame) const;
 
   protected:
     virtual std::string_view name() const;
@@ -140,7 +142,7 @@ class GreatereqFunction : public BuiltInFunction {
 class AndFunction : public BuiltInFunction {
   public:
     using BuiltInFunction::BuiltInFunction;
-    virtual std::shared_ptr<Element> call(CallFrame frame) const;
+    virtual ElementGuard call(CallFrame frame) const;
 
   protected:
     virtual std::string_view name() const;
@@ -150,7 +152,7 @@ class AndFunction : public BuiltInFunction {
 class OrFunction : public BuiltInFunction {
   public:
     using BuiltInFunction::BuiltInFunction;
-    virtual std::shared_ptr<Element> call(CallFrame frame) const;
+    virtual ElementGuard call(CallFrame frame) const;
 
   protected:
     virtual std::string_view name() const;
@@ -160,7 +162,7 @@ class OrFunction : public BuiltInFunction {
 class XorFunction : public BuiltInFunction {
   public:
     using BuiltInFunction::BuiltInFunction;
-    virtual std::shared_ptr<Element> call(CallFrame frame) const;
+    virtual ElementGuard call(CallFrame frame) const;
 
   protected:
     virtual std::string_view name() const;
@@ -170,7 +172,7 @@ class XorFunction : public BuiltInFunction {
 class NotFunction : public BuiltInFunction {
   public:
     using BuiltInFunction::BuiltInFunction;
-    virtual std::shared_ptr<Element> call(CallFrame frame) const;
+    virtual ElementGuard call(CallFrame frame) const;
 
   protected:
     virtual std::string_view name() const;

@@ -3,11 +3,10 @@
 
 namespace evaluator {
 
-using ast::Element;
 using ast::Position;
 using ast::Span;
 
-Evaluator::Evaluator() : global(std::make_shared<Scope>(Scope(nullptr))) {
+Evaluator::Evaluator() : global(this->garbage_collector.create_scope(nullptr)) {
     Span nowhere(Position(0, 0), Position(0, 0));
 
     this->global->define(
@@ -57,8 +56,10 @@ Evaluator::Evaluator() : global(std::make_shared<Scope>(Scope(nullptr))) {
     );
 }
 
-std::shared_ptr<Element> Evaluator::evaluate(Program program) {
-    return program.evaluate(this->global);
+ElementGuard Evaluator::evaluate(Program program) {
+    return program.evaluate(
+        EvaluationContext(&this->garbage_collector, *this->global)
+    );
 }
 
 } // namespace evaluator

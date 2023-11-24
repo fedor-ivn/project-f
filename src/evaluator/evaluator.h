@@ -6,12 +6,13 @@
 namespace evaluator {
 
 class Evaluator {
-  std::shared_ptr<Scope> global;
+    GarbageCollector garbage_collector;
+    ScopeGuard global;
 
   public:
     Evaluator();
 
-    std::shared_ptr<ast::Element> evaluate(Program program);
+    ElementGuard evaluate(Program program);
 };
 
 } // namespace evaluator

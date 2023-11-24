@@ -8,6 +8,14 @@
 
 namespace evaluator {
 
+class EvaluationContext {
+  public:
+    GarbageCollector* garbage_collector;
+    std::shared_ptr<Scope> scope;
+
+    EvaluationContext(GarbageCollector*, std::shared_ptr<Scope>);
+};
+
 class Expression {
   public:
     ast::Span span;
@@ -19,8 +27,7 @@ class Expression {
 
     virtual ~Expression() = default;
 
-    virtual std::shared_ptr<ast::Element> evaluate(std::shared_ptr<Scope> scope
-    ) const = 0;
+    virtual ElementGuard evaluate(EvaluationContext context) const = 0;
     virtual void display(std::ostream& stream, size_t depth) const = 0;
 
     // Returns in the sense "evaluating this expression will always end up
@@ -57,7 +64,7 @@ class Body {
 
     static Body parse(std::shared_ptr<ast::List> unparsed);
 
-    std::shared_ptr<ast::Element> evaluate(std::shared_ptr<Scope> scope) const;
+    ElementGuard evaluate(EvaluationContext context) const;
 
     void display(std::ostream& stream, size_t depth) const;
 
@@ -73,7 +80,7 @@ class Program {
 
     static Program parse(std::vector<std::shared_ptr<ast::Element>> elements);
 
-    std::shared_ptr<ast::Element> evaluate(std::shared_ptr<Scope> scope) const;
+    ElementGuard evaluate(EvaluationContext context) const;
 
     void display(std::ostream& stream, size_t depth) const;
     friend std::ostream& operator<<(std::ostream& stream, Program const& self);
@@ -85,8 +92,7 @@ class Symbol : public Expression {
   public:
     Symbol(std::shared_ptr<ast::Symbol> symbol);
 
-    virtual std::shared_ptr<ast::Element> evaluate(std::shared_ptr<Scope> scope
-    ) const;
+    virtual ElementGuard evaluate(EvaluationContext context) const;
     virtual void display(std::ostream& stream, size_t depth) const;
 
     virtual bool returns() const;
@@ -106,8 +112,7 @@ class Quote : public Expression {
     static std::unique_ptr<Quote>
     parse(ast::Span span, std::shared_ptr<ast::List> arguments);
 
-    virtual std::shared_ptr<ast::Element> evaluate(std::shared_ptr<Scope> scope
-    ) const;
+    virtual ElementGuard evaluate(EvaluationContext context) const;
     virtual void display(std::ostream& stream, size_t depth) const;
 
     virtual bool returns() const;
@@ -132,8 +137,7 @@ class Setq : public Expression {
     static std::unique_ptr<Setq>
     parse(ast::Span span, std::shared_ptr<ast::List> arguments);
 
-    virtual std::shared_ptr<ast::Element> evaluate(std::shared_ptr<Scope> scope
-    ) const;
+    virtual ElementGuard evaluate(EvaluationContext context) const;
     virtual void display(std::ostream& stream, size_t depth) const;
 
     virtual bool returns() const;
@@ -160,8 +164,7 @@ class Cond : public Expression {
     static std::unique_ptr<Cond>
     parse(ast::Span span, std::shared_ptr<ast::List> arguments);
 
-    virtual std::shared_ptr<ast::Element> evaluate(std::shared_ptr<Scope> scope
-    ) const;
+    virtual ElementGuard evaluate(EvaluationContext context) const;
     virtual void display(std::ostream& stream, size_t depth) const;
 
     virtual bool returns() const;
@@ -181,8 +184,7 @@ class Return : public Expression {
     static std::unique_ptr<Return>
     parse(ast::Span span, std::shared_ptr<ast::List> arguments);
 
-    virtual std::shared_ptr<ast::Element> evaluate(std::shared_ptr<Scope> scope
-    ) const;
+    virtual ElementGuard evaluate(EvaluationContext context) const;
     virtual void display(std::ostream& stream, size_t depth) const;
 
     virtual bool returns() const;
@@ -202,8 +204,7 @@ class Break : public Expression {
     static std::unique_ptr<Break>
     parse(ast::Span span, std::shared_ptr<ast::List> arguments);
 
-    virtual std::shared_ptr<ast::Element> evaluate(std::shared_ptr<Scope> scope
-    ) const;
+    virtual ElementGuard evaluate(EvaluationContext context) const;
     virtual void display(std::ostream& stream, size_t depth) const;
 
     virtual bool returns() const;
@@ -227,8 +228,7 @@ class Call : public Expression {
 
     static std::unique_ptr<Call> parse(std::shared_ptr<ast::Cons> arguments);
 
-    virtual std::shared_ptr<ast::Element> evaluate(std::shared_ptr<Scope> scope
-    ) const;
+    virtual ElementGuard evaluate(EvaluationContext context) const;
     virtual void display(std::ostream& stream, size_t depth) const;
 
     virtual bool returns() const;
@@ -255,8 +255,7 @@ class Func : public Expression {
     static std::unique_ptr<Func>
     parse(ast::Span span, std::shared_ptr<ast::List> arguments);
 
-    virtual std::shared_ptr<ast::Element> evaluate(std::shared_ptr<Scope> scope
-    ) const;
+    virtual ElementGuard evaluate(EvaluationContext context) const;
     virtual void display(std::ostream& stream, size_t depth) const;
 
     virtual bool returns() const;
@@ -277,8 +276,7 @@ class Lambda : public Expression {
     static std::unique_ptr<Lambda>
     parse(ast::Span span, std::shared_ptr<ast::List> arguments);
 
-    virtual std::shared_ptr<ast::Element> evaluate(std::shared_ptr<Scope> scope
-    ) const;
+    virtual ElementGuard evaluate(EvaluationContext context) const;
     virtual void display(std::ostream& stream, size_t depth) const;
 
     virtual bool returns() const;
@@ -299,8 +297,7 @@ class Prog : public Expression {
     static std::unique_ptr<Prog>
     parse(ast::Span span, std::shared_ptr<ast::List> arguments);
 
-    virtual std::shared_ptr<ast::Element> evaluate(std::shared_ptr<Scope> scope
-    ) const;
+    virtual ElementGuard evaluate(EvaluationContext context) const;
     virtual void display(std::ostream& stream, size_t depth) const;
 
     virtual bool returns() const;
@@ -321,8 +318,7 @@ class While : public Expression {
     static std::unique_ptr<While>
     parse(ast::Span span, std::shared_ptr<ast::List> arguments);
 
-    virtual std::shared_ptr<ast::Element> evaluate(std::shared_ptr<Scope> scope
-    ) const;
+    virtual ElementGuard evaluate(EvaluationContext context) const;
     virtual void display(std::ostream& stream, size_t depth) const;
 
     virtual bool returns() const;

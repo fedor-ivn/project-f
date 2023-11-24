@@ -3,11 +3,13 @@
 
 #include "expression.h"
 
-using ast::Element;
+namespace evaluator {
 
 class BreakControlFlow {
   public:
-    std::shared_ptr<Element> element;
+    ElementGuard element;
 
-    BreakControlFlow(std::shared_ptr<Element> element);
+    BreakControlFlow(ElementGuard element);
 };
+
+} // namespace evaluator
