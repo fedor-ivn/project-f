@@ -10,6 +10,10 @@ Evaluator::Evaluator() : global(this->garbage_collector.create_scope(nullptr)) {
     Span nowhere(Position(0, 0), Position(0, 0));
 
     this->global->define(
+        ast::Symbol("plus", nowhere), std::make_shared<PlusFunction>()
+    );
+
+    this->global->define(
         ast::Symbol("head", nowhere), std::make_shared<HeadFunction>()
     );
     this->global->define(
