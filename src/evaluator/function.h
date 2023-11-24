@@ -70,6 +70,20 @@ class FuncFunction : public UserDefinedFunction {
     std::string _name;
 };
 
+class LambdaFunction : public UserDefinedFunction {
+  public:
+    LambdaFunction(
+        ast::Span span,
+        Parameters parameters,
+        std::shared_ptr<Body> body,
+        std::shared_ptr<Scope> scope
+    );
+
+  private:
+    virtual void _display_verbose(std::ostream& stream, size_t depth) const;
+    virtual std::string_view name() const;
+};
+
 class BuiltInFunction : public Function {
   public:
     BuiltInFunction();

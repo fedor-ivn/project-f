@@ -1,6 +1,7 @@
 #include "../../utils.h"
 #include "../error.h"
 #include "../expression.h"
+#include "../function.h"
 
 namespace evaluator {
 
@@ -10,7 +11,7 @@ using ast::Span;
 using utils::Depth;
 using utils::to_cons;
 
-Lambda::Lambda(Span span, Parameters parameters, Body body)
+Lambda::Lambda(Span span, Parameters parameters, std::shared_ptr<Body> body)
     : Expression(span), parameters(std::move(parameters)),
       body(std::move(body)) {}
 
@@ -35,13 +36,18 @@ Lambda::parse(Span span, std::shared_ptr<ast::List> arguments) {
     auto body = Body::parse(cons->right);
     body.validate_no_free_break();
 
-    return std::make_unique<Lambda>(
-        Lambda(span, std::move(parameters), std::move(body))
-    );
+    return std::make_unique<Lambda>(Lambda(
+        span, std::move(parameters), std::make_shared<Body>(std::move(body))
+    ));
 }
 
-std::shared_ptr<ast::Element> Lambda::evaluate(std::shared_ptr<Scope>) const {
-    throw std::runtime_error("Not implemented");
+std::shared_ptr<ast::Element> Lambda::evaluate(std::shared_ptr<Scope> scope
+) const {
+    auto function = std::make_shared<LambdaFunction>(
+        this->span, this->parameters, this->body, scope
+    );
+
+    return function;
 }
 
 void Lambda::display(std::ostream& stream, size_t depth) const {
@@ -52,7 +58,7 @@ void Lambda::display(std::ostream& stream, size_t depth) const {
     stream << '\n';
 
     stream << Depth(depth + 1) << "body = ";
-    this->body.display(stream, depth + 1);
+    this->body->display(stream, depth + 1);
     stream << '\n';
 
     stream << Depth(depth + 1) << "span = " << this->span << '\n';

@@ -269,10 +269,10 @@ class Func : public Expression {
 
 class Lambda : public Expression {
     Parameters parameters;
-    Body body;
+    std::shared_ptr<Body> body;
 
   public:
-    Lambda(ast::Span span, Parameters parameters, Body body);
+    Lambda(ast::Span span, Parameters parameters, std::shared_ptr<Body> body);
 
     static std::unique_ptr<Lambda>
     parse(ast::Span span, std::shared_ptr<ast::List> arguments);

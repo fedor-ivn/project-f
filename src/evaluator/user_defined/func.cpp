@@ -1,7 +1,6 @@
 #include "../error.h"
 #include "../expression.h"
 #include "../function.h"
-#include <string_view>
 
 namespace evaluator {
 
