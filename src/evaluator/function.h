@@ -39,6 +39,46 @@ class BuiltInFunction : public Function {
     virtual void _display_verbose(std::ostream& stream, size_t depth) const;
 };
 
+class PlusFunction : public BuiltInFunction {
+  public:
+    using BuiltInFunction::BuiltInFunction;
+    virtual ElementGuard call(CallFrame frame) const;
+
+  private:
+    virtual std::string_view name() const;
+    virtual void display_parameters(std::ostream& stream) const;
+};
+
+class TimesFunction : public BuiltInFunction {
+  public:
+    using BuiltInFunction::BuiltInFunction;
+    virtual ElementGuard call(CallFrame frame) const;
+
+  private:
+    virtual std::string_view name() const;
+    virtual void display_parameters(std::ostream& stream) const;
+};
+
+class MinusFunction : public BuiltInFunction {
+  public:
+    using BuiltInFunction::BuiltInFunction;
+    virtual ElementGuard call(CallFrame frame) const;
+
+  private:
+    virtual std::string_view name() const;
+    virtual void display_parameters(std::ostream& stream) const;
+};
+
+class DivideFunction : public BuiltInFunction {
+  public:
+    using BuiltInFunction::BuiltInFunction;
+    virtual ElementGuard call(CallFrame frame) const;
+
+  private:
+    virtual std::string_view name() const;
+    virtual void display_parameters(std::ostream& stream) const;
+};
+
 class HeadFunction : public BuiltInFunction {
   public:
     using BuiltInFunction::BuiltInFunction;
