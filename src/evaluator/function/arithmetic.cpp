@@ -59,7 +59,7 @@ ElementGuard PlusFunction::call(CallFrame frame) const {
 
     if (auto element = evaluate_arithmetic_operation(
             frame,
-            [](int a, int b) { return a + b; },
+            [](int64_t a, int64_t b) { return a + b; },
             [](double a, double b) { return a + b; }
         )) {
         return frame.context.garbage_collector->temporary(element);
@@ -72,6 +72,97 @@ ElementGuard PlusFunction::call(CallFrame frame) const {
 
 std::string_view PlusFunction::name() const { return "plus"; }
 void PlusFunction::display_parameters(std::ostream& stream) const {
+    stream << "a b";
+}
+
+ElementGuard TimesFunction::call(CallFrame frame) const {
+    if (frame.arguments.size() != 2) {
+        throw EvaluationError(
+            "`times` expects 2 arguments, received " +
+                std::to_string(frame.arguments.size()),
+            frame.call_site
+        );
+    }
+
+    if (auto element = evaluate_arithmetic_operation(
+            frame,
+            [](int64_t a, int64_t b) { return a * b; },
+            [](double a, double b) { return a * b; }
+        )) {
+        return frame.context.garbage_collector->temporary(element);
+    }
+    throw EvaluationError(
+        "`times` expects arguments to be either integers or reals",
+        frame.call_site
+    );
+}
+
+std::string_view TimesFunction::name() const { return "times"; }
+void TimesFunction::display_parameters(std::ostream& stream) const {
+    stream << "a b";
+}
+
+ElementGuard MinusFunction::call(CallFrame frame) const {
+    if (frame.arguments.size() != 2) {
+        throw EvaluationError(
+            "`minus` expects 2 arguments, received " +
+                std::to_string(frame.arguments.size()),
+            frame.call_site
+        );
+    }
+
+    if (auto element = evaluate_arithmetic_operation(
+            frame,
+            [](int64_t a, int64_t b) { return a - b; },
+            [](double a, double b) { return a - b; }
+        )) {
+        return frame.context.garbage_collector->temporary(element);
+    }
+    throw EvaluationError(
+        "`minus` expects arguments to be either integers or reals",
+        frame.call_site
+    );
+}
+
+std::string_view MinusFunction::name() const { return "minus"; }
+void MinusFunction::display_parameters(std::ostream& stream) const {
+    stream << "a b";
+}
+
+ElementGuard DivideFunction::call(CallFrame frame) const {
+    if (frame.arguments.size() != 2) {
+        throw EvaluationError(
+            "`divide` expects 2 arguments, received " +
+                std::to_string(frame.arguments.size()),
+            frame.call_site
+        );
+    }
+
+    if (auto element = evaluate_arithmetic_operation(
+            frame,
+            [&frame](int64_t a, int64_t b) {
+                if (b == 0) {
+                    throw EvaluationError("division by zero", frame.call_site);
+                }
+                return a / b;
+            },
+            [&frame](double a, double b) {
+                if (b == 0) {
+                    throw EvaluationError("division by zero", frame.call_site);
+                }
+                return a / b;
+            }
+        )) {
+        return frame.context.garbage_collector->temporary(element);
+    }
+    throw EvaluationError(
+        "`divide` expects arguments to be either integers or reals",
+        frame.call_site
+    );
+}
+
+std::string_view DivideFunction::name() const { return "divide"; }
+void DivideFunction::display_parameters(std::ostream& stream) const {
     stream << "a b";
 }
 

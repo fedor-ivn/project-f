@@ -12,6 +12,15 @@ Evaluator::Evaluator() : global(this->garbage_collector.create_scope(nullptr)) {
     this->global->define(
         ast::Symbol("plus", nowhere), std::make_shared<PlusFunction>()
     );
+    this->global->define(
+        ast::Symbol("times", nowhere), std::make_shared<TimesFunction>()
+    );
+    this->global->define(
+        ast::Symbol("minus", nowhere), std::make_shared<MinusFunction>()
+    );
+    this->global->define(
+        ast::Symbol("divide", nowhere), std::make_shared<DivideFunction>()
+    );
 
     this->global->define(
         ast::Symbol("head", nowhere), std::make_shared<HeadFunction>()
