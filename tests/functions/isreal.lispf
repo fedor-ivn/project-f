@@ -1,0 +1,4 @@
+(cond (not (isreal 4.0))
+    (return false))
+(and (isreal (divide 0.0 0.0))
+     (not (isreal 4)))

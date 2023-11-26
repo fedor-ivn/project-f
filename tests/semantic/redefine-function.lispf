@@ -1,0 +1,4 @@
+; test that it is possible to redefine functions
+(func baz () 1728)
+(func baz () 1729)
+(equal (baz) 1729)

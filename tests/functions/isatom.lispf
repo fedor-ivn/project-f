@@ -1,0 +1,9 @@
+(setq foo 1)
+(setq bar 'bar)
+
+(cond (not (isatom 'foo))
+    (return false))
+(cond (not (isatom bar))
+    (return false))
+(and (not (isatom foo))
+     (not (isatom ''foo)))

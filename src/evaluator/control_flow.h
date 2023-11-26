@@ -9,16 +9,16 @@ using ast::Element;
 
 class BreakControlFlow {
   public:
-    std::shared_ptr<Element> element;
+    ElementGuard element;
 
-    BreakControlFlow(std::shared_ptr<Element> element);
+    BreakControlFlow(ElementGuard element);
 };
 
 class ReturnControlFlow {
   public:
-    std::shared_ptr<Element> element;
+    ElementGuard element;
 
-    ReturnControlFlow(std::shared_ptr<Element> element);
+    ReturnControlFlow(ElementGuard element);
 };
 
 } // namespace evaluator

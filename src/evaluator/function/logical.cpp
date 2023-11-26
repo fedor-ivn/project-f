@@ -7,7 +7,7 @@ namespace evaluator {
 using ast::Element;
 using ast::ElementKind;
 
-std::shared_ptr<Element> AndFunction::call(CallFrame frame) const {
+ElementGuard AndFunction::call(CallFrame frame) const {
     if (frame.arguments.size() != 2) {
         throw EvaluationError(
             "`and` expects 2 arguments, received " +
@@ -30,7 +30,9 @@ std::shared_ptr<Element> AndFunction::call(CallFrame frame) const {
     auto b_bool = std::dynamic_pointer_cast<ast::Boolean>(b_element);
     auto result = a_bool->value && b_bool->value;
 
-    return std::make_shared<ast::Boolean>(result, this->span);
+    return frame.context.garbage_collector->temporary(
+        std::make_shared<ast::Boolean>(result, this->span)
+    );
 }
 
 std::string_view AndFunction::name() const { return "and"; }
@@ -39,7 +41,7 @@ void AndFunction::display_parameters(std::ostream& stream) const {
     stream << "a b";
 }
 
-std::shared_ptr<Element> OrFunction::call(CallFrame frame) const {
+ElementGuard OrFunction::call(CallFrame frame) const {
     if (frame.arguments.size() != 2) {
         throw EvaluationError(
             "`or` expects 2 arguments, received " +
@@ -62,7 +64,9 @@ std::shared_ptr<Element> OrFunction::call(CallFrame frame) const {
     auto b_bool = std::dynamic_pointer_cast<ast::Boolean>(b_element);
     auto result = a_bool->value || b_bool->value;
 
-    return std::make_shared<ast::Boolean>(result, this->span);
+    return frame.context.garbage_collector->temporary(
+        std::make_shared<ast::Boolean>(result, this->span)
+    );
 }
 
 std::string_view OrFunction::name() const { return "or"; }
@@ -71,7 +75,7 @@ void OrFunction::display_parameters(std::ostream& stream) const {
     stream << "a b";
 }
 
-std::shared_ptr<Element> XorFunction::call(CallFrame frame) const {
+ElementGuard XorFunction::call(CallFrame frame) const {
     if (frame.arguments.size() != 2) {
         throw EvaluationError(
             "`xor` expects 2 arguments, received " +
@@ -94,7 +98,9 @@ std::shared_ptr<Element> XorFunction::call(CallFrame frame) const {
     auto b_bool = std::dynamic_pointer_cast<ast::Boolean>(b_element);
     auto result = a_bool->value != b_bool->value;
 
-    return std::make_shared<ast::Boolean>(result, this->span);
+    return frame.context.garbage_collector->temporary(
+        std::make_shared<ast::Boolean>(result, this->span)
+    );
 }
 
 std::string_view XorFunction::name() const { return "xor"; }
@@ -103,7 +109,7 @@ void XorFunction::display_parameters(std::ostream& stream) const {
     stream << "a b";
 }
 
-std::shared_ptr<Element> NotFunction::call(CallFrame frame) const {
+ElementGuard NotFunction::call(CallFrame frame) const {
     if (frame.arguments.size() != 1) {
         throw EvaluationError(
             "`not` expects 1 argument, received " +
@@ -123,7 +129,9 @@ std::shared_ptr<Element> NotFunction::call(CallFrame frame) const {
     auto element_bool = std::dynamic_pointer_cast<ast::Boolean>(element);
     auto result = !element_bool->value;
 
-    return std::make_shared<ast::Boolean>(result, this->span);
+    return frame.context.garbage_collector->temporary(
+        std::make_shared<ast::Boolean>(result, this->span)
+    );
 }
 
 std::string_view NotFunction::name() const { return "not"; }

@@ -63,14 +63,18 @@ std::unique_ptr<Func> Func::parse(Span span, std::shared_ptr<List> arguments) {
     ));
 }
 
-std::shared_ptr<Element> Func::evaluate(std::shared_ptr<Scope> scope) const {
+ElementGuard Func::evaluate(EvaluationContext context) const {
     auto function = std::make_shared<FuncFunction>(
-        this->span, this->name->value, this->parameters, this->body, scope
+        this->span,
+        this->name->value,
+        this->parameters,
+        this->body,
+        context.scope
     );
 
-    scope->define(*this->name, function);
+    context.scope->define(*this->name, function);
 
-    return function;
+    return context.garbage_collector->temporary(function);
 }
 
 void Func::display(std::ostream& stream, size_t depth) const {

@@ -1,0 +1,1 @@
+(and (isint 4) (not (isint 4.0)))

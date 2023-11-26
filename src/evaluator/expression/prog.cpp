@@ -38,9 +38,8 @@ std::unique_ptr<Prog> Prog::parse(Span span, std::shared_ptr<List> arguments) {
     );
 }
 
-std::shared_ptr<Element> Prog::evaluate(std::shared_ptr<Scope> parent_scope
-) const {
-    auto local_scope = std::make_shared<Scope>(Scope(parent_scope));
+ElementGuard Prog::evaluate(EvaluationContext context) const {
+    auto local_scope = context.garbage_collector->create_scope(context.scope);
 
     for (auto parameter : this->variables.parameters) {
         local_scope->define(
@@ -48,18 +47,15 @@ std::shared_ptr<Element> Prog::evaluate(std::shared_ptr<Scope> parent_scope
         );
     }
 
-    std::shared_ptr<ast::Element> result = std::make_shared<Null>(this->span);
-    for (auto const& expression : this->body.body) {
-        try {
-            result = expression->evaluate(local_scope);
-        } catch (BreakControlFlow e) {
-            return e.element;
-        } catch (ReturnControlFlow e) {
-            return e.element;
-        }
+    try {
+        return this->body.evaluate(
+            EvaluationContext(context.garbage_collector, *local_scope)
+        );
+    } catch (BreakControlFlow& e) {
+        return std::move(e.element);
+    } catch (ReturnControlFlow& e) {
+        return std::move(e.element);
     }
-
-    return result;
 };
 
 void Prog::display(std::ostream& stream, size_t depth) const {

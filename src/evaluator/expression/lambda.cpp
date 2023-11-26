@@ -41,13 +41,12 @@ Lambda::parse(Span span, std::shared_ptr<ast::List> arguments) {
     ));
 }
 
-std::shared_ptr<ast::Element> Lambda::evaluate(std::shared_ptr<Scope> scope
-) const {
-    auto function = std::make_shared<LambdaFunction>(
-        this->span, this->parameters, this->body, scope
+ElementGuard Lambda::evaluate(EvaluationContext context) const {
+    return context.garbage_collector->temporary(
+        std::make_shared<LambdaFunction>(
+            this->span, this->parameters, this->body, context.scope
+        )
     );
-
-    return function;
 }
 
 void Lambda::display(std::ostream& stream, size_t depth) const {

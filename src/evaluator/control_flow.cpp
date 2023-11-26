@@ -2,10 +2,10 @@
 
 namespace evaluator {
 
-BreakControlFlow::BreakControlFlow(std::shared_ptr<Element> element)
-    : element(element){};
+BreakControlFlow::BreakControlFlow(ElementGuard element)
+    : element(std::move(element)){};
 
-ReturnControlFlow::ReturnControlFlow(std::shared_ptr<Element> element)
-    : element(element){};
+ReturnControlFlow::ReturnControlFlow(ElementGuard element)
+    : element(std::move(element)){};
 
 } // namespace evaluator

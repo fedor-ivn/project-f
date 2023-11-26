@@ -4,7 +4,6 @@
 
 namespace evaluator {
 
-using ast::Element;
 using ast::List;
 using ast::Null;
 using ast::Position;
@@ -26,14 +25,18 @@ Body Body::parse(std::shared_ptr<List> unparsed) {
     return Body(std::move(body));
 }
 
-std::shared_ptr<Element> Body::evaluate(std::shared_ptr<Scope> parent) const {
-    std::shared_ptr<Element> last_evaluated =
-        std::make_shared<Null>(Null(Span(Position(0, 0), Position(0, 0))));
-
-    for (auto& expression : this->body) {
-        last_evaluated = expression->evaluate(parent);
+ElementGuard Body::evaluate(EvaluationContext context) const {
+    if (this->body.empty()) {
+        return context.garbage_collector->temporary(
+            std::make_shared<Null>(Span(Position(0, 0), Position(0, 0)))
+        );
     }
-    return last_evaluated;
+
+    for (size_t i = 0; i < this->body.size() - 1; ++i) {
+        this->body[i]->evaluate(context);
+    }
+
+    return this->body.back()->evaluate(context);
 }
 
 void Body::display(std::ostream& stream, size_t depth) const {

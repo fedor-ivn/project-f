@@ -38,8 +38,9 @@ std::unique_ptr<ast::List> Parser::parse_list() {
     auto start = token->span.start;
     auto head = this->parse_element();
     auto tail = this->parse_list();
+    Span span(start, tail->span.end);
     return std::make_unique<ast::Cons>(
-        ast::Cons(std::move(head), std::move(tail), Span(start, tail->span.end))
+        ast::Cons(std::move(head), std::move(tail), span)
     );
 }
 
@@ -74,16 +75,17 @@ std::unique_ptr<ast::Element> Parser::parse_element() {
             std::make_unique<ast::Symbol>(ast::Symbol("quote", token->span));
         auto element = this->parse_element();
         auto end = element->span.end;
+        auto element_span = element->span;
         auto tail = std::make_unique<ast::Cons>(ast::Cons(
             std::move(element),
             std::make_shared<ast::Null>(ast::Null(Span(end, end))),
-            element->span
+            element_span
         ));
-        return std::make_unique<ast::Cons>(ast::Cons(
-            std::move(quote),
-            std::move(tail),
-            Span(token->span.start, tail->span.end)
-        ));
+        Span span(token->span.start, tail->span.end);
+
+        return std::make_unique<ast::Cons>(
+            ast::Cons(std::move(quote), std::move(tail), span)
+        );
     }
 
     if (token->is_left_parenthesis()) {

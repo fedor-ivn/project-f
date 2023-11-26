@@ -1,0 +1,5 @@
+; `func` inside `prog` never changes the outer function
+(func foo (x) (plus x 1))
+(prog ()
+    (func foo (x) (plus x 2)))
+(equal (foo 1) 2)

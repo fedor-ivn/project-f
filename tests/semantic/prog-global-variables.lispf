@@ -1,0 +1,4 @@
+; test that prog has access to outer scope
+(setq a 1)
+(prog () (setq a 2))
+(equal a 2)

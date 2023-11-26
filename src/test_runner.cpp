@@ -1,6 +1,7 @@
 #include <filesystem>
 #include <fstream>
 #include <iostream>
+#include <sstream>
 #include <string>
 
 #include "ast/element.h"
@@ -129,7 +130,7 @@ bool test_semantic_file(std::filesystem::path path) {
 
     auto output = evaluator.evaluate(std::move(program));
 
-    auto boolean = std::dynamic_pointer_cast<ast::Boolean>(output);
+    auto boolean = std::dynamic_pointer_cast<ast::Boolean>(*output);
 
     if (!boolean) {
         return false;
@@ -173,7 +174,7 @@ int test_files_semantic(std::vector<std::filesystem::path> paths) {
     for (auto&& path : paths) {
         std::cout << path << ": ";
 
-        bool passed;
+        bool passed = false;
         try {
             passed = test_semantic_file(path);
         } catch (SyntaxError const& e) {

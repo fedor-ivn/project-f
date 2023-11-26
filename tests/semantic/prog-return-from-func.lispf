@@ -1,0 +1,5 @@
+; test that `return` inside `prog` returns from the function
+(func foo ()
+    (prog () (return 42))
+    (divide 1 0))
+(equal (foo) 42)

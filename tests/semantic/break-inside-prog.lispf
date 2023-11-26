@@ -1,0 +1,4 @@
+; test `break` inside `prog`
+(prog ()
+  (break true)
+  (divide 2 0))

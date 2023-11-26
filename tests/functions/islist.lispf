@@ -1,0 +1,4 @@
+(cond (not (islist '(1 2 3)))
+    (return false))
+(and (islist null)
+     (not (islist 6)))

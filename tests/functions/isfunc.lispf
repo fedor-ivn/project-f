@@ -1,0 +1,7 @@
+(func foo () null)
+(setq bar (lambda () null))
+
+(cond (not (isfunc isfunc))
+    (return false))
+(and (isfunc foo)
+     (isfunc bar))

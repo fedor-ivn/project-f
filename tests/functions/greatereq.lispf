@@ -1,0 +1,4 @@
+(cond (not (greatereq 4 3))
+    (return false))
+(and (not (greatereq false true))
+     (greatereq -1.0 -1.0))

@@ -1,0 +1,6 @@
+; test `break` inside `while`
+(setq l '(1 2 3 4))
+(while (not (isnull l))
+    (cond (equal (head l) 3) (break))
+    (setq l (tail l)))
+(equal (head l) 3)

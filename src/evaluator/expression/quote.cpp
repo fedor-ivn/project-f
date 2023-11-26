@@ -4,7 +4,6 @@
 
 namespace evaluator {
 
-using ast::Boolean;
 using ast::Element;
 using ast::List;
 using ast::Span;
@@ -32,7 +31,9 @@ Quote::parse(Span span, std::shared_ptr<List> arguments) {
     return std::make_unique<Quote>(Quote(span, element));
 }
 
-std::shared_ptr<Element> Quote::evaluate(std::shared_ptr<Scope>) const { return this->element; }
+ElementGuard Quote::evaluate(EvaluationContext context) const {
+    return context.garbage_collector->temporary(this->element);
+}
 
 void Quote::display(std::ostream& stream, size_t depth) const {
     stream << "Quote {\n";

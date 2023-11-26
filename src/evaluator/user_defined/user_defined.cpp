@@ -14,7 +14,7 @@ UserDefinedFunction::UserDefinedFunction(
 )
     : Function(span), parameters(parameters), body(body), scope(scope) {}
 
-std::shared_ptr<Element> UserDefinedFunction::call(CallFrame frame) const {
+ElementGuard UserDefinedFunction::call(CallFrame frame) const {
     if (this->parameters.parameters.size() != frame.arguments.size()) {
         std::string message;
 
@@ -31,7 +31,8 @@ std::shared_ptr<Element> UserDefinedFunction::call(CallFrame frame) const {
         throw EvaluationError(message, frame.call_site);
     }
 
-    auto scope = std::make_shared<Scope>(this->scope);
+    auto scope =
+        frame.context.garbage_collector->create_scope(frame.context.scope);
 
     for (size_t parameter_index = 0;
          parameter_index < this->parameters.parameters.size();
@@ -43,9 +44,11 @@ std::shared_ptr<Element> UserDefinedFunction::call(CallFrame frame) const {
     }
 
     try {
-        return this->body->evaluate(scope);
-    } catch (ReturnControlFlow e) {
-        return e.element;
+        return this->body->evaluate(
+            EvaluationContext(frame.context.garbage_collector, *scope)
+        );
+    } catch (ReturnControlFlow& e) {
+        return std::move(e.element);
     }
 }
 

@@ -3,12 +3,24 @@
 
 namespace evaluator {
 
-using ast::Element;
 using ast::Position;
 using ast::Span;
 
-Evaluator::Evaluator() : global(std::make_shared<Scope>(Scope(nullptr))) {
+Evaluator::Evaluator() : global(this->garbage_collector.create_scope(nullptr)) {
     Span nowhere(Position(0, 0), Position(0, 0));
+
+    this->global->define(
+        ast::Symbol("plus", nowhere), std::make_shared<PlusFunction>()
+    );
+    this->global->define(
+        ast::Symbol("times", nowhere), std::make_shared<TimesFunction>()
+    );
+    this->global->define(
+        ast::Symbol("minus", nowhere), std::make_shared<MinusFunction>()
+    );
+    this->global->define(
+        ast::Symbol("divide", nowhere), std::make_shared<DivideFunction>()
+    );
 
     this->global->define(
         ast::Symbol("head", nowhere), std::make_shared<HeadFunction>()
@@ -57,8 +69,10 @@ Evaluator::Evaluator() : global(std::make_shared<Scope>(Scope(nullptr))) {
     );
 }
 
-std::shared_ptr<Element> Evaluator::evaluate(Program program) {
-    return program.evaluate(this->global);
+ElementGuard Evaluator::evaluate(Program program) {
+    return program.evaluate(
+        EvaluationContext(&this->garbage_collector, *this->global)
+    );
 }
 
 } // namespace evaluator

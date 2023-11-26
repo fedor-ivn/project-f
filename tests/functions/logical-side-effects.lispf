@@ -1,0 +1,7 @@
+(setq counter 0)
+(func increment ()
+    (setq counter (plus counter 1))
+    true)
+(and false (increment))
+(or true (increment))
+(equal counter 2)

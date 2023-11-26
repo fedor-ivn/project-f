@@ -1,0 +1,6 @@
+(cond (nonequal (divide 7 2) 3)
+    (return false))
+(cond (nonequal (divide 5.0 -2) -2.5)
+    (return false))
+(and (equal (divide 2 0.5) 4.0)
+     (equal (divide -5.0 -2.0) 2.5))
