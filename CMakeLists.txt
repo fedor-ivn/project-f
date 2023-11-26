@@ -32,6 +32,7 @@ add_library(internals
     src/evaluator/function/lists.cpp
     src/evaluator/function/evaluation.cpp
     src/evaluator/function/comparisons.cpp
+    src/evaluator/function/predicates.cpp
     src/evaluator/function/logical.cpp
     src/evaluator/user_defined/user_defined.cpp
     src/evaluator/user_defined/func.cpp

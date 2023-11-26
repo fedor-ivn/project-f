@@ -56,6 +56,28 @@ Evaluator::Evaluator() : global(this->garbage_collector.create_scope(nullptr)) {
     );
 
     this->global->define(
+        ast::Symbol("isint", nowhere), std::make_shared<IsIntFunction>()
+    );
+    this->global->define(
+        ast::Symbol("isreal", nowhere), std::make_shared<IsRealFunction>()
+    );
+    this->global->define(
+        ast::Symbol("isbool", nowhere), std::make_shared<IsBoolFunction>()
+    );
+    this->global->define(
+        ast::Symbol("isnull", nowhere), std::make_shared<IsNullFunction>()
+    );
+    this->global->define(
+        ast::Symbol("isatom", nowhere), std::make_shared<IsAtomFunction>()
+    );
+    this->global->define(
+        ast::Symbol("islist", nowhere), std::make_shared<IsListFunction>()
+    );
+    this->global->define(
+        ast::Symbol("isfunc", nowhere), std::make_shared<IsFuncFunction>()
+    );
+
+    this->global->define(
         ast::Symbol("and", nowhere), std::make_shared<AndFunction>()
     );
     this->global->define(
