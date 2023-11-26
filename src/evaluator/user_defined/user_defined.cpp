@@ -31,8 +31,7 @@ ElementGuard UserDefinedFunction::call(CallFrame frame) const {
         throw EvaluationError(message, frame.call_site);
     }
 
-    auto scope =
-        frame.context.garbage_collector->create_scope(frame.context.scope);
+    auto scope = frame.context.garbage_collector->create_scope(this->scope);
 
     for (size_t parameter_index = 0;
          parameter_index < this->parameters.parameters.size();
