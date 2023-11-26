@@ -146,12 +146,7 @@ ElementGuard DivideFunction::call(CallFrame frame) const {
                 }
                 return a / b;
             },
-            [&frame](double a, double b) {
-                if (b == 0) {
-                    throw EvaluationError("division by zero", frame.call_site);
-                }
-                return a / b;
-            }
+            [](double a, double b) { return a / b; }
         )) {
         return frame.context.garbage_collector->temporary(element);
     }
