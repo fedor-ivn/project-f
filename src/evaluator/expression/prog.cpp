@@ -53,8 +53,6 @@ ElementGuard Prog::evaluate(EvaluationContext context) const {
         );
     } catch (BreakControlFlow& e) {
         return std::move(e.element);
-    } catch (ReturnControlFlow& e) {
-        return std::move(e.element);
     }
 };
 
