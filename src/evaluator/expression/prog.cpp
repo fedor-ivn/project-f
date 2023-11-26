@@ -54,6 +54,8 @@ std::shared_ptr<Element> Prog::evaluate(std::shared_ptr<Scope> parent_scope
             result = expression->evaluate(local_scope);
         } catch (BreakControlFlow e) {
             return e.element;
+        } catch (ReturnControlFlow e) {
+            return e.element;
         }
     }
 

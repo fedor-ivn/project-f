@@ -1,3 +1,4 @@
+#include "../control_flow.h"
 #include "../error.h"
 #include "../function.h"
 
@@ -41,7 +42,11 @@ std::shared_ptr<Element> UserDefinedFunction::call(CallFrame frame) const {
         );
     }
 
-    return this->body->evaluate(scope);
+    try {
+        return this->body->evaluate(scope);
+    } catch (ReturnControlFlow e) {
+        return e.element;
+    }
 }
 
 void UserDefinedFunction::display_parameters(std::ostream& stream) const {
