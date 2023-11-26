@@ -1,7 +1,7 @@
 (func equalList (a b)
     (cond (isnull a) (return (isnull b)))
     (cond (isnull b) (return false))
-    (cond (nonequal (isnull (head a)) (isnull (head b))) 
+    (cond (nonequal (isnull (head a)) (isnull (head b)))
           (return false))
     (equalList (tail a) (tail b)))
 

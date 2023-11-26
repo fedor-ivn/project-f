@@ -1,6 +1,5 @@
 #include "../error.h"
 #include "../function.h"
-#include <memory>
 
 namespace evaluator {
 
