@@ -3,6 +3,8 @@
 
 #include "expression.h"
 
+namespace evaluator {
+
 using ast::Element;
 
 class BreakControlFlow {
@@ -18,3 +20,5 @@ class ReturnControlFlow {
 
     ReturnControlFlow(std::shared_ptr<Element> element);
 };
+
+} // namespace evaluator
