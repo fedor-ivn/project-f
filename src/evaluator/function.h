@@ -231,6 +231,75 @@ class GreatereqFunction : public BuiltInFunction {
     virtual void display_parameters(std::ostream& stream) const;
 };
 
+class IsIntFunction : public BuiltInFunction {
+  public:
+    using BuiltInFunction::BuiltInFunction;
+    virtual ElementGuard call(CallFrame frame) const;
+
+    virtual std::string_view name() const;
+    virtual void display_parameters(std::ostream& stream) const;
+};
+
+class IsRealFunction : public BuiltInFunction {
+  public:
+    using BuiltInFunction::BuiltInFunction;
+    virtual ElementGuard call(CallFrame frame) const;
+
+  protected:
+    virtual std::string_view name() const;
+    virtual void display_parameters(std::ostream& stream) const;
+};
+
+class IsBoolFunction : public BuiltInFunction {
+  public:
+    using BuiltInFunction::BuiltInFunction;
+    virtual ElementGuard call(CallFrame frame) const;
+
+  protected:
+    virtual std::string_view name() const;
+    virtual void display_parameters(std::ostream& stream) const;
+};
+
+class IsNullFunction : public BuiltInFunction {
+  public:
+    using BuiltInFunction::BuiltInFunction;
+    virtual ElementGuard call(CallFrame frame) const;
+
+  protected:
+    virtual std::string_view name() const;
+    virtual void display_parameters(std::ostream& stream) const;
+};
+
+class IsAtomFunction : public BuiltInFunction {
+  public:
+    using BuiltInFunction::BuiltInFunction;
+    virtual ElementGuard call(CallFrame frame) const;
+
+  protected:
+    virtual std::string_view name() const;
+    virtual void display_parameters(std::ostream& stream) const;
+};
+
+class IsListFunction : public BuiltInFunction {
+  public:
+    using BuiltInFunction::BuiltInFunction;
+    virtual ElementGuard call(CallFrame frame) const;
+
+  protected:
+    virtual std::string_view name() const;
+    virtual void display_parameters(std::ostream& stream) const;
+};
+
+class IsFuncFunction : public BuiltInFunction {
+  public:
+    using BuiltInFunction::BuiltInFunction;
+    virtual ElementGuard call(CallFrame frame) const;
+
+  protected:
+    virtual std::string_view name() const;
+    virtual void display_parameters(std::ostream& stream) const;
+};
+
 class AndFunction : public BuiltInFunction {
   public:
     using BuiltInFunction::BuiltInFunction;
