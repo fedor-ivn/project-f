@@ -32,13 +32,6 @@ std::shared_ptr<Element> UserDefinedFunction::call(CallFrame frame) const {
     return this->body->evaluate(scope);
 }
 
-void UserDefinedFunction::_display_verbose(std::ostream& stream, size_t) const {
-    stream << "UserDefinedFunction(" << this->_name << ", " << this->span
-           << ")";
-}
-
-std::string_view UserDefinedFunction::name() const { return this->_name; }
-
 void UserDefinedFunction::display_parameters(std::ostream& stream) const {
     if (this->parameters.parameters.empty()) {
         return;
