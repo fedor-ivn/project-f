@@ -1,5 +1,3 @@
-#include <vector>
-
 #include "../ast/element.h"
 #include "expression.h"
 #include "scope.h"
@@ -29,6 +27,60 @@ class Function : public ast::Element {
     virtual std::string_view name() const = 0;
     virtual void display_parameters(std::ostream& stream) const = 0;
     void _display_pretty(std::ostream& stream) const;
+};
+
+class UserDefinedFunction : public Function {
+  public:
+    UserDefinedFunction(
+        ast::Span span,
+        Parameters parameters,
+        std::shared_ptr<Body> body,
+        std::shared_ptr<Scope> scope
+    );
+
+    virtual ElementGuard call(CallFrame frame) const;
+
+  protected:
+    virtual void display_parameters(std::ostream& stream) const;
+    virtual void _display_verbose(std::ostream& stream, size_t depth) const = 0;
+
+  private:
+    Parameters parameters;
+    std::shared_ptr<Body> body;
+
+    std::shared_ptr<Scope> scope;
+};
+
+class FuncFunction : public UserDefinedFunction {
+  public:
+    FuncFunction(
+        ast::Span span,
+        std::string name,
+        Parameters parameters,
+        std::shared_ptr<Body> body,
+        std::shared_ptr<Scope> scope
+    );
+
+  protected:
+    virtual void _display_verbose(std::ostream& stream, size_t depth) const;
+    virtual std::string_view name() const;
+
+  private:
+    std::string _name;
+};
+
+class LambdaFunction : public UserDefinedFunction {
+  public:
+    LambdaFunction(
+        ast::Span span,
+        Parameters parameters,
+        std::shared_ptr<Body> body,
+        std::shared_ptr<Scope> scope
+    );
+
+  protected:
+    virtual void _display_verbose(std::ostream& stream, size_t depth) const;
+    virtual std::string_view name() const;
 };
 
 class BuiltInFunction : public Function {

@@ -12,4 +12,11 @@ class BreakControlFlow {
     BreakControlFlow(ElementGuard element);
 };
 
+class ReturnControlFlow {
+  public:
+    ElementGuard element;
+
+    ReturnControlFlow(ElementGuard element);
+};
+
 } // namespace evaluator

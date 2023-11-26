@@ -33,6 +33,9 @@ add_library(internals
     src/evaluator/function/evaluation.cpp
     src/evaluator/function/comparisons.cpp
     src/evaluator/function/logical.cpp
+    src/evaluator/user_defined/user_defined.cpp
+    src/evaluator/user_defined/func.cpp
+    src/evaluator/user_defined/lambda.cpp
     src/evaluator/scope.cpp
     src/reader/scanner.cpp
     src/reader/token.cpp

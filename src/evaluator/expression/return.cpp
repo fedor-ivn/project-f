@@ -1,4 +1,5 @@
 #include "../../utils.h"
+#include "../control_flow.h"
 #include "../error.h"
 #include "../expression.h"
 
@@ -36,8 +37,9 @@ Return::parse(Span span, std::shared_ptr<List> arguments) {
     return std::make_unique<Return>(Return(span, std::move(expression)));
 }
 
-ElementGuard Return::evaluate(EvaluationContext) const {
-    throw std::runtime_error("Not implemented");
+ElementGuard Return::evaluate(EvaluationContext context) const {
+    auto element = this->expression->evaluate(context);
+    throw ReturnControlFlow(std::move(element));
 }
 
 void Return::display(std::ostream& stream, size_t depth) const {

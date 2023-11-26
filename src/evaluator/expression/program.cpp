@@ -1,4 +1,5 @@
 #include "../../utils.h"
+#include "../control_flow.h"
 #include "../expression.h"
 #include <memory>
 
@@ -21,7 +22,11 @@ Program Program::parse(std::vector<std::shared_ptr<Element>> ast) {
 }
 
 ElementGuard Program::evaluate(EvaluationContext context) const {
-    return this->program.evaluate(context);
+    try {
+        return this->program.evaluate(context);
+    } catch (ReturnControlFlow& e) {
+        return std::move(e.element);
+    }
 }
 
 std::ostream& operator<<(std::ostream& stream, Program const& self) {

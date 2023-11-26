@@ -242,14 +242,14 @@ class Call : public Expression {
 class Func : public Expression {
     std::shared_ptr<ast::Symbol> name;
     Parameters parameters;
-    Body body;
+    std::shared_ptr<Body> body;
 
   public:
     Func(
         ast::Span span,
         std::shared_ptr<ast::Symbol> name,
         Parameters parameters,
-        Body body
+        std::shared_ptr<Body> body
     );
 
     static std::unique_ptr<Func>
@@ -268,10 +268,10 @@ class Func : public Expression {
 
 class Lambda : public Expression {
     Parameters parameters;
-    Body body;
+    std::shared_ptr<Body> body;
 
   public:
-    Lambda(ast::Span span, Parameters parameters, Body body);
+    Lambda(ast::Span span, Parameters parameters, std::shared_ptr<Body> body);
 
     static std::unique_ptr<Lambda>
     parse(ast::Span span, std::shared_ptr<ast::List> arguments);
