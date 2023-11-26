@@ -41,7 +41,6 @@ class UserDefinedFunction : public Function {
     virtual std::shared_ptr<ast::Element> call(CallFrame frame) const;
 
   protected:
-    virtual std::string_view name() const = 0;
     virtual void display_parameters(std::ostream& stream) const;
     virtual void _display_verbose(std::ostream& stream, size_t depth) const = 0;
 
@@ -62,10 +61,11 @@ class FuncFunction : public UserDefinedFunction {
         std::shared_ptr<Scope> scope
     );
 
-  private:
+  protected:
     virtual void _display_verbose(std::ostream& stream, size_t depth) const;
     virtual std::string_view name() const;
 
+  private:
     std::string _name;
 };
 
@@ -78,7 +78,7 @@ class LambdaFunction : public UserDefinedFunction {
         std::shared_ptr<Scope> scope
     );
 
-  private:
+  protected:
     virtual void _display_verbose(std::ostream& stream, size_t depth) const;
     virtual std::string_view name() const;
 };
