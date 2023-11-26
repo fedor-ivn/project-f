@@ -5,8 +5,6 @@
 
 namespace evaluator {
 
-using ast::Element;
-
 class BreakControlFlow {
   public:
     ElementGuard element;
