@@ -15,7 +15,19 @@ UserDefinedFunction::UserDefinedFunction(
 
 std::shared_ptr<Element> UserDefinedFunction::call(CallFrame frame) const {
     if (this->parameters.parameters.size() != frame.arguments.size()) {
-        throw EvaluationError("TODO", frame.call_site);
+        std::string message;
+
+        if (this->name() != "") {
+            message = "Function `" + std::string(this->name()) + "` ";
+        } else {
+            message = "This lambda ";
+        }
+
+        message += "expects " +
+                   std::to_string(this->parameters.parameters.size()) +
+                   " arguments, got " + std::to_string(frame.arguments.size());
+
+        throw EvaluationError(message, frame.call_site);
     }
 
     auto scope = std::make_shared<Scope>(this->scope);
