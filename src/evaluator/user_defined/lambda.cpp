@@ -8,7 +8,7 @@ LambdaFunction::LambdaFunction(
     ast::Span span,
     Parameters parameters,
     std::shared_ptr<Body> body,
-    std::shared_ptr<Scope> scope
+    std::weak_ptr<Scope> scope
 )
     : UserDefinedFunction(span, parameters, body, scope) {}
 
