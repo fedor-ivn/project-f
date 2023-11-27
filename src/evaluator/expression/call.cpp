@@ -37,7 +37,7 @@ std::unique_ptr<Call> Call::parse(std::shared_ptr<Cons> form) {
     }
 
     return std::make_unique<Call>(
-        Call(form->span, std::move(function), std::move(arguments))
+        form->span, std::move(function), std::move(arguments)
     );
 }
 

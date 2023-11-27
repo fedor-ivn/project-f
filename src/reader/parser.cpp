@@ -32,59 +32,51 @@ std::unique_ptr<ast::List> Parser::parse_list() {
     auto& token = this->peek_token();
     if (token->is_right_parenthesis()) {
         auto token = this->next_token();
-        return std::make_unique<ast::Null>(ast::Null(token->span));
+        return std::make_unique<ast::Null>(token->span);
     }
 
     auto start = token->span.start;
     auto head = this->parse_element();
     auto tail = this->parse_list();
     Span span(start, tail->span.end);
-    return std::make_unique<ast::Cons>(
-        ast::Cons(std::move(head), std::move(tail), span)
-    );
+    return std::make_unique<ast::Cons>(std::move(head), std::move(tail), span);
 }
 
 std::unique_ptr<ast::Element> Parser::parse_element() {
     auto const token = this->next_token();
 
     if (token->is_null()) {
-        return std::make_unique<ast::Null>(ast::Null(token->span));
+        return std::make_unique<ast::Null>(token->span);
     }
     if (auto boolean = token->to_boolean()) {
-        return std::make_unique<ast::Boolean>(
-            ast::Boolean(boolean.value(), token->span)
-        );
+        return std::make_unique<ast::Boolean>(boolean.value(), token->span);
     }
     if (auto integer = token->to_integer()) {
-        return std::make_unique<ast::Integer>(
-            ast::Integer(integer.value(), token->span)
-        );
+        return std::make_unique<ast::Integer>(integer.value(), token->span);
     }
     if (auto real = token->to_real()) {
-        return std::make_unique<ast::Real>(ast::Real(real.value(), token->span)
-        );
+        return std::make_unique<ast::Real>(real.value(), token->span);
     }
     if (auto symbol = token->to_symbol()) {
         return std::make_unique<ast::Symbol>(
-            ast::Symbol(std::string(symbol.value()), token->span)
+            std::string(symbol.value()), token->span
         );
     }
 
     if (token->is_apostrophe()) {
-        auto quote =
-            std::make_unique<ast::Symbol>(ast::Symbol("quote", token->span));
+        auto quote = std::make_unique<ast::Symbol>("quote", token->span);
         auto element = this->parse_element();
         auto end = element->span.end;
         auto element_span = element->span;
-        auto tail = std::make_unique<ast::Cons>(ast::Cons(
+        auto tail = std::make_unique<ast::Cons>(
             std::move(element),
-            std::make_shared<ast::Null>(ast::Null(Span(end, end))),
+            std::make_shared<ast::Null>(Span(end, end)),
             element_span
-        ));
+        );
         Span span(token->span.start, tail->span.end);
 
         return std::make_unique<ast::Cons>(
-            ast::Cons(std::move(quote), std::move(tail), span)
+            std::move(quote), std::move(tail), span
         );
     }
 

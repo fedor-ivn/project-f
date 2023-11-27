@@ -56,13 +56,12 @@ std::unique_ptr<Cond> Cond::parse(Span span, std::shared_ptr<List> arguments) {
             throw EvaluationError("`cond` has extra arguments", cons->span);
         }
     } else {
-        otherwise =
-            Expression::parse(std::make_shared<Null>(Null(arguments->span)));
+        otherwise = Expression::parse(std::make_shared<Null>(arguments->span));
     }
 
-    auto cond =
-        Cond(span, std::move(condition), std::move(then), std::move(otherwise));
-    return std::make_unique<Cond>(std::move(cond));
+    return std::make_unique<Cond>(
+        span, std::move(condition), std::move(then), std::move(otherwise)
+    );
 }
 
 ElementGuard Cond::evaluate(EvaluationContext context) const {

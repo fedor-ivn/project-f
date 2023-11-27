@@ -60,14 +60,14 @@ std::unique_ptr<Token> Scanner::parse_symbol() {
     auto span = this->advance(end);
 
     if (symbol == "true") {
-        return std::make_unique<Boolean>(Boolean(true, span));
+        return std::make_unique<Boolean>(true, span);
     } else if (symbol == "false") {
-        return std::make_unique<Boolean>(Boolean(false, span));
+        return std::make_unique<Boolean>(false, span);
     } else if (symbol == "null") {
-        return std::make_unique<Null>(Null(span));
+        return std::make_unique<Null>(span);
     }
 
-    return std::make_unique<Symbol>(Symbol(symbol, span));
+    return std::make_unique<Symbol>(symbol, span);
 }
 
 std::unique_ptr<Token> Scanner::parse_numeral() {
@@ -101,7 +101,7 @@ std::unique_ptr<Token> Scanner::parse_numeral() {
 
         double real = std::stod(std::string(source.substr(0, end)));
         auto span = this->advance(end);
-        return std::make_unique<Real>(Real(real, span));
+        return std::make_unique<Real>(real, span);
     }
 
     if (this->can_peek(end) && !is_delimiter(this->source[end])) {
@@ -112,7 +112,7 @@ std::unique_ptr<Token> Scanner::parse_numeral() {
     auto span = this->advance(end);
     try {
         int64_t integer = std::stoll(std::string(literal));
-        return std::make_unique<Integer>(Integer(integer, span));
+        return std::make_unique<Integer>(integer, span);
     } catch (std::out_of_range const&) {
         throw SyntaxError(ErrorCause::IntegerOverflow, span, false);
     }
@@ -134,16 +134,15 @@ std::unique_ptr<Token> Scanner::next_token() {
             switch (character) {
             case '(': {
                 auto span = this->advance();
-                return std::make_unique<LeftParenthesis>(LeftParenthesis(span));
+                return std::make_unique<LeftParenthesis>(span);
             }
             case ')': {
                 auto span = this->advance();
-                return std::make_unique<RightParenthesis>(RightParenthesis(span)
-                );
+                return std::make_unique<RightParenthesis>(span);
             }
             case '\'': {
                 auto span = this->advance();
-                return std::make_unique<Apostrophe>(Apostrophe(span));
+                return std::make_unique<Apostrophe>(span);
             }
             case ';':
                 while (this->peek() != '\n') {
@@ -172,9 +171,7 @@ std::unique_ptr<Token> Scanner::next_token() {
     } catch (ReachedEndOfFile) {
     }
 
-    return std::make_unique<EndOfFile>(
-        EndOfFile(Span(this->position, this->position))
-    );
+    return std::make_unique<EndOfFile>(Span(this->position, this->position));
 }
 
 } // namespace reader

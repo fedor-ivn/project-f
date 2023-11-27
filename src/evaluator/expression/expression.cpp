@@ -62,10 +62,10 @@ std::unique_ptr<Expression> Expression::parse(std::shared_ptr<Element> element
     }
 
     if (auto symbol = std::dynamic_pointer_cast<ast::Symbol>(element)) {
-        return std::make_unique<Symbol>(Symbol(std::move(symbol)));
+        return std::make_unique<Symbol>(std::move(symbol));
     }
 
-    return std::make_unique<Quote>(Quote(element->span, element));
+    return std::make_unique<Quote>(element->span, element);
 }
 
 bool Expression::diverges() const { return this->returns() || this->breaks(); }

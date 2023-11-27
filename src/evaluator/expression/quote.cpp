@@ -28,7 +28,7 @@ Quote::parse(Span span, std::shared_ptr<List> arguments) {
         throw EvaluationError("`quote` has extra arguments", cons->span);
     }
 
-    return std::make_unique<Quote>(Quote(span, element));
+    return std::make_unique<Quote>(span, element);
 }
 
 ElementGuard Quote::evaluate(EvaluationContext context) const {

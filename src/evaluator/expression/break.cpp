@@ -5,7 +5,6 @@
 
 namespace evaluator {
 
-using ast::Element;
 using ast::List;
 using ast::Null;
 using ast::Span;
@@ -19,11 +18,11 @@ std::unique_ptr<Break>
 Break::parse(Span span, std::shared_ptr<List> arguments) {
     auto cons = to_cons(arguments);
     if (!cons) {
-        auto null = Quote(
-            arguments->span, std::make_shared<Null>(Null(arguments->span))
-        );
         return std::make_unique<Break>(
-            Break(span, std::make_unique<Quote>(null))
+            span,
+            std::make_unique<Quote>(
+                arguments->span, std::make_shared<Null>(arguments->span)
+            )
         );
     }
 
@@ -34,7 +33,7 @@ Break::parse(Span span, std::shared_ptr<List> arguments) {
         throw EvaluationError("`break` has extra arguments", cons->span);
     }
 
-    return std::make_unique<Break>(Break(span, std::move(expression)));
+    return std::make_unique<Break>(span, std::move(expression));
 }
 
 ElementGuard Break::evaluate(EvaluationContext context) const {
