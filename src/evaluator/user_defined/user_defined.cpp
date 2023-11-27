@@ -4,13 +4,11 @@
 
 namespace evaluator {
 
-using ast::Element;
-
 UserDefinedFunction::UserDefinedFunction(
     ast::Span span,
     Parameters parameters,
     std::shared_ptr<Body> body,
-    std::shared_ptr<Scope> scope
+    std::weak_ptr<Scope> scope
 )
     : Function(span), parameters(parameters), body(body), scope(scope) {}
 
@@ -31,7 +29,14 @@ ElementGuard UserDefinedFunction::call(CallFrame frame) const {
         throw EvaluationError(message, frame.call_site);
     }
 
-    auto scope = frame.context.garbage_collector->create_scope(this->scope);
+    auto parent_scope = this->scope.lock();
+    if (!parent_scope) {
+        throw std::logic_error(
+            "Failed to call a user-defined function because the garbage "
+            "collector dropped its parent scope too early. This is a bug."
+        );
+    }
+    auto scope = frame.context.garbage_collector->create_scope(parent_scope);
 
     for (size_t parameter_index = 0;
          parameter_index < this->parameters.parameters.size();

@@ -2,6 +2,7 @@
 #include <string>
 
 #include "error.h"
+#include "function.h"
 #include "scope.h"
 
 namespace evaluator {
@@ -49,22 +50,89 @@ std::shared_ptr<ast::Element> Scope::lookup(ast::Symbol const& symbol) {
 GarbageCollector::GarbageCollector() {}
 
 ScopeGuard GarbageCollector::create_scope(std::shared_ptr<Scope> parent) {
-    // For `std::make_shared`, `Scope`'s constructor is private 🤡, so keep
-    // using the copy constructor here.
-    auto scope = std::make_shared<Scope>(Scope(parent));
+    // For `std::make_shared`, `Scope`'s constructor is private 🤡, so
+    // construct `shared_ptr` directly.
+    std::shared_ptr<Scope> scope(new Scope(parent));
     this->alive_scopes.insert(scope);
     return ScopeGuard(this, scope);
 }
 
 ElementGuard GarbageCollector::temporary(std::shared_ptr<ast::Element> value) {
-    this->temporaries.insert(value);
+    if (auto function = std::dynamic_pointer_cast<UserDefinedFunction>(value)) {
+        this->temporary_functions.insert(function);
+    }
     return ElementGuard(this, value);
 }
 
+class ScopeVisitor {
+  public:
+    std::unordered_set<std::shared_ptr<Scope>> visited_scopes;
+    std::unordered_set<std::shared_ptr<Scope>>* dead_scopes;
+    std::unordered_set<std::shared_ptr<Scope>> next_dead_scopes;
+
+    ScopeVisitor(std::unordered_set<std::shared_ptr<Scope>>* dead_scopes)
+        : dead_scopes(dead_scopes) {}
+
+    bool can_short_circuit() {
+        return this->dead_scopes->size() == this->next_dead_scopes.size();
+    }
+
+    bool visit_scope(std::shared_ptr<Scope> scope) {
+        if (this->visited_scopes.contains(scope)) {
+            return false;
+        }
+
+        this->visited_scopes.insert(scope);
+
+        if (this->dead_scopes->contains(scope)) {
+            this->next_dead_scopes.insert(scope);
+        }
+
+        for (auto v : scope->variables) {
+            if (auto function =
+                    std::dynamic_pointer_cast<UserDefinedFunction>(v.second)) {
+                if (this->visit_function(function)) {
+                    return true;
+                }
+            }
+        }
+
+        if (scope->parent != nullptr) {
+            return this->visit_scope(scope->parent);
+        }
+
+        return this->can_short_circuit();
+    }
+
+    bool visit_function(std::shared_ptr<UserDefinedFunction> function) {
+        auto parent_scope = function->scope.lock();
+        if (!parent_scope) {
+            throw std::logic_error("Detected an early-collected parent scope "
+                                   "of a function. This is a bug.");
+        }
+
+        return this->visit_scope(parent_scope);
+    }
+};
+
 void GarbageCollector::collect() {
-    // todo: must keep scopes which are held by functions still reachable
-    // via alive scopes and temporaries
-    this->dead_scopes.clear();
+    if (this->dead_scopes.empty()) {
+        return;
+    }
+
+    ScopeVisitor visitor(&this->dead_scopes);
+    for (auto& function : this->temporary_functions) {
+        if (visitor.visit_function(function)) {
+            return;
+        }
+    }
+    for (auto& scope : this->alive_scopes) {
+        if (visitor.visit_scope(scope)) {
+            return;
+        }
+    }
+
+    this->dead_scopes = std::move(visitor.next_dead_scopes);
 }
 
 ScopeGuard::ScopeGuard(GarbageCollector* gc, std::shared_ptr<Scope> scope)
@@ -92,7 +160,10 @@ ElementGuard::~ElementGuard() {
         return;
     }
 
-    this->garbage_collector->temporaries.erase(this->element);
+    if (auto function =
+            std::dynamic_pointer_cast<UserDefinedFunction>(this->element)) {
+        this->garbage_collector->temporary_functions.erase(function);
+    }
     if (this->collect_garbage) {
         this->garbage_collector->collect();
     }

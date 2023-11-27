@@ -9,6 +9,8 @@
 
 namespace evaluator {
 
+class UserDefinedFunction;
+
 class Scope {
     std::unordered_map<std::string, std::shared_ptr<ast::Element>> variables;
     std::shared_ptr<Scope> parent;
@@ -26,6 +28,7 @@ class Scope {
     std::shared_ptr<ast::Element> lookup(ast::Symbol const& symbol);
 
     friend class GarbageCollector;
+    friend class ScopeVisitor;
 };
 
 class ScopeGuard;
@@ -34,7 +37,8 @@ class ElementGuard;
 class GarbageCollector {
     std::unordered_set<std::shared_ptr<Scope>> alive_scopes;
     std::unordered_set<std::shared_ptr<Scope>> dead_scopes;
-    std::unordered_set<std::shared_ptr<ast::Element>> temporaries;
+    std::unordered_set<std::shared_ptr<UserDefinedFunction>>
+        temporary_functions;
 
   public:
     GarbageCollector();

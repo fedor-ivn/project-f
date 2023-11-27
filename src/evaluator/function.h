@@ -30,25 +30,25 @@ class Function : public ast::Element {
 };
 
 class UserDefinedFunction : public Function {
+    Parameters parameters;
+    std::shared_ptr<Body> body;
+    std::weak_ptr<Scope> scope;
+
   public:
     UserDefinedFunction(
         ast::Span span,
         Parameters parameters,
         std::shared_ptr<Body> body,
-        std::shared_ptr<Scope> scope
+        std::weak_ptr<Scope> scope
     );
 
     virtual ElementGuard call(CallFrame frame) const;
 
+    friend class ScopeVisitor;
+
   protected:
     virtual void display_parameters(std::ostream& stream) const;
     virtual void _display_verbose(std::ostream& stream, size_t depth) const = 0;
-
-  private:
-    Parameters parameters;
-    std::shared_ptr<Body> body;
-
-    std::shared_ptr<Scope> scope;
 };
 
 class FuncFunction : public UserDefinedFunction {
@@ -58,7 +58,7 @@ class FuncFunction : public UserDefinedFunction {
         std::string name,
         Parameters parameters,
         std::shared_ptr<Body> body,
-        std::shared_ptr<Scope> scope
+        std::weak_ptr<Scope> scope
     );
 
   protected:
@@ -75,7 +75,7 @@ class LambdaFunction : public UserDefinedFunction {
         ast::Span span,
         Parameters parameters,
         std::shared_ptr<Body> body,
-        std::shared_ptr<Scope> scope
+        std::weak_ptr<Scope> scope
     );
 
   protected:
