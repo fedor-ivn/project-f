@@ -36,9 +36,7 @@ While::parse(Span span, std::shared_ptr<List> arguments) {
     auto body = Body::parse(cons->right);
     body.validate_no_break_with_value();
 
-    return std::make_unique<While>(
-        While(span, std::move(condition), std::move(body))
-    );
+    return std::make_unique<While>(span, std::move(condition), std::move(body));
 }
 
 ElementGuard While::evaluate(EvaluationContext context) const {
@@ -62,7 +60,7 @@ ElementGuard While::evaluate(EvaluationContext context) const {
     }
 
     return context.garbage_collector->temporary(
-        std::make_shared<Null>(Null(this->span))
+        std::make_shared<Null>(this->span)
     );
 }
 

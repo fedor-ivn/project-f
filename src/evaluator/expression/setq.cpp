@@ -45,7 +45,7 @@ std::unique_ptr<Setq> Setq::parse(Span span, std::shared_ptr<List> arguments) {
         throw EvaluationError("`setq` has extra arguments", cons->span);
     }
 
-    return std::make_unique<Setq>(Setq(span, symbol, std::move(expression)));
+    return std::make_unique<Setq>(span, symbol, std::move(expression));
 }
 
 ElementGuard Setq::evaluate(EvaluationContext context) const {

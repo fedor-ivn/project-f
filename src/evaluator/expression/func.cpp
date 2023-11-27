@@ -55,12 +55,12 @@ std::unique_ptr<Func> Func::parse(Span span, std::shared_ptr<List> arguments) {
     auto body = Body::parse(cons->right);
     body.validate_no_free_break();
 
-    return std::make_unique<Func>(Func(
+    return std::make_unique<Func>(
         span,
         name,
         std::move(parameters),
         std::make_shared<Body>(std::move(body))
-    ));
+    );
 }
 
 ElementGuard Func::evaluate(EvaluationContext context) const {

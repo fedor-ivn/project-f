@@ -82,7 +82,7 @@ ElementGuard ConsFunction::call(CallFrame frame) const {
     }
 
     return frame.context.garbage_collector->temporary(
-        std::make_unique<Cons>(left, right, frame.call_site)
+        std::make_shared<Cons>(left, right, frame.call_site)
     );
 }
 

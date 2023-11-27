@@ -5,7 +5,6 @@
 
 namespace evaluator {
 
-using ast::Element;
 using ast::List;
 using ast::Null;
 using ast::Span;
@@ -19,11 +18,11 @@ std::unique_ptr<Return>
 Return::parse(Span span, std::shared_ptr<List> arguments) {
     auto cons = to_cons(arguments);
     if (!cons) {
-        auto null = Quote(
-            arguments->span, std::make_shared<Null>(Null(arguments->span))
-        );
         return std::make_unique<Return>(
-            Return(span, std::make_unique<Quote>(null))
+            span,
+            std::make_unique<Quote>(
+                arguments->span, std::make_shared<Null>(arguments->span)
+            )
         );
     }
 
@@ -34,7 +33,7 @@ Return::parse(Span span, std::shared_ptr<List> arguments) {
         throw EvaluationError("`return` has extra arguments", cons->span);
     }
 
-    return std::make_unique<Return>(Return(span, std::move(expression)));
+    return std::make_unique<Return>(span, std::move(expression));
 }
 
 ElementGuard Return::evaluate(EvaluationContext context) const {

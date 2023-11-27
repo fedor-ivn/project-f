@@ -36,9 +36,9 @@ Lambda::parse(Span span, std::shared_ptr<ast::List> arguments) {
     auto body = Body::parse(cons->right);
     body.validate_no_free_break();
 
-    return std::make_unique<Lambda>(Lambda(
+    return std::make_unique<Lambda>(
         span, std::move(parameters), std::make_shared<Body>(std::move(body))
-    ));
+    );
 }
 
 ElementGuard Lambda::evaluate(EvaluationContext context) const {

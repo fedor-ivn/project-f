@@ -33,9 +33,7 @@ std::unique_ptr<Prog> Prog::parse(Span span, std::shared_ptr<List> arguments) {
 
     auto body = Body::parse(cons->right);
 
-    return std::make_unique<Prog>(
-        Prog(span, std::move(variables), std::move(body))
-    );
+    return std::make_unique<Prog>(span, std::move(variables), std::move(body));
 }
 
 ElementGuard Prog::evaluate(EvaluationContext context) const {
@@ -43,7 +41,7 @@ ElementGuard Prog::evaluate(EvaluationContext context) const {
 
     for (auto parameter : this->variables.parameters) {
         local_scope->define(
-            *parameter, std::make_shared<ast::Null>(Null(parameter->span))
+            *parameter, std::make_shared<Null>(parameter->span)
         );
     }
 
